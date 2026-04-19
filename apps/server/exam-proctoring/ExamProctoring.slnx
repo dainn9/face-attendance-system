@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="services/auth-service/auth-service.csproj" Id="0c0a5154-22da-4b17-b46c-545dcd7f5ce6" />
+  <Project Path="services/user-service/user-service.csproj" Id="6399d14b-a970-4f67-a2cd-e84c52497d64" />
+</Solution>

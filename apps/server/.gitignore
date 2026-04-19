@@ -1,0 +1,88 @@
+## Build results
+bin/
+obj/
+[Bb]uild/
+[Bb]uild[Ll]og/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## VS Code & Visual Studio
+.vscode/
+.vs/
+.idea/
+
+## Auto-generated
+Generated\ Files/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Logs
+*.log
+logs/
+
+## Entity Framework
+#Migrations/
+
+## Secrets
+secrets.json
+*.secret.json
+appsettings.Development.json
+appsettings.Local.json
+
+## Resharper / Rider
+*.DotSettings.user
+.idea/
+
+## Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+## Database
+*.mdf
+*.ldf
+*.sqlite
+*.db
+
+## Others
+_ReSharper*/
+[Tt]humbs.db
+*.DS_Store
+*.bak
+*.tmp
+*.swp
+
+## Publish output
+publish/
+
+*.env
+!.env.example
+*.env.*
+
+## PEM Keys
+
+*.pem
+
+services/upload/uploads/*
+
+!.env.example
+
+docker-compose.yml
+
+!docker-compose.example.yml
+
+!Dockerfile.user
+
+data/uploads
