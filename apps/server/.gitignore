@@ -86,3 +86,8 @@ docker-compose.yml
 !Dockerfile.user
 
 data/uploads
+
+.vscode/settings.json
+.copilot-commit-message-instructions.md
+
+obj/auth-service.EntityFrameworkCore.targets
