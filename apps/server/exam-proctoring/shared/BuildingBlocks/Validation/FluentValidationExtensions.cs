@@ -1,3 +1,4 @@
+using BuildingBlocks.Validation.Helpers;
 using FluentValidation;
 
 namespace BuildingBlocks.Validation
@@ -8,7 +9,16 @@ namespace BuildingBlocks.Validation
         {
             return ruleBuilder
                 .NotEqual(Guid.Empty)
-                .WithMessage("Guid không được rỗng");
+                .WithMessage(ValidationMessages.InvalidGuid);
+        }
+
+        public static IRuleBuilderOptions<T, string> PasswordComplexity<T>(this IRuleBuilder<T, string> ruleBuilder)
+        {
+            return ruleBuilder
+                .MinimumLength(8)
+                .WithMessage(ValidationMessages.MinLength)
+                .Must(ValidationHelper.IsStrongPassword)
+                .WithMessage(ValidationMessages.PasswordComplexity);
         }
     }
 }

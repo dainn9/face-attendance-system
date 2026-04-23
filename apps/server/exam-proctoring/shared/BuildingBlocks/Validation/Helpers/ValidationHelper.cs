@@ -15,7 +15,5 @@ namespace BuildingBlocks.Validation.Helpers
         public static bool IsStrongPassword(string password) => PasswordRegex.IsMatch(password);
 
         public static bool IsValidOtp(string otp) => OtpRegex.IsMatch(otp);
-
-        public static bool IsValidMaxLength(string value, int maxLength) => value.Length <= maxLength;
     }
 }

@@ -2,12 +2,15 @@ using System.Security.Claims;
 using auth_service.API.Contracts;
 using auth_service.API.Extensions;
 using auth_service.Application.Contracts;
+using auth_service.Application.Features.Auth.Commands.ChangePassword;
 using auth_service.Application.Features.Auth.Commands.Login;
 using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
 using auth_service.Domain.Enum;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Extensions;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace auth_service.API.Controller
@@ -45,6 +48,7 @@ namespace auth_service.API.Controller
         }
 
         // POST: api/v1/auths/refresh
+        [Authorize]
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
@@ -58,6 +62,20 @@ namespace auth_service.API.Controller
             var result = await _mediator.Send(new RefreshTokenCommand(userId, refreshToken, sessionType));
             SetAuthCookies(result);
             return Ok(new { message = "Token refreshed" });
+        }
+
+        // =============================
+        // Password
+        // =============================
+        // POST: api/v1/auths/change-password
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var userId = User.GetUserId();
+            var command = new ChangePasswordCommand(userId, request.CurrentPassword, request.NewPassword, request.ConfirmPassword);
+            await _mediator.Send(command);
+            return Ok(new { message = "Password changed successfully" });
         }
 
         // =============================
