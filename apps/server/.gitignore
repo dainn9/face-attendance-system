@@ -91,3 +91,5 @@ data/uploads
 .copilot-commit-message-instructions.md
 
 obj/auth-service.EntityFrameworkCore.targets
+
+*.md
