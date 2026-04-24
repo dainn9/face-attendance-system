@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using auth_service.API.Contracts;
 using auth_service.API.Extensions;
 using auth_service.Application.Contracts;
@@ -6,7 +5,6 @@ using auth_service.Application.Features.Auth.Commands.ChangePassword;
 using auth_service.Application.Features.Auth.Commands.Login;
 using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
-using auth_service.Domain.Enum;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Extensions;
 using MediatR;
@@ -100,7 +98,5 @@ namespace auth_service.API.Controller
                 Path = "/"
             });
         }
-
-
     }
 }
