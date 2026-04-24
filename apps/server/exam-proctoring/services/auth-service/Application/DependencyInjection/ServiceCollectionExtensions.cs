@@ -1,3 +1,5 @@
+using auth_service.Application.Abstractions.Services;
+using auth_service.Application.Services;
 using BuildingBlocks.Behaviors;
 using FluentValidation;
 using MediatR;
@@ -9,6 +11,10 @@ namespace auth_service.Application.DependencyInjection
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             // Services
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ISessionService, SessionService>();
+
+            // MediatR
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly);

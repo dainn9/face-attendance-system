@@ -3,7 +3,7 @@ using MediatR;
 
 namespace auth_service.Application.Features.Auth.Commands.Logout
 {
-    public class LogoutHandler : IRequestHandler<LogoutCommand, Task>
+    public class LogoutHandler : IRequestHandler<LogoutCommand>
     {
         private readonly IRefreshTokenStore _refreshTokenStore;
 
@@ -12,10 +12,9 @@ namespace auth_service.Application.Features.Auth.Commands.Logout
             _refreshTokenStore = refreshTokenStore;
         }
 
-        public async Task<Task> Handle(LogoutCommand request, CancellationToken cancellationToken)
+        public async Task Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
             await _refreshTokenStore.RevokeRefreshTokenAsync(request.UserId, request.SessionType);
-            return Task.CompletedTask;
         }
     }
 }

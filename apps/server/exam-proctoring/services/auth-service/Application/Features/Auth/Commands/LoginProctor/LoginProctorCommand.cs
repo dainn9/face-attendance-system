@@ -1,0 +1,7 @@
+using auth_service.Application.Contracts;
+using MediatR;
+
+namespace auth_service.Application.Features.Auth.Commands.LoginProctor
+{
+    public record LoginProctorCommand(string Email, string Password) : IRequest<AuthResponse>;
+}
