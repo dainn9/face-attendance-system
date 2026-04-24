@@ -1,11 +1,12 @@
+
 using BuildingBlocks.Validation;
 using FluentValidation;
 
-namespace auth_service.Application.Features.Auth.Commands.Login
+namespace auth_service.Application.Features.Auth.Commands.LoginProctor
 {
-    public class LoginValidator : AbstractValidator<LoginCommand>
+    public class LoginProctorValidator : AbstractValidator<LoginProctorCommand>
     {
-        public LoginValidator()
+        public LoginProctorValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty()
