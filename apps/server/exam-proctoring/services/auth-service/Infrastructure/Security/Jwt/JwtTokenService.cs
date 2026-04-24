@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using auth_service.Application.Abstractions.Security;
 using auth_service.Domain.Aggregates.User;
+using auth_service.Domain.Enum;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -30,7 +31,7 @@ namespace auth_service.Infrastructure.Security.Jwt
             }
         }
 
-        public string GenerateAccessToken(User user)
+        public string GenerateAccessToken(User user, SessionType sessionType)
         {
             var creds = _keyProvider.GetSigningCredentials();
 
@@ -38,7 +39,8 @@ namespace auth_service.Infrastructure.Security.Jwt
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email.Value),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim("session_type", sessionType.ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

@@ -2,6 +2,7 @@ using auth_service.Application.Abstractions.Caching;
 using auth_service.Application.Abstractions.Persistence;
 using auth_service.Application.Abstractions.Security;
 using auth_service.Application.Contracts;
+using auth_service.Domain.Enum;
 using auth_service.Domain.ValueObjects;
 using BuildingBlocks.Exceptions;
 using MediatR;
@@ -48,10 +49,10 @@ namespace auth_service.Application.Features.Auth.Commands.Login
             var accessTokenExpiry = _tokenService.GetAccessTokenExpiry();
             var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiry();
 
-            var token = _tokenService.GenerateAccessToken(user);
+            var token = _tokenService.GenerateAccessToken(user, SessionType.Admin);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            await _refreshTokenStore.StoreRefreshTokenAsync(user.Id, refreshToken, refreshTokenExpiry);
+            await _refreshTokenStore.StoreRefreshTokenAsync(user.Id, SessionType.Admin, refreshToken, refreshTokenExpiry);
 
             return new AuthResponse(
                 AccessToken: token,
