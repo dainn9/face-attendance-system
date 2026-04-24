@@ -40,7 +40,7 @@ namespace auth_service.Infrastructure.Security.Jwt
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email.Value),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim("SessionType", sessionType.ToString())
+                new Claim("session_type", sessionType.ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

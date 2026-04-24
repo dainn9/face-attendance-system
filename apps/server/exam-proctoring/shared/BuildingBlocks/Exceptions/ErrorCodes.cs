@@ -6,6 +6,7 @@ namespace BuildingBlocks.Exceptions
         public const string NotFound = "NOT_FOUND";
         public const string EntityNotFound = "ENTITY_NOT_FOUND";
         public const string Unauthorized = "UNAUTHORIZED";
+        public const string InvalidSessionType = "INVALID_SESSION_TYPE";
         public const string InvalidRefreshToken = "INVALID_REFRESH_TOKEN";
         public const string ConfigurationError = "CONFIGURATION_ERROR";
 

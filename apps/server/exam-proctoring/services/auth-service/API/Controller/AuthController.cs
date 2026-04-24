@@ -1,8 +1,11 @@
+using System.Security.Claims;
 using auth_service.API.Contracts;
+using auth_service.API.Extensions;
 using auth_service.Application.Contracts;
 using auth_service.Application.Features.Auth.Commands.Login;
 using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
+using auth_service.Domain.Enum;
 using BuildingBlocks.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -31,8 +34,10 @@ namespace auth_service.API.Controller
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            var refreshToken = Request.Cookies["refresh"] ?? string.Empty;
-            await _mediator.Send(new LogoutCommand(refreshToken));
+            var sessionType = User.GetSessionType();
+            var userId = User.GetUserId();
+
+            await _mediator.Send(new LogoutCommand(userId, sessionType));
 
             Response.Cookies.Delete("access");
             Response.Cookies.Delete("refresh");
@@ -47,7 +52,10 @@ namespace auth_service.API.Controller
             if (string.IsNullOrEmpty(refreshToken))
                 throw new UnauthorizedException("Missing refresh token", ErrorCodes.InvalidRefreshToken);
 
-            var result = await _mediator.Send(new RefreshTokenCommand(refreshToken));
+            var sessionType = User.GetSessionType();
+            var userId = User.GetUserId();
+
+            var result = await _mediator.Send(new RefreshTokenCommand(userId, refreshToken, sessionType));
             SetAuthCookies(result);
             return Ok(new { message = "Token refreshed" });
         }
@@ -74,5 +82,7 @@ namespace auth_service.API.Controller
                 Path = "/"
             });
         }
+
+
     }
 }
