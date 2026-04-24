@@ -1,3 +1,4 @@
 .vscode/settings.json
 obj/auth-service.EntityFrameworkCore.targets
 .copilot-commit-message-instructions.md
+apps/server/README.md
