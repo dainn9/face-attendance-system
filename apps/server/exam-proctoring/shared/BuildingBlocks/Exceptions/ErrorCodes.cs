@@ -21,6 +21,7 @@ namespace BuildingBlocks.Exceptions
 
         // ======= PASSWORD =======
         public const string PasswordEmpty = "PASSWORD_EMPTY";
+        public const string PasswordIncorrect = "PASSWORD_INCORRECT";
 
         // ======= REFRESH TOKEN =======
         public const string RefreshTokenStoreFailed = "REFRESH_TOKEN_STORE_FAILED";
