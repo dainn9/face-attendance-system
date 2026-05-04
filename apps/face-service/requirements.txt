@@ -4,3 +4,5 @@ insightface
 opencv-python-headless
 numpy
 python-multipart
+pydantic-settings
+onnxruntime
