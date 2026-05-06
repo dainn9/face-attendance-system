@@ -15,7 +15,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace auth_service.API.Controller
+namespace auth_service.API.Controllers
 {
     [ApiController]
     [Route("api/v1/auths")]
@@ -32,7 +32,11 @@ namespace auth_service.API.Controller
             var command = new LoginAdminCommand(request.Email, request.Password);
             var result = await _mediator.Send(command);
             SetAuthCookies(result);
-            return Ok(new { message = "Login successful" });
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Login successful"
+            });
         }
 
         // POST: api/v1/auths/login-profile
@@ -42,7 +46,11 @@ namespace auth_service.API.Controller
             var command = new LoginProfileCommand(request.Email, request.Password);
             var result = await _mediator.Send(command);
             SetAuthCookies(result);
-            return Ok(new { message = "Login successful" });
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Login successful"
+            });
         }
 
         // POST: api/v1/auths/login-proctor
@@ -52,7 +60,11 @@ namespace auth_service.API.Controller
             var command = new LoginProctorCommand(request.Email, request.Password);
             var result = await _mediator.Send(command);
             SetAuthCookies(result);
-            return Ok(new { message = "Login successful" });
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Login successful"
+            });
         }
 
         // POST: api/v1/auths/logout
@@ -66,7 +78,11 @@ namespace auth_service.API.Controller
 
             Response.Cookies.Delete("access");
             Response.Cookies.Delete("refresh");
-            return Ok(new { message = "Logout successful" });
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Logout successful"
+            });
         }
 
         // POST: api/v1/auths/refresh
@@ -83,7 +99,11 @@ namespace auth_service.API.Controller
 
             var result = await _mediator.Send(new RefreshTokenCommand(userId, refreshToken, sessionType));
             SetAuthCookies(result);
-            return Ok(new { message = "Token refreshed" });
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Token refreshed"
+            });
         }
 
         // =============================
@@ -97,7 +117,11 @@ namespace auth_service.API.Controller
             var userId = User.GetUserId();
             var command = new ChangePasswordCommand(userId, request.CurrentPassword, request.NewPassword, request.ConfirmPassword);
             await _mediator.Send(command);
-            return Ok(new { message = "Password changed successfully" });
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Password changed successfully"
+            });
         }
 
         // =============================
@@ -114,7 +138,6 @@ namespace auth_service.API.Controller
             return Ok(new ApiResponse<MeResponse>
             {
                 Success = true,
-                TraceId = HttpContext.TraceIdentifier,
                 Data = result
             });
         }

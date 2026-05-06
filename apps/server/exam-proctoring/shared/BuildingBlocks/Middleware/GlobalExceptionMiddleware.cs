@@ -27,7 +27,7 @@ namespace BuildingBlocks.Middleware
             catch (ValidationException ex)
             {
                 if (context.Response.HasStarted) return;
-                await HanldeValidationExceptionAsync(context, ex);
+                await HandleValidationExceptionAsync(context, ex);
             }
             catch (BaseException ex)
             {
@@ -81,7 +81,7 @@ namespace BuildingBlocks.Middleware
             });
         }
 
-        private async Task HanldeValidationExceptionAsync(HttpContext context, ValidationException ex)
+        private async Task HandleValidationExceptionAsync(HttpContext context, ValidationException ex)
         {
             var traceId = context.TraceIdentifier;
 
