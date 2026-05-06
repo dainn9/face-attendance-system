@@ -3,6 +3,7 @@ namespace BuildingBlocks.Exceptions
     public class ErrorCodes
     {
         // ======= GENERAL =======
+        public const string Token_Expired = "TOKEN_EXPIRED";
         public const string NotFound = "NOT_FOUND";
         public const string EntityNotFound = "ENTITY_NOT_FOUND";
         public const string Unauthorized = "UNAUTHORIZED";

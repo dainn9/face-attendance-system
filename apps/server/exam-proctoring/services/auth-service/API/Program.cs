@@ -41,6 +41,19 @@ var privatePem = await File.ReadAllTextAsync(jwtOptions.PrivateKeyPath);
 using var rsa = RSA.Create();
 rsa.ImportFromPem(privatePem);
 
+// CORS Configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -66,6 +79,23 @@ builder.Services
                 if (context.Request.Cookies.TryGetValue("access", out var token) && !string.IsNullOrWhiteSpace(token))
                     context.Token = token;
                 return Task.CompletedTask;
+            },
+
+            OnAuthenticationFailed = context =>
+            {
+                if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    var result = System.Text.Json.JsonSerializer.Serialize(new
+                    {
+                        errorCode = ErrorCodes.Token_Expired,
+                        // message = "Your session has expired. Please log in again."
+                    });
+                    return context.Response.WriteAsync(result);
+                }
+
+                return Task.CompletedTask;
             }
         };
     });
@@ -73,6 +103,7 @@ builder.Services
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseCors("AllowFrontend");
 
 // =============================
 // Middleware
