@@ -7,8 +7,10 @@ using auth_service.Application.Features.Auth.Commands.LoginProctor;
 using auth_service.Application.Features.Auth.Commands.LoginProfile;
 using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
+using auth_service.Application.Features.Auth.Queries.GetMe;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Extensions;
+using BuildingBlocks.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -96,6 +98,25 @@ namespace auth_service.API.Controller
             var command = new ChangePasswordCommand(userId, request.CurrentPassword, request.NewPassword, request.ConfirmPassword);
             await _mediator.Send(command);
             return Ok(new { message = "Password changed successfully" });
+        }
+
+        // =============================
+        // Me
+        // =============================
+        // GET: api/v1/auths/me
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var userId = User.GetUserId();
+            var query = new GetMeQuery(userId);
+            var result = await _mediator.Send(query);
+            return Ok(new ApiResponse<MeResponse>
+            {
+                Success = true,
+                TraceId = HttpContext.TraceIdentifier,
+                Data = result
+            });
         }
 
         // =============================
