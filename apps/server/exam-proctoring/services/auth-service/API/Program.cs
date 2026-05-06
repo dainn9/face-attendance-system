@@ -5,10 +5,12 @@ using auth_service.Infrastructure.Persistence;
 using auth_service.Infrastructure.Security.Jwt;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Middleware;
+using BuildingBlocks.Results;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -91,16 +93,22 @@ builder.Services
             {
                 if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                 {
+                    var traceId = context.HttpContext.TraceIdentifier;
+
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     context.Response.ContentType = "application/json";
-                    var result = System.Text.Json.JsonSerializer.Serialize(new
+
+                    var response = new ApiResponse<object>
                     {
-                        errorCode = ErrorCodes.Token_Expired,
-                        // message = "Your session has expired. Please log in again."
-                    });
+                        Success = false,
+                        Message = "Your session has expired. Please log in again.",
+                        ErrorCode = ErrorCodes.Token_Expired,
+                        TraceId = traceId
+                    };
+
+                    var result = JsonSerializer.Serialize(response);
                     return context.Response.WriteAsync(result);
                 }
-
                 return Task.CompletedTask;
             }
         };
