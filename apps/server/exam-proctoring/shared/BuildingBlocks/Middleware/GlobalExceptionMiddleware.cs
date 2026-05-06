@@ -1,4 +1,5 @@
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Results;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -51,13 +52,13 @@ namespace BuildingBlocks.Middleware
 
             context.Response.StatusCode = ex.StatusCode;
 
-            await context.Response.WriteAsJsonAsync(new
+            await context.Response.WriteAsJsonAsync(new ApiResponse<object>
             {
-                success = false,
-                message = ex.Message,
-                details = ex.Details,
-                errorCode = ex.ErrorCode,
-                traceId
+                Success = false,
+                Message = ex.Message,
+                ErrorCode = ex.ErrorCode,
+                Errors = ex.Details,
+                TraceId = traceId
             });
         }
 
@@ -71,12 +72,12 @@ namespace BuildingBlocks.Middleware
 
             context.Response.StatusCode = 500;
 
-            await context.Response.WriteAsJsonAsync(new
+            await context.Response.WriteAsJsonAsync(new ApiResponse<object>
             {
-                success = false,
-                message = "Internal Server Error",
-                errorCode = "INTERNAL_ERROR",
-                traceId
+                Success = false,
+                Message = "Internal Server Error",
+                ErrorCode = "INTERNAL_ERROR",
+                TraceId = traceId
             });
         }
 
@@ -90,17 +91,17 @@ namespace BuildingBlocks.Middleware
 
             context.Response.StatusCode = 400;
 
-            await context.Response.WriteAsJsonAsync(new
+            await context.Response.WriteAsJsonAsync(new ApiResponse<object>
             {
-                success = false,
-                message = "Validation failed",
-                errorCode = "VALIDATION_ERROR",
-                details = ex.Errors.Select(e => new
+                Success = false,
+                Message = "Validation failed",
+                ErrorCode = "VALIDATION_ERROR",
+                Errors = ex.Errors.Select(e => new
                 {
                     field = e.PropertyName,
                     error = e.ErrorMessage
                 }),
-                traceId
+                TraceId = traceId
             });
         }
     }
