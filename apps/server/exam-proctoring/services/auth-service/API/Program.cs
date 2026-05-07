@@ -5,10 +5,13 @@ using auth_service.Infrastructure.Persistence;
 using auth_service.Infrastructure.Security.Jwt;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Middleware;
+using BuildingBlocks.Results;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +20,12 @@ var builder = WebApplication.CreateBuilder(args);
 // =============================
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.DefaultIgnoreCondition =
+                JsonIgnoreCondition.WhenWritingNull;
+        });
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -40,6 +48,19 @@ if (!File.Exists(jwtOptions.PrivateKeyPath))
 var privatePem = await File.ReadAllTextAsync(jwtOptions.PrivateKeyPath);
 using var rsa = RSA.Create();
 rsa.ImportFromPem(privatePem);
+
+// CORS Configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -66,6 +87,29 @@ builder.Services
                 if (context.Request.Cookies.TryGetValue("access", out var token) && !string.IsNullOrWhiteSpace(token))
                     context.Token = token;
                 return Task.CompletedTask;
+            },
+
+            OnAuthenticationFailed = context =>
+            {
+                if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                {
+                    var traceId = context.HttpContext.TraceIdentifier;
+
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+
+                    var response = new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Your session has expired. Please log in again.",
+                        ErrorCode = ErrorCodes.Token_Expired,
+                        TraceId = traceId
+                    };
+
+                    var result = JsonSerializer.Serialize(response);
+                    return context.Response.WriteAsync(result);
+                }
+                return Task.CompletedTask;
             }
         };
     });
@@ -73,6 +117,7 @@ builder.Services
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseCors("AllowFrontend");
 
 // =============================
 // Middleware
