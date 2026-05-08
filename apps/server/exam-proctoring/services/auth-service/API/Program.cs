@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -91,25 +90,47 @@ builder.Services
 
             OnAuthenticationFailed = context =>
             {
-                if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                if (context.Exception is not SecurityTokenExpiredException)
+                    return Task.CompletedTask;
+
+                context.NoResult();
+
+                var traceId = context.HttpContext.TraceIdentifier;
+
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+
+                var response = new ApiResponse<object>
                 {
-                    var traceId = context.HttpContext.TraceIdentifier;
+                    Success = false,
+                    Message = "Your session has expired. Please log in again.",
+                    ErrorCode = ErrorCodes.Token_Expired,
+                    TraceId = traceId
+                };
 
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    context.Response.ContentType = "application/json";
+                return context.Response.WriteAsJsonAsync(response);
+            },
 
-                    var response = new ApiResponse<object>
-                    {
-                        Success = false,
-                        Message = "Your session has expired. Please log in again.",
-                        ErrorCode = ErrorCodes.Token_Expired,
-                        TraceId = traceId
-                    };
+            OnChallenge = context =>
+            {
+                context.HandleResponse();
 
-                    var result = JsonSerializer.Serialize(response);
-                    return context.Response.WriteAsync(result);
-                }
-                return Task.CompletedTask;
+                var traceId = context.HttpContext.TraceIdentifier;
+
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+
+                var hasRefreshToken = context.Request.Cookies.ContainsKey("refresh");
+
+                var response = new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = hasRefreshToken ? "Your session has expired. Please log in again." : "Unauthorized",
+                    ErrorCode = hasRefreshToken ? ErrorCodes.Token_Expired : ErrorCodes.Unauthorized,
+                    TraceId = traceId
+                };
+
+                return context.Response.WriteAsJsonAsync(response);
             }
         };
     });

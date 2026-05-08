@@ -14,7 +14,7 @@ namespace auth_service.Application.Features.Auth.Commands.Logout
 
         public async Task Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
-            await _refreshTokenStore.RevokeRefreshTokenAsync(request.UserId, request.SessionType);
+            await _refreshTokenStore.RevokeRefreshTokenAsync(request.RefreshToken);
         }
     }
 }

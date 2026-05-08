@@ -22,17 +22,19 @@ namespace auth_service.Application.Features.Auth.Commands.RefreshToken
 
         public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken ct)
         {
+            var session = await _refreshTokenStore.GetSessionByRefreshTokenAsync(request.RefreshToken);
+
             try
             {
-                await _refreshTokenStore.ConsumeRefreshTokenAsync(request.UserId, request.SessionType, request.RefreshToken);
+                await _refreshTokenStore.ConsumeRefreshTokenAsync(request.RefreshToken);
             }
             catch (UnauthorizedException)
             {
-                await _refreshTokenStore.RevokeAllRefreshTokensAsync(request.UserId); // kick toàn bộ session
+                await _refreshTokenStore.RevokeAllRefreshTokensAsync(session.UserId); // kick toàn bộ session
                 throw new UnauthorizedException("Invalid refresh token.", ErrorCodes.InvalidRefreshToken);
             }
 
-            var user = await _userRepository.GetByIdAsync(request.UserId, ct)
+            var user = await _userRepository.GetByIdAsync(session.UserId, ct)
                 ?? throw new UnauthorizedException("Invalid refresh token.", ErrorCodes.InvalidRefreshToken);
 
             if (!user.IsActive)
@@ -44,10 +46,11 @@ namespace auth_service.Application.Features.Auth.Commands.RefreshToken
             var accessTokenExpiry = _tokenService.GetAccessTokenExpiry();
             var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiry();
 
-            var token = _tokenService.GenerateAccessToken(user, request.SessionType);
+
+            var token = _tokenService.GenerateAccessToken(user, session.SessionType);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            await _refreshTokenStore.StoreRefreshTokenAsync(user.Id, request.SessionType, refreshToken, refreshTokenExpiry);
+            await _refreshTokenStore.StoreRefreshTokenAsync(user.Id, session.SessionType, refreshToken, refreshTokenExpiry);
 
             return new AuthResponse(
                 AccessToken: token,

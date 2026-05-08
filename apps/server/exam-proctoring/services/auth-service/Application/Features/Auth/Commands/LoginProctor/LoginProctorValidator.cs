@@ -16,9 +16,7 @@ namespace auth_service.Application.Features.Auth.Commands.LoginProctor
 
             RuleFor(x => x.Password)
                 .NotEmpty()
-                .WithMessage(ValidationMessages.Required)
-                .MinimumLength(8)
-                .WithMessage(ValidationMessages.MinLength);
+                .WithMessage(ValidationMessages.Required);
         }
     }
 }
