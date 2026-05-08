@@ -7,6 +7,5 @@ namespace auth_service.Application.Abstractions.Services
     public interface ISessionService
     {
         Task<AuthResponse> CreateSessionAsync(User user, SessionType sessionType, CancellationToken ct);
-
     }
 }

@@ -20,18 +20,18 @@ namespace auth_service.Application.Services
 
         public async Task<AuthResponse> CreateSessionAsync(User user, SessionType sessionType, CancellationToken ct)
         {
-            await _refreshTokenStore.RevokeRefreshTokenAsync(user.Id, sessionType);
+            await _refreshTokenStore.RevokeSessionsAsync(user.Id, sessionType);
 
             var accessTokenExpiry = _tokenService.GetAccessTokenExpiry();
             var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiry();
             var token = _tokenService.GenerateAccessToken(user, sessionType);
-            var refreshToken = _tokenService.GenerateRefreshToken();
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-            await _refreshTokenStore.StoreRefreshTokenAsync(user.Id, sessionType, refreshToken, refreshTokenExpiry);
+            await _refreshTokenStore.StoreRefreshTokenAsync(user.Id, sessionType, newRefreshToken, refreshTokenExpiry);
 
             return new AuthResponse(
                 AccessToken: token,
-                RefreshToken: refreshToken,
+                RefreshToken: newRefreshToken,
                 AccessTokenExpiresIn: accessTokenExpiry,
                 RefreshTokenExpiresIn: refreshTokenExpiry
             );

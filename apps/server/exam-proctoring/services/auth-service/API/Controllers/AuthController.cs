@@ -1,5 +1,4 @@
 using auth_service.API.Contracts;
-using auth_service.API.Extensions;
 using auth_service.Application.Contracts;
 using auth_service.Application.Features.Auth.Commands.ChangePassword;
 using auth_service.Application.Features.Auth.Commands.LoginAdmin;
@@ -26,6 +25,7 @@ namespace auth_service.API.Controllers
         public AuthController(IMediator mediator) => _mediator = mediator;
 
         // POST: api/v1/auths/login-admin
+        [AllowAnonymous]
         [HttpPost("login-admin")]
         public async Task<IActionResult> LoginAdmin([FromBody] LoginRequest request)
         {
@@ -40,6 +40,7 @@ namespace auth_service.API.Controllers
         }
 
         // POST: api/v1/auths/login-profile
+        [AllowAnonymous]
         [HttpPost("login-profile")]
         public async Task<IActionResult> LoginProfile([FromBody] LoginRequest request)
         {
@@ -54,6 +55,7 @@ namespace auth_service.API.Controllers
         }
 
         // POST: api/v1/auths/login-proctor
+        [AllowAnonymous]
         [HttpPost("login-proctor")]
         public async Task<IActionResult> LoginProctor([FromBody] LoginRequest request)
         {
@@ -68,13 +70,19 @@ namespace auth_service.API.Controllers
         }
 
         // POST: api/v1/auths/logout
+        [AllowAnonymous]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            var sessionType = User.GetSessionType();
-            var userId = User.GetUserId();
+            var refreshToken = Request.Cookies["refresh"];
+            if (string.IsNullOrEmpty(refreshToken))
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Message = "Logout successful"
+                });
 
-            await _mediator.Send(new LogoutCommand(userId, sessionType));
+            await _mediator.Send(new LogoutCommand(refreshToken));
 
             Response.Cookies.Delete("access");
             Response.Cookies.Delete("refresh");
@@ -86,7 +94,7 @@ namespace auth_service.API.Controllers
         }
 
         // POST: api/v1/auths/refresh
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
@@ -94,10 +102,7 @@ namespace auth_service.API.Controllers
             if (string.IsNullOrEmpty(refreshToken))
                 throw new UnauthorizedException("Missing refresh token", ErrorCodes.InvalidRefreshToken);
 
-            var sessionType = User.GetSessionType();
-            var userId = User.GetUserId();
-
-            var result = await _mediator.Send(new RefreshTokenCommand(userId, refreshToken, sessionType));
+            var result = await _mediator.Send(new RefreshTokenCommand(refreshToken));
             SetAuthCookies(result);
             return Ok(new ApiResponse<object>
             {
