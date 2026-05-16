@@ -1,4 +1,6 @@
 import LoginPage from "../features/auth/pages/LoginPage";
+import ProfilePage from "../features/user/pages/ProfilePage";
+import ResultPage from "../features/user/pages/ResultPage";
 import Layout from "../shared/components/Layout/Layout";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
@@ -12,7 +14,9 @@ export const routes = [
                 element: <Layout />,
                 children: [
                     { index: true, element: <div>Dashboard</div> },
-                    { path: "home", element: <div>Home</div> },
+                    { path: "profile", element: <ProfilePage /> },
+                    { path: "results", element: <ResultPage /> },
+
                 ],
             },
         ],
