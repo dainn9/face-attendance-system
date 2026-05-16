@@ -84,8 +84,16 @@ namespace auth_service.API.Controllers
 
             await _mediator.Send(new LogoutCommand(refreshToken));
 
-            Response.Cookies.Delete("access");
-            Response.Cookies.Delete("refresh");
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/"
+            };
+
+            Response.Cookies.Delete("access", cookieOptions);
+            Response.Cookies.Delete("refresh", cookieOptions);
             return Ok(new ApiResponse<object>
             {
                 Success = true,
