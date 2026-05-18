@@ -6,3 +6,6 @@ numpy
 python-multipart
 pydantic-settings
 onnxruntime
+torch 
+torchvision
+pymilvus
