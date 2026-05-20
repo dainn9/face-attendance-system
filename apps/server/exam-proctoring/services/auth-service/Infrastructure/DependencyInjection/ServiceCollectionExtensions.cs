@@ -2,14 +2,12 @@ using auth_service.Application.Abstractions.Caching;
 using auth_service.Application.Abstractions.Persistence;
 using auth_service.Application.Abstractions.Security;
 using auth_service.Application.Abstractions.Seed;
-using auth_service.Application.Abstractions.System;
 using auth_service.Infrastructure.Caching;
 using auth_service.Infrastructure.Persistence;
 using auth_service.Infrastructure.Persistence.Repositories;
 using auth_service.Infrastructure.Security.Jwt;
 using auth_service.Infrastructure.Security.Password;
 using auth_service.Infrastructure.Seed;
-using auth_service.Infrastructure.System;
 using Microsoft.EntityFrameworkCore;
 
 namespace auth_service.Infrastructure.DependencyInjection
@@ -63,11 +61,6 @@ namespace auth_service.Infrastructure.DependencyInjection
             // Seeders
             // ==========================
             services.AddScoped<IUserSeeder, UserSeeder>();
-
-            // ==========================
-            // System
-            // ==========================
-            services.AddScoped<IClock, SystemClock>();
 
             return services;
         }
