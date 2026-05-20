@@ -19,6 +19,7 @@ namespace BuildingBlocks.Exceptions
         // ======= EMAIL =======
         public const string EmailEmpty = "EMAIL_EMPTY";
         public const string InvalidEmail = "INVALID_EMAIL";
+        public const string EmailAlreadyExists = "EMAIL_ALREADY_EXISTS";
 
         // ======= PASSWORD =======
         public const string PasswordEmpty = "PASSWORD_EMPTY";

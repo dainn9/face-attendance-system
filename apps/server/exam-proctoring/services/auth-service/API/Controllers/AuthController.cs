@@ -6,7 +6,9 @@ using auth_service.Application.Features.Auth.Commands.LoginProctor;
 using auth_service.Application.Features.Auth.Commands.LoginProfile;
 using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
+using auth_service.Application.Features.Auth.Commands.Register;
 using auth_service.Application.Features.Auth.Queries.GetMe;
+using auth_service.Domain.Enum;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Extensions;
 using BuildingBlocks.Results;
@@ -152,6 +154,23 @@ namespace auth_service.API.Controllers
             {
                 Success = true,
                 Data = result
+            });
+        }
+
+        // =============================
+        // Admin-only
+        // =============================
+        // POST: api/v1/auths/register
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            var command = new RegisterCommand(request.Email, request.Password, request.UserRole);
+            await _mediator.Send(command);
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Registration successful"
             });
         }
 
