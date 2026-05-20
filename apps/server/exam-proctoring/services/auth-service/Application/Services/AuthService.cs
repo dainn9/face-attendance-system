@@ -1,7 +1,6 @@
 using auth_service.Application.Abstractions.Persistence;
 using auth_service.Application.Abstractions.Security;
 using auth_service.Application.Abstractions.Services;
-using auth_service.Application.Abstractions.System;
 using auth_service.Domain.Aggregates.User;
 using auth_service.Domain.ValueObjects;
 using BuildingBlocks.Exceptions;
@@ -12,13 +11,11 @@ namespace auth_service.Application.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly IClock _clock;
 
-        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, IClock clock)
+        public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
-            _clock = clock;
         }
 
         public async Task<User> AuthenticateAsync(string email, string password, CancellationToken ct)
@@ -35,12 +32,12 @@ namespace auth_service.Application.Services
 
             if (!_passwordHasher.Verify(password, user.PasswordHash.Value))
             {
-                user.RecordFailedLogin(5, TimeSpan.FromMinutes(15), _clock.UtcNow);
+                user.RecordFailedLogin(5, TimeSpan.FromMinutes(15), DateTime.UtcNow);
                 await _userRepository.UpdateAsync(user, ct);
                 throw new UnauthorizedException("Email or password not correct.", ErrorCodes.Unauthorized);
             }
 
-            user.RecordSuccessfulLogin(_clock.UtcNow);
+            user.RecordSuccessfulLogin(DateTime.UtcNow);
             await _userRepository.UpdateAsync(user, ct);
             return user;
         }
