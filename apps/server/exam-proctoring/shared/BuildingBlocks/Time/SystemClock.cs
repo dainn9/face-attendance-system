@@ -1,6 +1,4 @@
-using auth_service.Application.Abstractions.System;
-
-namespace auth_service.Infrastructure.System
+namespace BuildingBlocks.Time
 {
     public class SystemClock : IClock
     {
