@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Results;
 using FluentValidation;
@@ -59,6 +61,11 @@ namespace BuildingBlocks.Middleware
                 ErrorCode = ex.ErrorCode,
                 Errors = ex.Details,
                 TraceId = traceId
+            },
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             });
         }
 
@@ -78,6 +85,11 @@ namespace BuildingBlocks.Middleware
                 Message = "Internal Server Error",
                 ErrorCode = "INTERNAL_ERROR",
                 TraceId = traceId
+            },
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             });
         }
 
@@ -102,6 +114,11 @@ namespace BuildingBlocks.Middleware
                     error = e.ErrorMessage
                 }),
                 TraceId = traceId
+            },
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             });
         }
     }
