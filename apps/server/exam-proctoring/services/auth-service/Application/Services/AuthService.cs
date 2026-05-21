@@ -1,10 +1,10 @@
 using auth_service.Application.Abstractions.Persistence;
 using auth_service.Application.Abstractions.Security;
 using auth_service.Application.Abstractions.Services;
-using auth_service.Application.Abstractions.System;
 using auth_service.Domain.Aggregates.User;
 using auth_service.Domain.ValueObjects;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Time;
 
 namespace auth_service.Application.Services
 {

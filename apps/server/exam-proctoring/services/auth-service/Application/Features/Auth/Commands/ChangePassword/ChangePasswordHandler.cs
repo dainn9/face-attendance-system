@@ -1,9 +1,9 @@
 using auth_service.Application.Abstractions.Caching;
 using auth_service.Application.Abstractions.Persistence;
 using auth_service.Application.Abstractions.Security;
-using auth_service.Application.Abstractions.System;
 using auth_service.Domain.ValueObjects;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Time;
 using MediatR;
 
 namespace auth_service.Application.Features.Auth.Commands.ChangePassword
