@@ -20,5 +20,12 @@ namespace BuildingBlocks.Validation
                 .Must(ValidationHelper.IsStrongPassword)
                 .WithMessage(ValidationMessages.PasswordComplexity);
         }
+
+        public static IRuleBuilderOptions<T, string> MaxLength<T>(this IRuleBuilder<T, string> ruleBuilder, int maxLength)
+        {
+            return ruleBuilder
+                .MaximumLength(maxLength)
+                .WithMessage(ValidationMessages.MaxLength);
+        }
     }
 }

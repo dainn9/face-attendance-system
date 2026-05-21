@@ -10,6 +10,7 @@ namespace BuildingBlocks.Validation
         public const string PasswordComplexity = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
         public const string InvalidGuid = "{PropertyName} cannot be empty.";
         public const string InvalidUserRole = "Invalid user role.";
+        public const string InvalidGender = "Invalid gender.";
 
         // public const string Range = "Please enter a value between {0} and {1}.";
         // public const string InvalidFormat = "The format of this field is invalid.";
