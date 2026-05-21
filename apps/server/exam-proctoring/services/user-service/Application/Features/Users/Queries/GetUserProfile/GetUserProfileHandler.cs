@@ -12,8 +12,8 @@ namespace user_service.Application.Features.Users.Queries.GetUserProfile
         public GetUserProfileHandler(IUserRepository userRepository) => _userRepository = userRepository;
 
         public async Task<UserDto> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
-        => await _userRepository.GetByIdAsync(request.UserId, cancellationToken)
-                    ?? throw new EntityNotFoundException("User not found");
+        => await _userRepository.GetProfileByIdAsync(request.UserId, cancellationToken)
+        ?? throw new EntityNotFoundException("User not found");
 
     }
 }

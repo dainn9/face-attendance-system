@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -108,7 +109,12 @@ builder.Services
                     TraceId = traceId
                 };
 
-                return context.Response.WriteAsJsonAsync(response);
+                return context.Response.WriteAsJsonAsync(response,
+                    new JsonSerializerOptions
+                    {
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    }
+                );
             },
 
             OnChallenge = context =>
@@ -130,7 +136,12 @@ builder.Services
                     TraceId = traceId
                 };
 
-                return context.Response.WriteAsJsonAsync(response);
+                return context.Response.WriteAsJsonAsync(response,
+                    new JsonSerializerOptions
+                    {
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    }
+                );
             }
         };
     });

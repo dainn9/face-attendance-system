@@ -1,4 +1,4 @@
-namespace user_service.Domain.Enum
+namespace SharedKernel.Core.Enums
 {
     public enum Gender
     {

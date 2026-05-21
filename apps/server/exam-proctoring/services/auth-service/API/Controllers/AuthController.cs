@@ -165,7 +165,15 @@ namespace auth_service.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var command = new RegisterCommand(request.Email, request.Password, request.UserRole);
+            var command = new RegisterCommand(
+                request.Email,
+                request.Password,
+                request.UserRole,
+                request.FullName,
+                request.Gender,
+                request.DateOfBirth
+            );
+
             await _mediator.Send(command);
             return Ok(new ApiResponse<object>
             {

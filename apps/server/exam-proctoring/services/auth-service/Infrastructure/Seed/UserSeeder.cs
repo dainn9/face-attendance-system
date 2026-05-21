@@ -24,12 +24,15 @@ namespace auth_service.Infrastructure.Seed
             if (await _context.Users.AnyAsync(x => x.Role == UserRole.Admin))
                 return;
 
+            var now = DateTime.UtcNow;
             var adminUser = User.Create(
                 email: Email.Create("admin@system.vn"),
                 passwordHash: PasswordHash.Create(_passwordHasher.Hash("Admin@123")),
                 role: UserRole.Admin,
-                now: DateTime.UtcNow
+                now: now
             );
+
+            adminUser.UpdateActiveStatus(true, now);
 
             _context.Users.Add(adminUser);
             await _context.SaveChangesAsync();

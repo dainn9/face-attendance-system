@@ -1,5 +1,5 @@
 using SharedKernel.Core;
-using user_service.Domain.Enum;
+using SharedKernel.Core.Enums;
 
 namespace user_service.Domain.Aggregates.User
 {

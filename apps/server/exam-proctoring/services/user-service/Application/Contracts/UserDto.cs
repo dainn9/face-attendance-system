@@ -1,4 +1,4 @@
-using user_service.Domain.Enum;
+using SharedKernel.Core.Enums;
 
 namespace user_service.Application.Contracts
 {

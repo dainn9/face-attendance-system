@@ -5,10 +5,11 @@ namespace auth_service.Application.Abstractions.Persistence
 {
     public interface IUserRepository
     {
-        Task AddAsync(User user, CancellationToken ct = default);
+        void Add(User user);
         Task UpdateAsync(User user, CancellationToken ct = default);
         Task<User?> GetByEmailAsync(Email email, CancellationToken ct = default);
         Task<bool> ExistsByEmailAsync(Email email, CancellationToken ct = default);
         Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default);
+        Task<User?> GetTrackedByIdAsync(Guid id, CancellationToken ct = default);
     }
 }
