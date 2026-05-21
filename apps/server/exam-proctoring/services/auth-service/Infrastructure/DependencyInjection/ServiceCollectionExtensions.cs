@@ -1,13 +1,17 @@
 using auth_service.Application.Abstractions.Caching;
+using auth_service.Application.Abstractions.Clients;
 using auth_service.Application.Abstractions.Persistence;
 using auth_service.Application.Abstractions.Security;
 using auth_service.Application.Abstractions.Seed;
 using auth_service.Infrastructure.Caching;
+using auth_service.Infrastructure.Clients;
+using auth_service.Infrastructure.Outbox;
 using auth_service.Infrastructure.Persistence;
 using auth_service.Infrastructure.Persistence.Repositories;
 using auth_service.Infrastructure.Security.Jwt;
 using auth_service.Infrastructure.Security.Password;
 using auth_service.Infrastructure.Seed;
+using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Time;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,6 +56,7 @@ namespace auth_service.Infrastructure.DependencyInjection
             // Repositories
             // ==========================
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IOutboxRepository, OutboxRepository>();
 
             // ==========================
             // Password Hasher            
@@ -67,6 +72,30 @@ namespace auth_service.Infrastructure.DependencyInjection
             // System
             // ==========================
             services.AddScoped<IClock, SystemClock>();
+
+            // ==========================
+            // Clients
+            // ==========================
+            services.AddHttpClient<IUserInternalClient, UserInternalClient>((sp, client) =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+
+                client.BaseAddress = new Uri(config["Services:UserService:BaseUrl"]!);
+                client.DefaultRequestHeaders.Add(
+                    "X-Internal-Api-Key",
+                    config["InternalAuth:ApiKey"]!
+                );
+            });
+
+            // ==========================
+            // Unit of Work
+            // ==========================
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // ==========================
+            // Hosted Services
+            // ==========================
+            services.AddHostedService<OutboxProcessor>();
 
             return services;
         }

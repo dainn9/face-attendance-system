@@ -38,7 +38,7 @@ namespace auth_service.Application.Features.Auth.Commands.RefreshToken
                 ?? throw new UnauthorizedException("Invalid refresh token.", ErrorCodes.InvalidRefreshToken);
 
             if (!user.IsActive)
-                throw new UnauthorizedException("Invalid refresh token.", ErrorCodes.AccountDisabled);
+                throw new UnauthorizedException("Invalid refresh token.", ErrorCodes.AccountNotActive);
 
             if (user.IsLocked())
                 throw new UnauthorizedException("Invalid refresh token.", ErrorCodes.AccountLocked);

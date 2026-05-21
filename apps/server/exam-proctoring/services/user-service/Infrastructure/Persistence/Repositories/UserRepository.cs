@@ -17,7 +17,7 @@ namespace user_service.Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public Task<UserDto?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+        public Task<UserDto?> GetProfileByIdAsync(Guid userId, CancellationToken cancellationToken)
         => _context.Users
             .AsNoTracking()
             .Where(u => u.Id == userId)
@@ -29,5 +29,10 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 u.Email
             ))
             .FirstOrDefaultAsync(cancellationToken);
+
+        public Task<bool> ExistsByIdAsync(Guid userId, CancellationToken cancellationToken)
+        => _context.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.Id == userId, cancellationToken);
     }
 }

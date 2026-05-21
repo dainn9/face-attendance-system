@@ -18,6 +18,9 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
 
         public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
+            if (await _userRepository.ExistsByIdAsync(request.UserId, cancellationToken))
+                return;
+
             var user = User.Create(
                 request.UserId,
                 request.FullName,

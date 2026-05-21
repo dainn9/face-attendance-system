@@ -13,7 +13,7 @@ namespace BuildingBlocks.Exceptions
 
         // ======= ACCOUNT =======
         public const string AccountNotFound = "ACCOUNT_NOT_FOUND";
-        public const string AccountDisabled = "ACCOUNT_DISABLED";
+        public const string AccountNotActive = "ACCOUNT_NOT_ACTIVE";
         public const string AccountLocked = "ACCOUNT_LOCKED";
 
         // ======= EMAIL =======

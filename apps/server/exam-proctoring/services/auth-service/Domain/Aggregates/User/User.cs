@@ -29,7 +29,7 @@ namespace auth_service.Domain.Aggregates.User
                 PasswordHash = passwordHash,
                 Email = email,
                 Role = role,
-                IsActive = true
+                IsActive = false,
             };
 
             user.SetCreated(now);

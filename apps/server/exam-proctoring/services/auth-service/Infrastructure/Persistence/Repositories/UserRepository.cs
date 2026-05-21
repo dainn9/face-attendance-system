@@ -11,11 +11,8 @@ namespace auth_service.Infrastructure.Persistence.Repositories
 
         public UserRepository(AuthDbContext context) => _context = context;
 
-        public async Task AddAsync(User user, CancellationToken ct = default)
-        {
-            await _context.Users.AddAsync(user, ct);
-            await _context.SaveChangesAsync(ct);
-        }
+        public void Add(User user)
+        => _context.Users.Add(user);
 
         public async Task UpdateAsync(User user, CancellationToken ct = default)
         {
@@ -36,6 +33,10 @@ namespace auth_service.Infrastructure.Persistence.Repositories
         public Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default)
             => _context.Users
                 .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id, ct);
+
+        public Task<User?> GetTrackedByIdAsync(Guid id, CancellationToken ct = default)
+            => _context.Users
                 .FirstOrDefaultAsync(u => u.Id == id, ct);
     }
 }

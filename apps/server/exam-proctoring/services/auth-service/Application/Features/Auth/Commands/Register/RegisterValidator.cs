@@ -7,6 +7,19 @@ namespace auth_service.Application.Features.Auth.Commands.Register
     {
         public RegisterValidator()
         {
+            RuleFor(x => x.FullName)
+                .NotEmpty()
+                .WithMessage(ValidationMessages.Required)
+                .MaxLength(100);
+
+            RuleFor(x => x.Gender)
+                .IsInEnum()
+                .WithMessage(ValidationMessages.InvalidGender);
+
+            RuleFor(x => x.DateOfBirth)
+                .NotEmpty()
+                .WithMessage(ValidationMessages.Required);
+
             RuleFor(x => x.Email)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)

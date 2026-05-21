@@ -28,7 +28,7 @@ namespace auth_service.Application.Services
                 ?? throw new UnauthorizedException("Email or password not correct.", ErrorCodes.Unauthorized);
 
             if (!user.IsActive)
-                throw new UnauthorizedException("Account is disabled.", ErrorCodes.AccountDisabled);
+                throw new UnauthorizedException("Account is not active.", ErrorCodes.AccountNotActive);
 
             if (user.IsLocked())
                 throw new UnauthorizedException("Account is locked out.", ErrorCodes.AccountLocked);
