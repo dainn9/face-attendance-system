@@ -1,4 +1,4 @@
-namespace auth_service.Application.Abstractions.System
+namespace BuildingBlocks.Time
 {
     public interface IClock
     {
