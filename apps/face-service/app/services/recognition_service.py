@@ -55,6 +55,12 @@ class RecognitionService:
         self.collection.load()
         print(f"[Milvus] ✓ Kết nối thành công — collection '{self.collection_name}' đã sẵn sàng")
 
+        # Thiết lập tham số tìm kiếm (nên giống lúc tạo index)
+        self.search_params = {
+            "metric_type": "COSINE",
+            "params": {"ef": 200}
+        }
+
     # ── Milvus setup ───────────────────────────────────────────────────────
 
     def _get_or_create_collection(self) -> Collection:
@@ -63,8 +69,8 @@ class RecognitionService:
 
         fields = [
             FieldSchema(name="id",        dtype=DataType.INT64,        is_primary=True, auto_id=True),
-            FieldSchema(name="student_id",     dtype=DataType.VARCHAR,       max_length=64),
-            FieldSchema(name="class_id", dtype=DataType.VARCHAR, max_length=64),
+            FieldSchema(name="user_id",     dtype=DataType.VARCHAR,       max_length=64),
+            # FieldSchema(name="class_id", dtype=DataType.VARCHAR, max_length=64),
             FieldSchema(name="pose", dtype=DataType.VARCHAR,  max_length=16),
             FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=self.embedding_dim),
         ]
@@ -101,81 +107,91 @@ class RecognitionService:
 
     # ── Database ───────────────────────────────────────────────────────────
 
-    def register(self, student_id: str, class_id: str, pose: str, img: np.ndarray) -> None:
+    def register(self, user_id: str, pose: str, img: np.ndarray) -> None:
         """Đăng ký khuôn mặt mới vào Milvus."""
         emb = self.get_embedding(img)
 
-        data = [{"student_id": student_id, "class_id": class_id, "pose": pose, "embedding": emb}]
+        data = [{"user_id": user_id, "pose": pose, "embedding": emb}]
 
         self.collection.insert(data)
         self.collection.flush()
         
         print(
             f"[register] ✓ "
-            f"student_id='{student_id}' "
+            f"user_id='{user_id}' "
             f"pose='{pose}'")   
 
-    def remove(self, student_id: str) -> None:
-        """Xoá tất cả embedding của 1 student_id khỏi Milvus."""
-        self.collection.delete(expr=f'student_id == "{student_id}"')
+    def remove(self, user_id: str) -> None:
+        """Xoá tất cả embedding của 1 user_id khỏi Milvus."""
+        self.collection.delete(expr=f'user_id == "{user_id}"')
         self.collection.flush()
-        print(f"[remove] ✓ Đã xoá '{student_id}'")
+        print(f"[remove] ✓ Đã xoá '{user_id}'")
 
     # ── Core functions ─────────────────────────────────────────────────────
     def identify(
         self,
         img: np.ndarray,
-        class_id: str | None = None,
+        allowed_user_ids: list[str],
     ) :
         """
-        1-N Search: so sánh ảnh với tất cả embedding đã đăng ký trong Milvus, trả về kết quả tốt nhất.
-         - Nếu có class_id thì chỉ search trong class đó
-         - Trả về student_id, class_id, similarity, is_known (có match hay không), top_k (danh sách kết quả trả về)
-         - Lưu ý: nếu best_score < threshold thì coi như không nhận diện được (is_known=False) dù vẫn trả về kết quả tốt nhất để tham khảo
+        1-N Search trong danh sách user được phép.
         """
         emb = self.get_embedding(img)
-        expr = None if class_id is None else f"class_id == '{class_id}'"
+
+        if not allowed_user_ids:
+            raise ValueError("allowed_user_ids cannot be empty")
+        
+        ids = ",".join([f'"{user_id}"' for user_id in allowed_user_ids])
+        expr = f"user_id in [{ids}]"
 
         results = self.collection.search(
             data=[emb],
             anns_field="embedding",
-            param={"metric_type": "COSINE", "params": {"ef": 200}},
+            param=self.search_params,
             limit=self.top_k,
-            output_fields=["student_id", "class_id"],
+            output_fields=["user_id"],
             expr=expr,
         )
 
         hits = results[0]  # query đơn nên lấy kết quả đầu tiên
 
         top_results = [
-            {"student_id": hit.entity.get("student_id"), "class_id": hit.entity.get("class_id"), "similarity": round(hit.score, 4)}
+            {
+                "user_id": hit.entity.get("user_id"),
+                "similarity": round(hit.score, 4)
+            }
             for hit in hits
         ]
 
         if not top_results:
-            return {"student_id": None, "class_id": None, "similarity": 0.0, "is_known": False, "top_k": []}
+            return {
+                "user_id": None,
+                "similarity": 0.0,
+                "is_known": False,
+                "top_k": []
+            }
 
         best = top_results[0]
         is_known = best["similarity"] >= self.threshold
 
         return {
-            "student_id": best["student_id"] if is_known else None,
-            "class_id": best["class_id"] if is_known else None,
+            "user_id": best["user_id"] if is_known else None,
             "similarity": best["similarity"],
             "is_known": is_known,
             "top_k": top_results,
         }
     
-    def verify(self, img: np.ndarray, student_id: str) -> dict:
-        """So sánh ảnh với embedding đã đăng ký của student_id đó, trả về True nếu có match nào trên threshold."""
+    def verify(self, img: np.ndarray, user_id: str) -> dict:
+        """So sánh ảnh với embedding đã đăng ký của user_id đó, trả về True nếu có match nào trên threshold."""
         emb = self.get_embedding(img)
 
         results = self.collection.search(
             data=[emb],
             anns_field="embedding",
-            param={"metric_type": "COSINE", "params": {"ef": 200}},
+            param=self.search_params,
             limit=1,
-            expr=f'student_id == "{student_id}"',
+            expr=f'user_id == "{user_id}"',
+            output_fields=[],
         )
 
         hits = results[0]
