@@ -101,6 +101,7 @@ builder.Services
                 return context.Response.WriteAsJsonAsync(response,
                     new JsonSerializerOptions
                     {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     });
             },
@@ -127,6 +128,7 @@ builder.Services
                 return context.Response.WriteAsJsonAsync(response,
                     new JsonSerializerOptions
                     {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     });
             }
