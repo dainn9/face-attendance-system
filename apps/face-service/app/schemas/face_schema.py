@@ -6,13 +6,12 @@ class FaceImageItem(BaseModel):
     image: str
 
 class FaceRegisterRequest(BaseModel):
-    student_id: str
-    class_id: str | None = None
+    user_id: str
     images: List[FaceImageItem]
 
-class FaceSearchRequest(BaseModel):
+class FaceIdentifyRequest(BaseModel):
     image: str
-    class_id: str | None = None
+    allowed_user_ids: List[str]
 
 # class VerifyMultiRequest(BaseModel):
 #     image: str

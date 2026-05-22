@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.schemas.face_schema import FaceRegisterRequest, FaceSearchRequest
+from app.schemas.face_schema import FaceIdentifyRequest, FaceRegisterRequest
 from app.utils.image import base64_to_image
 from app.services.recognition_service import RecognitionService
 from app.services.detector_service import detect_faces
@@ -44,7 +44,7 @@ async def register_face(
 
             face_crop = faces[0]["crop"]     
             ## Đăng ký khuôn mặt vào hệ thống
-            svc.register(student_id=req.student_id, class_id=req.class_id, pose=item.pose, img=face_crop)
+            svc.register(user_id=req.user_id, pose=item.pose, img=face_crop)
 
             registered.append(item.pose)
 
@@ -58,14 +58,14 @@ async def register_face(
         "success": True,
         "message": "Face registered successfully",
         "result": {
-            "student_id": req.student_id,
+            "user_id": req.user_id,
             "registered_poses": registered,
         }
     }
 
 @router.post("/identify")
 async def identify_face(
-    req: FaceSearchRequest,
+    req: FaceIdentifyRequest,
     _: None = Depends(verify_api_key)
 ):
     try:
@@ -78,7 +78,7 @@ async def identify_face(
             )
         
         face_crop = faces[0]["crop"]
-        result = svc.identify(img=face_crop, class_id=req.class_id)
+        result = svc.identify(img=face_crop, allowed_user_ids=req.allowed_user_ids)
 
     except HTTPException:
         raise
@@ -92,13 +92,13 @@ async def identify_face(
     }
 
 
-@router.delete("/remove/{student_id}")
+@router.delete("/remove/{user_id}")
 async def remove_face(
-    student_id: str,
+    user_id: str,
     _: None = Depends(verify_api_key)
 ):
     try:
-        svc.remove(student_id=student_id)
+        svc.remove(user_id=user_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
