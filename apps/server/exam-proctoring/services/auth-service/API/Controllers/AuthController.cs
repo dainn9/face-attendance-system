@@ -1,9 +1,7 @@
 using auth_service.API.Contracts;
 using auth_service.Application.Contracts;
 using auth_service.Application.Features.Auth.Commands.ChangePassword;
-using auth_service.Application.Features.Auth.Commands.LoginAdmin;
-using auth_service.Application.Features.Auth.Commands.LoginProctor;
-using auth_service.Application.Features.Auth.Commands.LoginProfile;
+using auth_service.Application.Features.Auth.Commands.Login;
 using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
 using auth_service.Application.Features.Auth.Commands.Register;
@@ -26,42 +24,12 @@ namespace auth_service.API.Controllers
 
         public AuthController(IMediator mediator) => _mediator = mediator;
 
-        // POST: api/v1/auths/login-admin
+        // POST: api/v1/auths/login
         [AllowAnonymous]
-        [HttpPost("login-admin")]
+        [HttpPost("login")]
         public async Task<IActionResult> LoginAdmin([FromBody] LoginRequest request)
         {
-            var command = new LoginAdminCommand(request.Email, request.Password);
-            var result = await _mediator.Send(command);
-            SetAuthCookies(result);
-            return Ok(new ApiResponse<object>
-            {
-                Success = true,
-                Message = "Login successful"
-            });
-        }
-
-        // POST: api/v1/auths/login-profile
-        [AllowAnonymous]
-        [HttpPost("login-profile")]
-        public async Task<IActionResult> LoginProfile([FromBody] LoginRequest request)
-        {
-            var command = new LoginProfileCommand(request.Email, request.Password);
-            var result = await _mediator.Send(command);
-            SetAuthCookies(result);
-            return Ok(new ApiResponse<object>
-            {
-                Success = true,
-                Message = "Login successful"
-            });
-        }
-
-        // POST: api/v1/auths/login-proctor
-        [AllowAnonymous]
-        [HttpPost("login-proctor")]
-        public async Task<IActionResult> LoginProctor([FromBody] LoginRequest request)
-        {
-            var command = new LoginProctorCommand(request.Email, request.Password);
+            var command = new LoginCommand(request.Email, request.Password);
             var result = await _mediator.Send(command);
             SetAuthCookies(result);
             return Ok(new ApiResponse<object>
