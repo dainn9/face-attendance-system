@@ -10,6 +10,11 @@ namespace auth_service.Application.IntegrationEvents
         string FullName,
         Gender Gender,
         DateOnly DateOfBirth,
-        string Email
+        string Email,
+        UserRole Role,
+        string? StudentCode,
+        string? LecturerCode,
+        string? FacultyCode,
+        string? MajorCode
     );
 }

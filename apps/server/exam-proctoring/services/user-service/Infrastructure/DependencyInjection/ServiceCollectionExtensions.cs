@@ -1,3 +1,4 @@
+using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Time;
 using Microsoft.EntityFrameworkCore;
 using user_service.Application.Abstractions.Persistence;
@@ -31,6 +32,11 @@ namespace user_service.Infrastructure.DependencyInjection
             // Repositories
             // ===========================
             services.AddScoped<IUserRepository, UserRepository>();
+
+            // ==========================
+            // Unit of Work            
+            // ==========================
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // ==========================
             // Utilities

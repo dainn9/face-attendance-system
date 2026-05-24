@@ -11,6 +11,7 @@ namespace BuildingBlocks.Validation
         public const string InvalidGuid = "{PropertyName} cannot be empty.";
         public const string InvalidUserRole = "Invalid user role.";
         public const string InvalidGender = "Invalid gender.";
+        public const string NotAllowed = "{PropertyName} is not allowed for this user role.";
 
         // public const string Range = "Please enter a value between {0} and {1}.";
         // public const string InvalidFormat = "The format of this field is invalid.";

@@ -1,9 +1,8 @@
-using MediatR;
 using SharedKernel.Core.Enums;
 
-namespace user_service.Application.Features.Users.Commands.CreateUser
+namespace auth_service.Application.Contracts
 {
-    public record CreateUserCommand(
+    public record CreateUserRequest(
         Guid UserId,
         string FullName,
         Gender Gender,
@@ -14,5 +13,5 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
         string? LecturerCode,
         string? FacultyCode,
         string? MajorCode
-    ) : IRequest;
+    );
 }

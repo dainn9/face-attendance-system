@@ -31,6 +31,10 @@ namespace user_service.Infrastructure.Persistence.Configurations
                     .IsRequired()
                     .HasMaxLength(500);
 
+            builder.Property(x => x.Role)
+                    .HasConversion<string>()
+                    .IsRequired();
+
             builder.Property(x => x.CreatedAt).IsRequired();
             builder.Property(x => x.UpdatedAt).IsRequired();
         }

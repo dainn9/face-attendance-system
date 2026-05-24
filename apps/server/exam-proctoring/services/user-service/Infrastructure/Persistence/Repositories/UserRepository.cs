@@ -11,11 +11,8 @@ namespace user_service.Infrastructure.Persistence.Repositories
 
         public UserRepository(UserDbContext Context) => _context = Context;
 
-        public async Task AddAsync(User user, CancellationToken cancellationToken)
-        {
-            await _context.Users.AddAsync(user, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+        public void Add(User user)
+        => _context.Users.Add(user);
 
         public Task<UserDto?> GetProfileByIdAsync(Guid userId, CancellationToken cancellationToken)
         => _context.Users
@@ -26,7 +23,18 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 u.FullName,
                 u.Gender,
                 u.DateOfBirth,
-                u.Email
+                u.Email,
+                u.Role,
+
+                u.StudentProfile != null ? u.StudentProfile.StudentCode : null,
+
+                u.LecturerProfile != null ? u.LecturerProfile.LecturerCode : null,
+
+                u.StudentProfile != null ? u.StudentProfile.FacultyCode
+                : u.LecturerProfile != null ? u.LecturerProfile.FacultyCode
+                : null,
+
+                u.StudentProfile != null ? u.StudentProfile.MajorCode : null
             ))
             .FirstOrDefaultAsync(cancellationToken);
 

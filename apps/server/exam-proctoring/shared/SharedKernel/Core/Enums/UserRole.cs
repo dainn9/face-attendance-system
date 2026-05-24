@@ -1,4 +1,4 @@
-namespace auth_service.Domain.Enum
+namespace SharedKernel.Core.Enums
 {
     public enum UserRole
     {

@@ -1,19 +1,23 @@
+using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Time;
 using MediatR;
+using SharedKernel.Core.Enums;
 using user_service.Application.Abstractions.Persistence;
 using user_service.Domain.Aggregates.User;
 
 namespace user_service.Application.Features.Users.Commands.CreateUser
 {
-    public class CreateUser : IRequestHandler<CreateUserCommand>
+    public class CreateUserHandler : IRequestHandler<CreateUserCommand>
     {
         private readonly IUserRepository _userRepository;
         private readonly IClock _clock;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateUser(IUserRepository userRepository, IClock clock)
+        public CreateUserHandler(IUserRepository userRepository, IClock clock, IUnitOfWork unitOfWork)
         {
             _userRepository = userRepository;
             _clock = clock;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -27,10 +31,29 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                 request.Gender,
                 request.DateOfBirth,
                 request.Email,
+                request.Role,
                 _clock.UtcNow
             );
 
-            await _userRepository.AddAsync(user, cancellationToken);
+            switch (request.Role)
+            {
+                case UserRole.Student:
+                    user.AddStudentProfile(
+                        request.StudentCode!,
+                        request.FacultyCode!,
+                        request.MajorCode!
+                    );
+                    break;
+                case UserRole.Lecturer:
+                    user.AddLecturerProfile(
+                        request.LecturerCode!,
+                        request.FacultyCode!
+                    );
+                    break;
+            }
+
+            _userRepository.Add(user);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 }

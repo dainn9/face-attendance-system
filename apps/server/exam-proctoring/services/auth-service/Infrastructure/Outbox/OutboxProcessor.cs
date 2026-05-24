@@ -1,9 +1,10 @@
-using System.Text.Json;
 using auth_service.Application.Abstractions.Clients;
 using auth_service.Application.Abstractions.Persistence;
+using auth_service.Application.Contracts;
 using auth_service.Application.IntegrationEvents;
 using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Time;
+using System.Text.Json;
 
 namespace auth_service.Infrastructure.Outbox
 {
@@ -48,14 +49,20 @@ namespace auth_service.Infrastructure.Outbox
                                 continue;
                             }
 
-                            await userClient.CreateUserAsync(
+                            var createUserRequest = new CreateUserRequest(
                                 payload.UserId,
                                 payload.FullName,
                                 payload.Gender,
                                 payload.DateOfBirth,
                                 payload.Email,
-                                stoppingToken
+                                payload.Role,
+                                payload.StudentCode,
+                                payload.LecturerCode,
+                                payload.FacultyCode,
+                                payload.MajorCode
                             );
+
+                            await userClient.CreateUserAsync(createUserRequest, stoppingToken);
 
                             authUser.UpdateActiveStatus(true, clock.UtcNow);
                         }

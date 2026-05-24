@@ -28,5 +28,9 @@ namespace BuildingBlocks.Exceptions
         // ======= REFRESH TOKEN =======
         public const string RefreshTokenStoreFailed = "REFRESH_TOKEN_STORE_FAILED";
 
+        // ======= USER SERVICE =======
+        public const string LecturerProfileAlreadyExists = "LECTURER_PROFILE_ALREADY_EXISTS";
+        public const string StudentProfileAlreadyExists = "STUDENT_PROFILE_ALREADY_EXISTS";
+        public const string InvalidUserRole = "INVALID_USER_ROLE";
     }
 }

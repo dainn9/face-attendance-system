@@ -1,10 +1,10 @@
 using auth_service.Application.Abstractions.Security;
 using auth_service.Application.Abstractions.Seed;
 using auth_service.Domain.Aggregates.User;
-using auth_service.Domain.Enum;
 using auth_service.Domain.ValueObjects;
 using auth_service.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel.Core.Enums;
 
 namespace auth_service.Infrastructure.Seed
 {
