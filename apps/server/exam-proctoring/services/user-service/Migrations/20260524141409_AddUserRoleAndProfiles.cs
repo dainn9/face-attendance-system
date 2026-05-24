@@ -11,6 +11,10 @@ namespace user_service.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropIndex(
+                name: "IX_users_Id",
+                table: "users");
+
             migrationBuilder.AddColumn<string>(
                 name: "Role",
                 table: "users",
@@ -65,6 +69,12 @@ namespace user_service.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_users_Email",
+                table: "users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_lecturer_profiles_LecturerCode",
                 table: "lecturer_profiles",
                 column: "LecturerCode",
@@ -86,9 +96,18 @@ namespace user_service.Migrations
             migrationBuilder.DropTable(
                 name: "student_profiles");
 
+            migrationBuilder.DropIndex(
+                name: "IX_users_Email",
+                table: "users");
+
             migrationBuilder.DropColumn(
                 name: "Role",
                 table: "users");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_Id",
+                table: "users",
+                column: "Id");
         }
     }
 }
