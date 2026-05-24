@@ -4,12 +4,8 @@ namespace user_service.Domain.Aggregates.User
     {
         public Guid UserId { get; private set; }
         public string StudentCode { get; private set; } = null!;
-
         public string FacultyCode { get; private set; } = null!;
-
         public string MajorCode { get; private set; } = null!;
-
-        public User User { get; private set; } = null!;
 
         private StudentProfile() { }
 

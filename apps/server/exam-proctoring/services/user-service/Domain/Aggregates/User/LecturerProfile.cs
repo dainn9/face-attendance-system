@@ -3,12 +3,8 @@ namespace user_service.Domain.Aggregates.User
     public class LecturerProfile
     {
         public Guid UserId { get; private set; }
-
         public string LecturerCode { get; private set; } = null!;
-
         public string FacultyCode { get; private set; } = null!;
-
-        public User User { get; private set; } = null!;
 
         private LecturerProfile() { }
 
