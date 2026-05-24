@@ -9,6 +9,8 @@ namespace user_service.Infrastructure.Persistence
         { }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<StudentProfile> StudentProfiles => Set<StudentProfile>();
+        public DbSet<LecturerProfile> LecturerProfiles => Set<LecturerProfile>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

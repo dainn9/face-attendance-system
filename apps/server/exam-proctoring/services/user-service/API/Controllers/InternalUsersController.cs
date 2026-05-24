@@ -25,8 +25,14 @@ namespace user_service.API.Controllers
                 request.FullName,
                 request.Gender,
                 request.DateOfBirth,
-                request.Email
+                request.Email,
+                request.Role,
+                request.StudentCode,
+                request.LecturerCode,
+                request.FacultyCode,
+                request.MajorCode
             );
+
             await _mediator.Send(command);
             return NoContent();
         }

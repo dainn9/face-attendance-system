@@ -1,7 +1,7 @@
-using auth_service.Domain.Enum;
 using auth_service.Domain.ValueObjects;
 using BuildingBlocks.Exceptions;
 using SharedKernel.Core;
+using SharedKernel.Core.Enums;
 
 namespace auth_service.Domain.Aggregates.User
 {

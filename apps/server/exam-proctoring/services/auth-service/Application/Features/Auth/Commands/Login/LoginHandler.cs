@@ -3,6 +3,7 @@ using auth_service.Application.Contracts;
 using auth_service.Domain.Enum;
 using BuildingBlocks.Exceptions;
 using MediatR;
+using SharedKernel.Core.Enums;
 
 namespace auth_service.Application.Features.Auth.Commands.Login
 {

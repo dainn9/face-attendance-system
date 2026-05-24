@@ -6,13 +6,13 @@ using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
 using auth_service.Application.Features.Auth.Commands.Register;
 using auth_service.Application.Features.Auth.Queries.GetMe;
-using auth_service.Domain.Enum;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Extensions;
 using BuildingBlocks.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Core.Enums;
 
 namespace auth_service.API.Controllers
 {
@@ -139,7 +139,11 @@ namespace auth_service.API.Controllers
                 request.UserRole,
                 request.FullName,
                 request.Gender,
-                request.DateOfBirth
+                request.DateOfBirth,
+                request.StudentCode,
+                request.LecturerCode,
+                request.FacultyCode,
+                request.MajorCode
             );
 
             await _mediator.Send(command);

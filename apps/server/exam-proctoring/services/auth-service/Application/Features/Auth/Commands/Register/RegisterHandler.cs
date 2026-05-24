@@ -46,7 +46,13 @@ namespace auth_service.Application.Features.Auth.Commands.Register
                 request.FullName,
                 request.Gender,
                 request.DateOfBirth,
-                user.Email.Value
+                user.Email.Value,
+                request.UserRole,
+                request.StudentCode,
+                request.LecturerCode,
+                request.FacultyCode,
+                request.MajorCode
+
             );
 
             var outboxMessage = OutboxMessage.Create(
