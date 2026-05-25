@@ -32,5 +32,18 @@ namespace BuildingBlocks.Exceptions
         public const string LecturerProfileAlreadyExists = "LECTURER_PROFILE_ALREADY_EXISTS";
         public const string StudentProfileAlreadyExists = "STUDENT_PROFILE_ALREADY_EXISTS";
         public const string InvalidUserRole = "INVALID_USER_ROLE";
+
+        // ======= ATTENDANCE SERVICE =======
+        public const string StudentAlreadyCheckedIn = "STUDENT_ALREADY_CHECKED_IN";
+        public const string StudentAlreadyEnrolled = "STUDENT_ALREADY_ENROLLED";
+        public const string StudentNotEnrolled = "STUDENT_NOT_ENROLLED";
+        public const string AttendanceSessionNotOpen = "ATTENDANCE_SESSION_NOT_OPEN";
+
+        // ======= COURSE =======
+        public const string CourseCodeAlreadyExists = "COURSE_CODE_ALREADY_EXISTS";
+        public const string CourseNameAlreadyExists = "COURSE_NAME_ALREADY_EXISTS";
+        public const string CourseCodeRequired = "COURSE_CODE_REQUIRED";
+        public const string CourseNameRequired = "COURSE_NAME_REQUIRED";
+        public const string CourseCreditsInvalid = "COURSE_CREDITS_INVALID";
     }
 }
