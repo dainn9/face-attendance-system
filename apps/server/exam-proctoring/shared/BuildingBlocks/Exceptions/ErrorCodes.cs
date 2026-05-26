@@ -32,6 +32,9 @@ namespace BuildingBlocks.Exceptions
         public const string LecturerProfileAlreadyExists = "LECTURER_PROFILE_ALREADY_EXISTS";
         public const string StudentProfileAlreadyExists = "STUDENT_PROFILE_ALREADY_EXISTS";
         public const string InvalidUserRole = "INVALID_USER_ROLE";
+        public const string InvalidUserData = "INVALID_USER_DATA";
+        public const string InvalidLecturerProfile = "INVALID_LECTURER_PROFILE";
+        public const string InvalidStudentProfile = "INVALID_STUDENT_PROFILE";
 
         // ======= ATTENDANCE SERVICE =======
         public const string StudentAlreadyCheckedIn = "STUDENT_ALREADY_CHECKED_IN";

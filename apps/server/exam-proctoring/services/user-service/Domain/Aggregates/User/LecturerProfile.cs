@@ -1,3 +1,5 @@
+using BuildingBlocks.Exceptions;
+
 namespace user_service.Domain.Aggregates.User
 {
     public class LecturerProfile
@@ -10,6 +12,12 @@ namespace user_service.Domain.Aggregates.User
 
         public static LecturerProfile Create(Guid userId, string lecturerCode, string facultyCode)
         {
+            if (string.IsNullOrWhiteSpace(lecturerCode))
+                throw new BusinessRuleViolationException("Lecturer code cannot be empty.", ErrorCodes.InvalidLecturerProfile);
+
+            if (string.IsNullOrWhiteSpace(facultyCode))
+                throw new BusinessRuleViolationException("Faculty code cannot be empty.", ErrorCodes.InvalidLecturerProfile);
+
             return new LecturerProfile
             {
                 UserId = userId,
