@@ -13,6 +13,9 @@ namespace user_service.Domain.Aggregates.User
 
         public static StudentProfile Create(Guid userId, string studentCode, string facultyCode, string majorCode)
         {
+            if (userId == Guid.Empty)
+                throw new BusinessRuleViolationException("User ID cannot be empty.", ErrorCodes.InvalidStudentProfile);
+
             if (string.IsNullOrWhiteSpace(studentCode))
                 throw new BusinessRuleViolationException("Student code cannot be empty.", ErrorCodes.InvalidStudentProfile);
 
