@@ -14,13 +14,13 @@ namespace attendance_service.Domain.Aggregates.Course
         public static Course Create(string name, string code, int credits, DateTime now)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new BusinessRuleViolationException("Name is required.", ErrorCodes.CourseNameRequired);
+                throw new BusinessRuleViolationException("Name is required.", ErrorCodes.InvalidCourseData);
 
             if (string.IsNullOrWhiteSpace(code))
-                throw new BusinessRuleViolationException("Code is required.", ErrorCodes.CourseCodeRequired);
+                throw new BusinessRuleViolationException("Code is required.", ErrorCodes.InvalidCourseData);
 
             if (credits <= 0)
-                throw new BusinessRuleViolationException("Credits must be greater than 0.", ErrorCodes.CourseCreditsInvalid);
+                throw new BusinessRuleViolationException("Credits must be greater than 0.", ErrorCodes.InvalidCourseData);
 
             var course = new Course
             {
@@ -39,13 +39,13 @@ namespace attendance_service.Domain.Aggregates.Course
         public void Update(string name, string code, int credits, DateTime now)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new BusinessRuleViolationException("Name is required.", ErrorCodes.CourseNameRequired);
+                throw new BusinessRuleViolationException("Name is required.", ErrorCodes.InvalidCourseData);
 
             if (string.IsNullOrWhiteSpace(code))
-                throw new BusinessRuleViolationException("Code is required.", ErrorCodes.CourseCodeRequired);
+                throw new BusinessRuleViolationException("Code is required.", ErrorCodes.InvalidCourseData);
 
             if (credits <= 0)
-                throw new BusinessRuleViolationException("Credits must be greater than 0.", ErrorCodes.CourseCreditsInvalid);
+                throw new BusinessRuleViolationException("Credits must be greater than 0.", ErrorCodes.InvalidCourseData);
 
             Name = name;
             Code = code;
