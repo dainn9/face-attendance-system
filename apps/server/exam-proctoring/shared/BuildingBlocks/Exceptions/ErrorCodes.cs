@@ -44,9 +44,12 @@ namespace BuildingBlocks.Exceptions
 
         // ======= COURSE =======
         public const string CourseCodeAlreadyExists = "COURSE_CODE_ALREADY_EXISTS";
-        public const string CourseNameAlreadyExists = "COURSE_NAME_ALREADY_EXISTS";
-        public const string CourseCodeRequired = "COURSE_CODE_REQUIRED";
-        public const string CourseNameRequired = "COURSE_NAME_REQUIRED";
-        public const string CourseCreditsInvalid = "COURSE_CREDITS_INVALID";
+        public const string InvalidCourseData = "INVALID_COURSE_DATA";
+
+        // ======= COURSE SECTION =======
+        public const string InvalidCourseSectionData = "INVALID_COURSE_SECTION_DATA";
+
+        // ======= ENROLLMENT =======
+        public const string InvalidEnrollmentData = "INVALID_ENROLLMENT_DATA";
     }
 }

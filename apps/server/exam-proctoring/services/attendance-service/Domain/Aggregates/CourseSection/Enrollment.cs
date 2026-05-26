@@ -1,3 +1,5 @@
+using BuildingBlocks.Exceptions;
+
 namespace attendance_service.Domain.Aggregates.CourseSection
 {
     public class Enrollment
@@ -11,6 +13,12 @@ namespace attendance_service.Domain.Aggregates.CourseSection
 
         public static Enrollment Create(Guid courseSessionId, Guid studentId, DateTime now)
         {
+            if (courseSessionId == Guid.Empty)
+                throw new BusinessRuleViolationException("Course session ID cannot be empty.", ErrorCodes.InvalidEnrollmentData);
+
+            if (studentId == Guid.Empty)
+                throw new BusinessRuleViolationException("Student ID cannot be empty.", ErrorCodes.InvalidEnrollmentData);
+
             var enrollment = new Enrollment
             {
                 Id = Guid.NewGuid(),

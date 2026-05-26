@@ -18,6 +18,21 @@ namespace attendance_service.Domain.Aggregates.CourseSection
 
         public static CourseSession Create(Guid courseId, string sectionCode, string semester, string academicYear, Guid lecturerId, DateTime now)
         {
+            if (courseId == Guid.Empty)
+                throw new BusinessRuleViolationException("Course ID cannot be empty.", ErrorCodes.InvalidCourseSectionData);
+
+            if (string.IsNullOrWhiteSpace(sectionCode))
+                throw new BusinessRuleViolationException("Section code cannot be empty.", ErrorCodes.InvalidCourseSectionData);
+
+            if (string.IsNullOrWhiteSpace(semester))
+                throw new BusinessRuleViolationException("Semester cannot be empty.", ErrorCodes.InvalidCourseSectionData);
+
+            if (string.IsNullOrWhiteSpace(academicYear))
+                throw new BusinessRuleViolationException("Academic year cannot be empty.", ErrorCodes.InvalidCourseSectionData);
+
+            if (lecturerId == Guid.Empty)
+                throw new BusinessRuleViolationException("Lecturer ID cannot be empty.", ErrorCodes.InvalidCourseSectionData);
+
             var courseSession = new CourseSession
             {
                 Id = Guid.NewGuid(),
