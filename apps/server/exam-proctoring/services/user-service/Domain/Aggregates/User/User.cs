@@ -19,6 +19,18 @@ namespace user_service.Domain.Aggregates.User
 
         public static User Create(Guid userId, string fullName, Gender gender, DateOnly dateOfBirth, string email, UserRole role, DateTime now)
         {
+            if (userId == Guid.Empty)
+                throw new BusinessRuleViolationException("User ID cannot be empty.", ErrorCodes.InvalidUserData);
+
+            if (string.IsNullOrWhiteSpace(fullName))
+                throw new BusinessRuleViolationException("Full name cannot be empty.", ErrorCodes.InvalidUserData);
+
+            if (string.IsNullOrWhiteSpace(email))
+                throw new BusinessRuleViolationException("Email cannot be empty.", ErrorCodes.InvalidUserData);
+
+            if (dateOfBirth >= DateOnly.FromDateTime(now))
+                throw new BusinessRuleViolationException("Date of birth must be in the past.", ErrorCodes.InvalidUserData);
+
             var user = new User
             {
                 Id = userId,
