@@ -44,27 +44,18 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                     .WithMessage(ValidationMessages.Required)
                     .MaximumLength(20);
 
+                RuleFor(x => x.ClassCode)
+                    .NotEmpty()
+                    .WithMessage(ValidationMessages.Required)
+                    .MaximumLength(20);
+
                 RuleFor(x => x.FacultyCode)
-                    .NotEmpty()
-                    .WithMessage(ValidationMessages.Required)
-                    .MaximumLength(20);
-
-                RuleFor(x => x.MajorCode)
-                    .NotEmpty()
-                    .WithMessage(ValidationMessages.Required)
-                    .MaximumLength(20);
-
-                RuleFor(x => x.LecturerCode)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
             });
 
             When(x => x.Role == UserRole.Lecturer, () =>
             {
-                RuleFor(x => x.LecturerCode)
-                    .NotEmpty()
-                    .WithMessage(ValidationMessages.Required)
-                    .MaximumLength(20);
 
                 RuleFor(x => x.FacultyCode)
                     .NotEmpty()
@@ -75,7 +66,7 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
 
-                RuleFor(x => x.MajorCode)
+                RuleFor(x => x.ClassCode)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
             });
@@ -90,11 +81,7 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
 
-                RuleFor(x => x.MajorCode)
-                    .Empty()
-                    .WithMessage(ValidationMessages.NotAllowed);
-
-                RuleFor(x => x.LecturerCode)
+                RuleFor(x => x.ClassCode)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
             });

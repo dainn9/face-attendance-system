@@ -8,5 +8,6 @@ namespace user_service.Application.Abstractions.Persistence
         void Add(User user);
         Task<UserDto?> GetProfileByIdAsync(Guid userId, CancellationToken cancellationToken);
         Task<bool> ExistsByIdAsync(Guid userId, CancellationToken cancellationToken);
+        Task<bool> ExistsByStudentCodeAsync(string studentCode, CancellationToken cancellationToken);
     }
 }

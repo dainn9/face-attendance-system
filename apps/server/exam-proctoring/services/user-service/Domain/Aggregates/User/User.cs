@@ -47,7 +47,7 @@ namespace user_service.Domain.Aggregates.User
             return user;
         }
 
-        public void AddLecturerProfile(string lecturerCode, string facultyCode)
+        public void AddLecturerProfile(string facultyCode)
         {
             if (Role != UserRole.Lecturer)
                 throw new BusinessRuleViolationException("Cannot add lecturer profile to a non-lecturer user.", ErrorCodes.InvalidUserRole);
@@ -57,12 +57,11 @@ namespace user_service.Domain.Aggregates.User
 
             LecturerProfile = LecturerProfile.Create(
                 Id,
-                lecturerCode,
                 facultyCode
             );
         }
 
-        public void AddStudentProfile(string studentCode, string facultyCode, string majorCode)
+        public void AddStudentProfile(string studentCode, string classCode)
         {
             if (Role != UserRole.Student)
                 throw new BusinessRuleViolationException("Cannot add student profile to a non-student user.", ErrorCodes.InvalidUserRole);
@@ -73,8 +72,7 @@ namespace user_service.Domain.Aggregates.User
             StudentProfile = StudentProfile.Create(
                 Id,
                 studentCode,
-                facultyCode,
-                majorCode
+                classCode
             );
         }
     }

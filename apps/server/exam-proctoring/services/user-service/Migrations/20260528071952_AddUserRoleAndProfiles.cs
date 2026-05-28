@@ -27,8 +27,6 @@ namespace user_service.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    LecturerCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     FacultyCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -51,9 +49,7 @@ namespace user_service.Migrations
                     UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     StudentCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    FacultyCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    MajorCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                    ClassCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -72,12 +68,6 @@ namespace user_service.Migrations
                 name: "IX_users_Email",
                 table: "users",
                 column: "Email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_lecturer_profiles_LecturerCode",
-                table: "lecturer_profiles",
-                column: "LecturerCode",
                 unique: true);
 
             migrationBuilder.CreateIndex(

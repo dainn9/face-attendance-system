@@ -1,5 +1,4 @@
 using auth_service.Domain.Aggregates.User;
-using auth_service.Domain.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace auth_service.Infrastructure.Persistence
@@ -9,7 +8,7 @@ namespace auth_service.Infrastructure.Persistence
         public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
 
         public DbSet<User> Users => Set<User>();
-        public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+        // public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

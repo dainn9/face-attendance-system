@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using api_gateway.Clients;
+using api_gateway.Middleware;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Results;
 using BuildingBlocks.Security.Jwt;
@@ -13,7 +15,45 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 // Add services to the container.
 
-builder.Services.AddControllers();
+// =============================
+// Clients
+// =============================
+static void ConfigureInternalClient(
+    IServiceProvider sp,
+    HttpClient client,
+    string serviceKey)
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+
+    client.BaseAddress = new Uri(
+        config[$"Services:{serviceKey}:BaseUrl"]!);
+
+    client.DefaultRequestHeaders.Add(
+        "X-Internal-Api-Key",
+        config["InternalAuth:ApiKey"]!);
+}
+
+builder.Services.AddHttpClient<UserClient>(
+    (sp, client) =>
+        ConfigureInternalClient(
+            sp,
+            client,
+            "UserService"));
+
+builder.Services.AddHttpClient<AuthClient>(
+    (sp, client) =>
+        ConfigureInternalClient(
+            sp,
+            client,
+            "AuthService"));
+
+builder.Services.AddControllers()
+.AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition =
+            JsonIgnoreCondition.WhenWritingNull;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -137,6 +177,11 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 app.UseCors("AllowFrontend");
+
+// =============================
+// Middleware
+// =============================
+app.UseMiddleware<GatewayExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

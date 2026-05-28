@@ -52,11 +52,7 @@ namespace user_service.Infrastructure.Persistence.Configurations
                 sp.HasIndex(x => x.StudentCode)
                     .IsUnique();
 
-                sp.Property(x => x.FacultyCode)
-                    .IsRequired()
-                    .HasMaxLength(20);
-
-                sp.Property(x => x.MajorCode)
+                sp.Property(x => x.ClassCode)
                     .IsRequired()
                     .HasMaxLength(20);
             });
@@ -68,13 +64,6 @@ namespace user_service.Infrastructure.Persistence.Configurations
                 lp.WithOwner().HasForeignKey(x => x.UserId);
 
                 lp.HasKey(x => x.UserId);
-
-                lp.Property(x => x.LecturerCode)
-                    .IsRequired()
-                    .HasMaxLength(20);
-
-                lp.HasIndex(x => x.LecturerCode)
-                    .IsUnique();
 
                 lp.Property(x => x.FacultyCode)
                     .IsRequired()

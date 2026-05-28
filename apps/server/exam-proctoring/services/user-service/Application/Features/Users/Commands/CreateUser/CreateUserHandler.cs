@@ -1,4 +1,5 @@
 using BuildingBlocks.Abstractions.Persistence;
+using BuildingBlocks.Exceptions;
 using BuildingBlocks.Time;
 using MediatR;
 using SharedKernel.Core.Enums;
@@ -38,15 +39,19 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             switch (request.Role)
             {
                 case UserRole.Student:
-                    user.AddStudentProfile(
-                        request.StudentCode!,
-                        request.FacultyCode!,
-                        request.MajorCode!
-                    );
+                    {
+                        if (await _userRepository.ExistsByStudentCodeAsync(request.StudentCode!, cancellationToken))
+                            throw new BusinessRuleViolationException($"Student code {request.StudentCode} already exists.", ErrorCodes.StudentCodeAlreadyExists);
+
+                        user.AddStudentProfile(
+                            request.StudentCode!,
+                            request.ClassCode!
+                        );
+                    }
                     break;
+
                 case UserRole.Lecturer:
                     user.AddLecturerProfile(
-                        request.LecturerCode!,
                         request.FacultyCode!
                     );
                     break;

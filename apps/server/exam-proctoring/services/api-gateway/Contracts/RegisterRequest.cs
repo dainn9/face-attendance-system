@@ -1,6 +1,6 @@
 using SharedKernel.Core.Enums;
 
-namespace auth_service.API.Contracts
+namespace api_gateway.Contracts
 {
     public record RegisterRequest(
         string Email,
@@ -10,8 +10,7 @@ namespace auth_service.API.Contracts
         Gender Gender,
         DateOnly DateOfBirth,
         string? StudentCode,
-        string? LecturerCode,
-        string? FacultyCode,
-        string? MajorCode
+        string? ClassCode,
+        string? FacultyCode
     );
 }

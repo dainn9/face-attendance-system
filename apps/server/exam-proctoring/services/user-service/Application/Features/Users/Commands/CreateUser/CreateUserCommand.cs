@@ -11,8 +11,7 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
         string Email,
         UserRole Role,
         string? StudentCode,
-        string? LecturerCode,
-        string? FacultyCode,
-        string? MajorCode
+        string? ClassCode,
+        string? FacultyCode
     ) : IRequest;
 }
