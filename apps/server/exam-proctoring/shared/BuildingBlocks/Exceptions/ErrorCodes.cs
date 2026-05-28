@@ -3,6 +3,7 @@ namespace BuildingBlocks.Exceptions
     public class ErrorCodes
     {
         // ======= GENERAL =======
+        public const string InternalServerError = "INTERNAL_SERVER_ERROR";
         public const string Token_Expired = "TOKEN_EXPIRED";
         public const string NotFound = "NOT_FOUND";
         public const string EntityNotFound = "ENTITY_NOT_FOUND";
@@ -35,6 +36,7 @@ namespace BuildingBlocks.Exceptions
         public const string InvalidUserData = "INVALID_USER_DATA";
         public const string InvalidLecturerProfile = "INVALID_LECTURER_PROFILE";
         public const string InvalidStudentProfile = "INVALID_STUDENT_PROFILE";
+        public const string StudentCodeAlreadyExists = "STUDENT_CODE_ALREADY_EXISTS";
 
         // ======= ATTENDANCE SERVICE =======
         public const string StudentAlreadyCheckedIn = "STUDENT_ALREADY_CHECKED_IN";

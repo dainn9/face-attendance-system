@@ -6,12 +6,11 @@ namespace user_service.Domain.Aggregates.User
     {
         public Guid UserId { get; private set; }
         public string StudentCode { get; private set; } = null!;
-        public string FacultyCode { get; private set; } = null!;
-        public string MajorCode { get; private set; } = null!;
+        public string ClassCode { get; private set; } = null!;
 
         private StudentProfile() { }
 
-        public static StudentProfile Create(Guid userId, string studentCode, string facultyCode, string majorCode)
+        public static StudentProfile Create(Guid userId, string studentCode, string classCode)
         {
             if (userId == Guid.Empty)
                 throw new BusinessRuleViolationException("User ID cannot be empty.", ErrorCodes.InvalidStudentProfile);
@@ -19,18 +18,14 @@ namespace user_service.Domain.Aggregates.User
             if (string.IsNullOrWhiteSpace(studentCode))
                 throw new BusinessRuleViolationException("Student code cannot be empty.", ErrorCodes.InvalidStudentProfile);
 
-            if (string.IsNullOrWhiteSpace(facultyCode))
-                throw new BusinessRuleViolationException("Faculty code cannot be empty.", ErrorCodes.InvalidStudentProfile);
-
-            if (string.IsNullOrWhiteSpace(majorCode))
-                throw new BusinessRuleViolationException("Major code cannot be empty.", ErrorCodes.InvalidStudentProfile);
+            if (string.IsNullOrWhiteSpace(classCode))
+                throw new BusinessRuleViolationException("Class code cannot be empty.", ErrorCodes.InvalidStudentProfile);
 
             return new StudentProfile
             {
                 UserId = userId,
                 StudentCode = studentCode,
-                FacultyCode = facultyCode,
-                MajorCode = majorCode
+                ClassCode = classCode
             };
         }
     }

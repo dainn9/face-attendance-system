@@ -1,6 +1,6 @@
 using SharedKernel.Core.Enums;
 
-namespace auth_service.Application.Contracts
+namespace api_gateway.Contracts
 {
     public record CreateUserRequest(
         Guid UserId,
@@ -9,9 +9,9 @@ namespace auth_service.Application.Contracts
         DateOnly DateOfBirth,
         string Email,
         UserRole Role,
+
         string? StudentCode,
-        string? LecturerCode,
-        string? FacultyCode,
-        string? MajorCode
+        string? ClassCode,
+        string? FacultyCode
     );
 }

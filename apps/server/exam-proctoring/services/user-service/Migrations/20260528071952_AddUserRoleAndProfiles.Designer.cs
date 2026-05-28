@@ -11,7 +11,7 @@ using user_service.Infrastructure.Persistence;
 namespace user_service.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260524141409_AddUserRoleAndProfiles")]
+    [Migration("20260528071952_AddUserRoleAndProfiles")]
     partial class AddUserRoleAndProfiles
     {
         /// <inheritdoc />
@@ -76,15 +76,7 @@ namespace user_service.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("varchar(20)");
 
-                            b1.Property<string>("LecturerCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("varchar(20)");
-
                             b1.HasKey("UserId");
-
-                            b1.HasIndex("LecturerCode")
-                                .IsUnique();
 
                             b1.ToTable("lecturer_profiles", (string)null);
 
@@ -97,12 +89,7 @@ namespace user_service.Migrations
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("char(36)");
 
-                            b1.Property<string>("FacultyCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("varchar(20)");
-
-                            b1.Property<string>("MajorCode")
+                            b1.Property<string>("ClassCode")
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("varchar(20)");

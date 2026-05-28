@@ -4,7 +4,6 @@ using auth_service.Application.Features.Auth.Commands.ChangePassword;
 using auth_service.Application.Features.Auth.Commands.Login;
 using auth_service.Application.Features.Auth.Commands.Logout;
 using auth_service.Application.Features.Auth.Commands.RefreshToken;
-using auth_service.Application.Features.Auth.Commands.Register;
 using auth_service.Application.Features.Auth.Queries.GetMe;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Extensions;
@@ -12,7 +11,6 @@ using BuildingBlocks.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel.Core.Enums;
 
 namespace auth_service.API.Controllers
 {
@@ -129,30 +127,29 @@ namespace auth_service.API.Controllers
         // Admin-only
         // =============================
         // POST: api/v1/auth/register
-        [Authorize(Roles = nameof(UserRole.Admin))]
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            var command = new RegisterCommand(
-                request.Email,
-                request.Password,
-                request.UserRole,
-                request.FullName,
-                request.Gender,
-                request.DateOfBirth,
-                request.StudentCode,
-                request.LecturerCode,
-                request.FacultyCode,
-                request.MajorCode
-            );
+        // [Authorize(Roles = nameof(UserRole.Admin))]
+        // [HttpPost("register")]
+        // public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        // {
+        //     var command = new RegisterCommand(
+        //         request.Email,
+        //         request.Password,
+        //         request.UserRole,
+        //         request.FullName,
+        //         request.Gender,
+        //         request.DateOfBirth,
+        //         request.StudentCode,
+        //         request.ClassCode,
+        //         request.FacultyCode
+        //     );
 
-            await _mediator.Send(command);
-            return Ok(new ApiResponse<object>
-            {
-                Success = true,
-                Message = "Registration successful"
-            });
-        }
+        //     await _mediator.Send(command);
+        //     return Ok(new ApiResponse<object>
+        //     {
+        //         Success = true,
+        //         Message = "Registration successful"
+        //     });
+        // }
 
         // =============================
         // Helpers

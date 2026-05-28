@@ -14,6 +14,9 @@ namespace auth_service.Infrastructure.Persistence.Repositories
         public void Add(User user)
         => _context.Users.Add(user);
 
+        public void Remove(User user)
+        => _context.Users.Remove(user);
+
         public async Task UpdateAsync(User user, CancellationToken ct = default)
         {
             _context.Users.Update(user);

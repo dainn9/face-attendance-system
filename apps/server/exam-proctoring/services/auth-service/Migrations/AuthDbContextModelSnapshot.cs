@@ -61,44 +61,6 @@ namespace auth_service.Migrations
 
                     b.ToTable("users", (string)null);
                 });
-
-            modelBuilder.Entity("auth_service.Domain.Outbox.OutboxMessage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Error")
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)");
-
-                    b.Property<DateTime?>("NextRetryAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("OccurredAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Payload")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("ProcessedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("RetryCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProcessedAt", "NextRetryAt");
-
-                    b.ToTable("OutboxMessages", (string)null);
-                });
 #pragma warning restore 612, 618
         }
     }

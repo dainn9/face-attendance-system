@@ -11,8 +11,7 @@ namespace user_service.Application.Contracts
         UserRole Role,
 
         string? StudentCode,
-        string? LecturerCode,
-        string? FacultyCode,
-        string? MajorCode
+        string? CLassCode,
+        string? FacultyCode
     );
 }

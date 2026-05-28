@@ -28,13 +28,9 @@ namespace user_service.Infrastructure.Persistence.Repositories
 
                 u.StudentProfile != null ? u.StudentProfile.StudentCode : null,
 
-                u.LecturerProfile != null ? u.LecturerProfile.LecturerCode : null,
+                u.StudentProfile != null ? u.StudentProfile.ClassCode : null,
 
-                u.StudentProfile != null ? u.StudentProfile.FacultyCode
-                : u.LecturerProfile != null ? u.LecturerProfile.FacultyCode
-                : null,
-
-                u.StudentProfile != null ? u.StudentProfile.MajorCode : null
+                u.LecturerProfile != null ? u.LecturerProfile.FacultyCode : null
             ))
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -42,5 +38,10 @@ namespace user_service.Infrastructure.Persistence.Repositories
         => _context.Users
             .AsNoTracking()
             .AnyAsync(u => u.Id == userId, cancellationToken);
+
+        public Task<bool> ExistsByStudentCodeAsync(string studentCode, CancellationToken cancellationToken)
+        => _context.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.StudentProfile != null && u.StudentProfile.StudentCode == studentCode, cancellationToken);
     }
 }

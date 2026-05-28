@@ -3,9 +3,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace user_service.API.Auth
+namespace BuildingBlocks.Security.Internal
 {
     public class InternalAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
