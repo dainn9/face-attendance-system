@@ -1,40 +1,26 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using attendance_service.Application.DependencyInjection;
-using attendance_service.Infrastructure.DependencyInjection;
-using attendance_service.Infrastructure.Persistence;
 using BuildingBlocks.Exceptions;
-using BuildingBlocks.Middleware;
 using BuildingBlocks.Results;
+using BuildingBlocks.Security.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// =============================
-// Add Layers
-// =============================
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 // Add services to the container.
 
-builder.Services.AddControllers()
-.AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.DefaultIgnoreCondition =
-            JsonIgnoreCondition.WhenWritingNull;
-    });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // =============================
 // Authentication / Authorization
 // =============================
-var jwtSettings = builder.Configuration.GetSection("Jwt").Get<BuildingBlocks.Security.Jwt.JwtSettings>();
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 
 if (jwtSettings == null)
     throw new ConfigurationException("Missing JWT configuration in appsettings.json");
@@ -48,6 +34,19 @@ if (!File.Exists(jwtSettings.PublicKeyPath))
 var publicPem = await File.ReadAllTextAsync(jwtSettings.PublicKeyPath);
 using var rsa = RSA.Create();
 rsa.ImportFromPem(publicPem);
+
+// CORS Configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 builder.Services
 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -137,10 +136,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// =============================
-// Middleware
-// =============================
-app.UseGlobalExceptionHandler();
+app.UseCors("AllowFrontend");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -154,27 +150,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapReverseProxy();
 app.MapControllers();
-
-// Database Migration & Seed
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AttendanceDbContext>();
-    if (app.Environment.IsDevelopment())
-    {
-        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-
-        if (pendingMigrations.Any())
-        {
-            Console.WriteLine("Applying migrations...");
-            await context.Database.MigrateAsync();
-            Console.WriteLine("Migrations applied successfully.");
-        }
-        else
-        {
-            Console.WriteLine("Database is up to date.");
-        }
-    }
-}
 
 app.Run();

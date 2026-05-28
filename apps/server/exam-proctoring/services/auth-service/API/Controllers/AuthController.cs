@@ -17,14 +17,14 @@ using SharedKernel.Core.Enums;
 namespace auth_service.API.Controllers
 {
     [ApiController]
-    [Route("api/v1/auths")]
+    [Route("api/v1/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
 
         public AuthController(IMediator mediator) => _mediator = mediator;
 
-        // POST: api/v1/auths/login
+        // POST: api/v1/auth/login
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> LoginAdmin([FromBody] LoginRequest request)
@@ -39,7 +39,7 @@ namespace auth_service.API.Controllers
             });
         }
 
-        // POST: api/v1/auths/logout
+        // POST: api/v1/auth/logout
         [AllowAnonymous]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
@@ -71,7 +71,7 @@ namespace auth_service.API.Controllers
             });
         }
 
-        // POST: api/v1/auths/refresh
+        // POST: api/v1/auth/refresh
         [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
@@ -92,7 +92,7 @@ namespace auth_service.API.Controllers
         // =============================
         // Password
         // =============================
-        // POST: api/v1/auths/change-password
+        // POST: api/v1/auth/change-password
         [Authorize]
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
@@ -110,7 +110,7 @@ namespace auth_service.API.Controllers
         // =============================
         // Me
         // =============================
-        // GET: api/v1/auths/me
+        // GET: api/v1/auth/me
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
@@ -128,7 +128,7 @@ namespace auth_service.API.Controllers
         // =============================
         // Admin-only
         // =============================
-        // POST: api/v1/auths/register
+        // POST: api/v1/auth/register
         [Authorize(Roles = nameof(UserRole.Admin))]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
