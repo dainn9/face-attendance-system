@@ -48,7 +48,6 @@ api.interceptors.response.use(
             isRefreshing = false;
             return Promise.reject(new UnauthorizedError());
         }
-
         // HANDLE 401 + REFRESH TOKEN
         if (status === 401 && data?.errorCode === ERROR_CODE.Token_Expired) {
             if (isRefreshing) {
@@ -65,7 +64,7 @@ api.interceptors.response.use(
 
             try {
                 await axios.post(
-                    `${API_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
+                    `${API_URL}/${API_ENDPOINTS.AUTH.REFRESH}`,
                     {},
                     { withCredentials: true }
                 );

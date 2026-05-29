@@ -11,8 +11,8 @@ using user_service.Infrastructure.Persistence;
 namespace user_service.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260528071952_AddUserRoleAndProfiles")]
-    partial class AddUserRoleAndProfiles
+    [Migration("20260529143609_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,6 +21,39 @@ namespace user_service.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("user_service.Domain.Aggregates.Faculty.Faculty", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("faculties", (string)null);
+                });
 
             modelBuilder.Entity("user_service.Domain.Aggregates.User.User", b =>
                 {
@@ -62,6 +95,46 @@ namespace user_service.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("user_service.Domain.Aggregates.Faculty.Faculty", b =>
+                {
+                    b.OwnsMany("user_service.Domain.Aggregates.Faculty.Major", "Majors", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("char(36)");
+
+                            b1.Property<string>("Code")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(20)");
+
+                            b1.Property<Guid>("FacultyId")
+                                .HasColumnType("char(36)");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("varchar(100)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("FacultyId", "Code")
+                                .IsUnique()
+                                .HasDatabaseName("IX_Major_FacultyId_Code");
+
+                            b1.HasIndex("FacultyId", "Name")
+                                .IsUnique()
+                                .HasDatabaseName("IX_Major_FacultyId_Name");
+
+                            b1.ToTable("majors", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("FacultyId");
+                        });
+
+                    b.Navigation("Majors");
                 });
 
             modelBuilder.Entity("user_service.Domain.Aggregates.User.User", b =>
