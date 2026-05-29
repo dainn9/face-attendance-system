@@ -13,7 +13,7 @@ namespace user_service.Domain.Aggregates.Faculty
 
         private Faculty() { }
 
-        public static Faculty Create(string name, string code)
+        public static Faculty Create(string name, string code, DateTime now)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new BusinessRuleViolationException("Faculty name cannot be empty.", ErrorCodes.InvalidFacultyData);
@@ -21,12 +21,16 @@ namespace user_service.Domain.Aggregates.Faculty
             if (string.IsNullOrWhiteSpace(code))
                 throw new BusinessRuleViolationException("Faculty code cannot be empty.", ErrorCodes.InvalidFacultyData);
 
-            return new Faculty
+            var faculty = new Faculty
             {
                 Id = Guid.NewGuid(),
                 Name = name.Trim(),
                 Code = code.Trim().ToUpperInvariant()
             };
+            faculty.SetCreated(now);
+            faculty.SetUpdated(now);
+
+            return faculty;
         }
 
         public void AddMajor(string name, string code)

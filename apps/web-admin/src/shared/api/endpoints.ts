@@ -1,9 +1,16 @@
+const AUTH_PREFIX = import.meta.env.VITE_PRIFIX_API_AUTH;
+const FACULTIES_PREFIX = import.meta.env.VITE_PRIFIX_API_USERS;
+
+
 export const API_ENDPOINTS = {
     AUTH: {
-        REFRESH: "/auths/refresh",
-        LOGIN: "/auths/login-admin",
-        LOGOUT: "/auths/logout",
-        CHANGE_PASSWORD: "/auths/change-password",
-        ME: "/auths/me",
+        REFRESH: `${AUTH_PREFIX}/auth/refresh`,
+        LOGIN: `${AUTH_PREFIX}/auth/login`,
+        LOGOUT: `${AUTH_PREFIX}/auth/logout`,
+        CHANGE_PASSWORD: `${AUTH_PREFIX}/auth/change-password`,
+        ME: `${AUTH_PREFIX}/auth/me`,
     },
+    FACULTIES: {
+        CREATE: `${FACULTIES_PREFIX}/faculties`,
+    }
 }

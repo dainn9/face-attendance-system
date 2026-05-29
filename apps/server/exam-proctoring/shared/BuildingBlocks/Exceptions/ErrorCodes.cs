@@ -45,6 +45,8 @@ namespace BuildingBlocks.Exceptions
         public const string MajorCodeAlreadyExists = "MAJOR_CODE_ALREADY_EXISTS";
         public const string InvalidFacultyData = "INVALID_FACULTY_DATA";
         public const string InvalidMajorData = "INVALID_MAJOR_DATA";
+        public const string FacultyNameAlreadyExists = "FACULTY_NAME_ALREADY_EXISTS";
+        public const string FacultyCodeAlreadyExists = "FACULTY_Code_ALREADY_EXISTS";
 
         // ======= FACULTY =======
         public const string FacultyAlreadyExists = "FACULTY_ALREADY_EXISTS";
