@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using user_service.Domain.Aggregates.Faculty;
 using user_service.Domain.Aggregates.User;
 
 namespace user_service.Infrastructure.Persistence
@@ -9,6 +10,7 @@ namespace user_service.Infrastructure.Persistence
         { }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<Faculty> Faculties => Set<Faculty>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

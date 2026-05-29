@@ -38,6 +38,14 @@ namespace BuildingBlocks.Exceptions
         public const string InvalidStudentProfile = "INVALID_STUDENT_PROFILE";
         public const string StudentCodeAlreadyExists = "STUDENT_CODE_ALREADY_EXISTS";
 
+        // ======= FACULTY =======
+        public const string FacultyAlreadyExists = "FACULTY_ALREADY_EXISTS";
+        public const string MajorAlreadyExists = "MAJOR_ALREADY_EXISTS";
+        public const string MajorNameAlreadyExists = "MAJOR_NAME_ALREADY_EXISTS";
+        public const string MajorCodeAlreadyExists = "MAJOR_CODE_ALREADY_EXISTS";
+        public const string InvalidFacultyData = "INVALID_FACULTY_DATA";
+        public const string InvalidMajorData = "INVALID_MAJOR_DATA";
+
         // ======= ATTENDANCE SERVICE =======
         public const string StudentAlreadyCheckedIn = "STUDENT_ALREADY_CHECKED_IN";
         public const string StudentAlreadyEnrolled = "STUDENT_ALREADY_ENROLLED";
