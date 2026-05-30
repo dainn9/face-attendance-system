@@ -36,8 +36,7 @@ namespace BuildingBlocks.Exceptions
         public const string InvalidUserData = "INVALID_USER_DATA";
         public const string InvalidLecturerProfile = "INVALID_LECTURER_PROFILE";
         public const string InvalidStudentProfile = "INVALID_STUDENT_PROFILE";
-        public const string StudentCodeAlreadyExists = "STUDENT_CODE_ALREADY_EXISTS";
-
+        public const string UserCodeAlreadyExists = "USER_CODE_ALREADY_EXISTS";
         // ======= FACULTY =======
         public const string FacultyAlreadyExists = "FACULTY_ALREADY_EXISTS";
         public const string MajorAlreadyExists = "MAJOR_ALREADY_EXISTS";

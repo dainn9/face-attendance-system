@@ -9,9 +9,12 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
         public CreateUserValidator()
         {
             RuleFor(x => x.UserId)
+                .ValidGuid();
+
+            RuleFor(x => x.UserCode)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
-                .ValidGuid();
+                .MaximumLength(20);
 
             RuleFor(x => x.FullName)
                 .NotEmpty()
@@ -39,49 +42,37 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
 
             When(x => x.Role == UserRole.Student, () =>
             {
-                RuleFor(x => x.StudentCode)
+                RuleFor(x => x.MajorId)
                     .NotEmpty()
-                    .WithMessage(ValidationMessages.Required)
-                    .MaximumLength(20);
+                    .WithMessage(ValidationMessages.InvalidGuid)
+                    .NotNull()
+                    .WithMessage(ValidationMessages.InvalidGuid);
 
-                RuleFor(x => x.ClassCode)
-                    .NotEmpty()
-                    .WithMessage(ValidationMessages.Required)
-                    .MaximumLength(20);
-
-                RuleFor(x => x.FacultyCode)
+                RuleFor(x => x.FacultyId)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
             });
 
             When(x => x.Role == UserRole.Lecturer, () =>
             {
-
-                RuleFor(x => x.FacultyCode)
+                RuleFor(x => x.FacultyId)
                     .NotEmpty()
-                    .WithMessage(ValidationMessages.Required)
-                    .MaximumLength(20);
+                    .WithMessage(ValidationMessages.InvalidGuid)
+                    .NotNull()
+                    .WithMessage(ValidationMessages.InvalidGuid);
 
-                RuleFor(x => x.StudentCode)
-                    .Empty()
-                    .WithMessage(ValidationMessages.NotAllowed);
-
-                RuleFor(x => x.ClassCode)
+                RuleFor(x => x.MajorId)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
             });
 
             When(x => x.Role == UserRole.Admin, () =>
             {
-                RuleFor(x => x.StudentCode)
+                RuleFor(x => x.FacultyId)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
 
-                RuleFor(x => x.FacultyCode)
-                    .Empty()
-                    .WithMessage(ValidationMessages.NotAllowed);
-
-                RuleFor(x => x.ClassCode)
+                RuleFor(x => x.MajorId)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
             });
