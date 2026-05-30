@@ -13,15 +13,25 @@ const ToastProvider = () => {
         return () => toastEmitter.unsubscribe();
     }, []);
 
+    useEffect(() => {
+        if (!toast) return;
+
+        const timer = setTimeout(() => {
+            setToast(null);
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [toast]);
+
     if (!toast) return null;
 
     return (
         <Toast
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast(null)}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
         />
     );
-}
+};
 
-export default ToastProvider
+export default ToastProvider;

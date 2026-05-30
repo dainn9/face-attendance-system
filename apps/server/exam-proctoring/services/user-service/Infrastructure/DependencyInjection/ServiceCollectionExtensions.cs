@@ -32,6 +32,7 @@ namespace user_service.Infrastructure.DependencyInjection
             // Repositories
             // ===========================
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IFacultyRepository, FacultyRepository>();
 
             // ==========================
             // Unit of Work            
