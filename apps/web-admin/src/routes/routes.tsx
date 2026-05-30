@@ -18,7 +18,7 @@ export const routes = [
     },
     {
         path: "/login",
-        element: <PublicRoute/>,
+        element: <PublicRoute />,
         children: [
             { path: "", element: <LoginPage /> },
             { path: "reset-password", element: <div>Reset Password</div> },
@@ -27,5 +27,5 @@ export const routes = [
     {
         path: "*",
         element: <h1>404 - Page Not Found</h1>,
-    }
+    },
 ];

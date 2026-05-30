@@ -6,6 +6,7 @@ namespace user_service.Domain.Aggregates.User
 {
     public class User : AggregateRoot<Guid>
     {
+        public string UserCode { get; private set; } = null!;
         public string FullName { get; private set; } = null!;
         public Gender Gender { get; private set; }
         public DateOnly DateOfBirth { get; private set; }
@@ -17,10 +18,13 @@ namespace user_service.Domain.Aggregates.User
 
         private User() { }
 
-        public static User Create(Guid userId, string fullName, Gender gender, DateOnly dateOfBirth, string email, UserRole role, DateTime now)
+        public static User Create(Guid userId, string userCode, string fullName, Gender gender, DateOnly dateOfBirth, string email, UserRole role, DateTime now)
         {
             if (userId == Guid.Empty)
                 throw new BusinessRuleViolationException("User ID cannot be empty.", ErrorCodes.InvalidUserData);
+
+            if (string.IsNullOrWhiteSpace(userCode))
+                throw new BusinessRuleViolationException("User code cannot be empty.", ErrorCodes.InvalidUserData);
 
             if (string.IsNullOrWhiteSpace(fullName))
                 throw new BusinessRuleViolationException("Full name cannot be empty.", ErrorCodes.InvalidUserData);
@@ -34,6 +38,7 @@ namespace user_service.Domain.Aggregates.User
             var user = new User
             {
                 Id = userId,
+                UserCode = userCode,
                 FullName = fullName,
                 Gender = gender,
                 DateOfBirth = dateOfBirth,
@@ -47,7 +52,7 @@ namespace user_service.Domain.Aggregates.User
             return user;
         }
 
-        public void AddLecturerProfile(string facultyCode)
+        public void AddLecturerProfile(Guid facultyId)
         {
             if (Role != UserRole.Lecturer)
                 throw new BusinessRuleViolationException("Cannot add lecturer profile to a non-lecturer user.", ErrorCodes.InvalidUserRole);
@@ -57,11 +62,11 @@ namespace user_service.Domain.Aggregates.User
 
             LecturerProfile = LecturerProfile.Create(
                 Id,
-                facultyCode
+                facultyId
             );
         }
 
-        public void AddStudentProfile(string studentCode, string classCode)
+        public void AddStudentProfile(Guid majorId)
         {
             if (Role != UserRole.Student)
                 throw new BusinessRuleViolationException("Cannot add student profile to a non-student user.", ErrorCodes.InvalidUserRole);
@@ -71,8 +76,7 @@ namespace user_service.Domain.Aggregates.User
 
             StudentProfile = StudentProfile.Create(
                 Id,
-                studentCode,
-                classCode
+                majorId
             );
         }
     }

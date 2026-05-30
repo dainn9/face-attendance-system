@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using user_service.Domain.Aggregates.Faculty;
 using user_service.Domain.Aggregates.User;
 
 namespace user_service.Infrastructure.Persistence.Configurations
@@ -11,6 +12,10 @@ namespace user_service.Infrastructure.Persistence.Configurations
             builder.ToTable("users");
 
             builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.UserCode)
+                    .IsRequired()
+                    .HasMaxLength(20);
 
             builder.Property(x => x.FullName)
                     .IsRequired()
@@ -30,6 +35,8 @@ namespace user_service.Infrastructure.Persistence.Configurations
 
             builder.HasIndex(x => x.Email).IsUnique();
 
+            builder.HasIndex(x => x.UserCode).IsUnique();
+
             builder.Property(x => x.Role)
                     .HasConversion<string>()
                     .IsRequired();
@@ -45,16 +52,12 @@ namespace user_service.Infrastructure.Persistence.Configurations
 
                 sp.HasKey(x => x.UserId);
 
-                sp.Property(x => x.StudentCode)
-                    .IsRequired()
-                    .HasMaxLength(20);
+                sp.Property(x => x.MajorId).IsRequired();
 
-                sp.HasIndex(x => x.StudentCode)
-                    .IsUnique();
-
-                sp.Property(x => x.ClassCode)
-                    .IsRequired()
-                    .HasMaxLength(20);
+                sp.HasOne<Major>()
+                   .WithMany()
+                   .HasForeignKey(x => x.MajorId)
+                   .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.OwnsOne(x => x.LecturerProfile, lp =>
@@ -65,9 +68,12 @@ namespace user_service.Infrastructure.Persistence.Configurations
 
                 lp.HasKey(x => x.UserId);
 
-                lp.Property(x => x.FacultyCode)
-                    .IsRequired()
-                    .HasMaxLength(20);
+                lp.Property(x => x.FacultyId).IsRequired();
+
+                lp.HasOne<Faculty>()
+                    .WithMany()
+                    .HasForeignKey(x => x.FacultyId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

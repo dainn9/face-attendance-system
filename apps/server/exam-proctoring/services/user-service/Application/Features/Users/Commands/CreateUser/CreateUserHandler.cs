@@ -26,8 +26,12 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             if (await _userRepository.ExistsByIdAsync(request.UserId, cancellationToken))
                 return;
 
+            if (await _userRepository.ExistsByUserCodeAsync(request.UserCode, cancellationToken))
+                throw new BusinessRuleViolationException($"User code {request.UserCode} already exists.", ErrorCodes.UserCodeAlreadyExists);
+
             var user = User.Create(
                 request.UserId,
+                request.UserCode,
                 request.FullName,
                 request.Gender,
                 request.DateOfBirth,
@@ -40,19 +44,15 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             {
                 case UserRole.Student:
                     {
-                        if (await _userRepository.ExistsByStudentCodeAsync(request.StudentCode!, cancellationToken))
-                            throw new BusinessRuleViolationException($"Student code {request.StudentCode} already exists.", ErrorCodes.StudentCodeAlreadyExists);
-
                         user.AddStudentProfile(
-                            request.StudentCode!,
-                            request.ClassCode!
+                            request.MajorId!.Value
                         );
                     }
                     break;
 
                 case UserRole.Lecturer:
                     user.AddLecturerProfile(
-                        request.FacultyCode!
+                        request.FacultyId!.Value
                     );
                     break;
             }

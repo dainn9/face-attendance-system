@@ -22,14 +22,14 @@ namespace user_service.API.Controllers
         {
             var command = new CreateUserCommand(
                 request.UserId,
+                request.UserCode,
                 request.FullName,
                 request.Gender,
                 request.DateOfBirth,
                 request.Email,
                 request.Role,
-                request.StudentCode,
-                request.ClassCode,
-                request.FacultyCode
+                request.FacultyId,
+                request.MajorId
             );
 
             await _mediator.Send(command);

@@ -1,17 +1,18 @@
-using SharedKernel.Core.Enums;
+// using SharedKernel.Core.Enums;
 
-namespace user_service.Application.Contracts
-{
-    public sealed record UserDto(
-        Guid UserId,
-        string FullName,
-        Gender Gender,
-        DateOnly DateOfBirth,
-        string Email,
-        UserRole Role,
+// namespace user_service.Application.Contracts
+// {
+//     public sealed record UserDto(
+//         Guid UserId,
+//         string UserCode,
+//         string FullName,
+//         Gender Gender,
+//         DateOnly DateOfBirth,
+//         string Email,
+//         UserRole Role,
 
-        string? StudentCode,
-        string? CLassCode,
-        string? FacultyCode
-    );
-}
+//         string? StudentCode,
+//         string? CLassCode,
+//         string? FacultyCode
+//     );
+// }
