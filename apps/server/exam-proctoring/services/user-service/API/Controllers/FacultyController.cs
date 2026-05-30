@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Core.Enums;
 using user_service.API.Contracts;
+using user_service.Application.Contracts;
 using user_service.Application.Features.Faculties.Commands.CreateFaculty;
+using user_service.Application.Features.Faculties.Queries.GetFaculties;
 
 namespace user_service.API.Controllers
 {
@@ -32,6 +34,20 @@ namespace user_service.API.Controllers
                 Success = true,
                 Message = "Faculty created successfully",
                 Data = facultyId
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFaculties()
+        {
+            var query = new GetFacultiesQuery();
+            var faculties = await _mediator.Send(query);
+
+            return Ok(new ApiResponse<IReadOnlyList<FacultyDto>>
+            {
+                Success = true,
+                Message = "Faculties retrieved successfully",
+                Data = faculties
             });
         }
 

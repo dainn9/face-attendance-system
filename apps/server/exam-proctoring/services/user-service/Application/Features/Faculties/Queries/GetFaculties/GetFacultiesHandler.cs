@@ -1,0 +1,50 @@
+using MediatR;
+using user_service.Application.Abstractions.Persistence;
+using user_service.Application.Contracts;
+
+namespace user_service.Application.Features.Faculties.Queries.GetFaculties
+{
+    public record GetFacultiesHandler : IRequestHandler<GetFacultiesQuery, IReadOnlyList<FacultyDto>>
+    {
+        private readonly IFacultyReadRepository _facultyReadRepository;
+        private readonly IUserReadRepository _userReadRepository;
+
+        public GetFacultiesHandler(IFacultyReadRepository facultyReadRepository, IUserReadRepository userReadRepository)
+        {
+            _facultyReadRepository = facultyReadRepository;
+            _userReadRepository = userReadRepository;
+        }
+
+        public async Task<IReadOnlyList<FacultyDto>> Handle(GetFacultiesQuery request, CancellationToken cancellationToken)
+        {
+            var faculties = await _facultyReadRepository.GetFacultiesAsync(cancellationToken);
+
+            var studentCounts = await _userReadRepository.GetStudentCountByMajorsAsync(cancellationToken);
+
+            var lecturerCounts = await _userReadRepository.GetLecturerCountByFacultyAsync(cancellationToken);
+
+            faculties = faculties
+            .Select(f =>
+            {
+                var majors = f.Majors
+                    .Select(m => m with
+                    {
+                        StudentCount = studentCounts.GetValueOrDefault(m.Id)
+                    })
+                    .ToArray();
+
+                return f with
+                {
+                    Majors = majors,
+                    StudentCount = majors.Sum(m => m.StudentCount),
+                    LecturerCount = lecturerCounts.GetValueOrDefault(f.Id)
+                };
+            })
+            .ToList();
+
+            return faculties;
+        }
+    }
+
+    public record GetFacultiesQuery : IRequest<IReadOnlyList<FacultyDto>>;
+}
