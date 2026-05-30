@@ -12,5 +12,6 @@ export const API_ENDPOINTS = {
     },
     FACULTIES: {
         CREATE: `${FACULTIES_PREFIX}/faculties`,
+        LIST: `${FACULTIES_PREFIX}/faculties`,
     }
 }

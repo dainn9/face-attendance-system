@@ -20,7 +20,15 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 f.Id,
                 f.Name,
                 f.Code,
-                f.Majors.Count
+                f.Majors.Count,
+                0,
+                0,
+                f.Majors.Select(m => new MajorDto(
+                    m.Id,
+                    m.Name,
+                    m.Code,
+                    0
+                )).ToArray()
             ))
             .ToListAsync(cancellationToken);
     }

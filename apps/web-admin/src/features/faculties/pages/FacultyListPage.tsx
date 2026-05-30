@@ -1,56 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
 import CreateFacultyCard from "../components/CreateFacultyCard";
 import FacultyCard from "../components/FacultyCard";
+import { useFaculties } from "../hooks/faculty.query";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const FacultyListPage = () => {
     const navigate = useNavigate();
+    const { data: faculties = [], isLoading } = useFaculties();
 
-    const faculties = [
-        {
-            id: "1",
-            name: "Công nghệ thông tin",
-            code: "CNTT",
-            majorCount: 3,
-            studentCount: 120,
-            lecturerCount: 8,
-            majors: [
-                {
-                    id: "1",
-                    name: "Khoa học máy tính",
-                    code: "CS",
-                    studentCount: 50,
-                },
-            ],
-        },
-        {
-            id: "2",
-            name: "Kinh tế",
-            code: "KT",
-            majorCount: 4,
-            studentCount: 180,
-            lecturerCount: 12,
-            majors: [],
-        },
-        {
-            id: "2",
-            name: "Kinh tế",
-            code: "KT",
-            majorCount: 4,
-            studentCount: 180,
-            lecturerCount: 12,
-            majors: [],
-        },
-        {
-            id: "2",
-            name: "Kinh tế",
-            code: "KT",
-            majorCount: 4,
-            studentCount: 180,
-            lecturerCount: 12,
-            majors: [],
-        },
-    ];
-
+    if (isLoading) {
+        return (
+            <>
+                <Skeleton height={40} width={250} />
+                <Skeleton count={5} height={100} />
+            </>
+        );
+    }
     return (
         <div className="p-6">
             <div className="mb-6 flex items-center justify-between">

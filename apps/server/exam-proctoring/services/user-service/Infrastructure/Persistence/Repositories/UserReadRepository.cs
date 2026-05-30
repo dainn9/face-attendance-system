@@ -30,9 +30,34 @@ namespace user_service.Infrastructure.Persistence.Repositories
         //     ))
         //     .FirstOrDefaultAsync(cancellationToken);
 
-        public Task<int> GetStudentCountByFacultyIdAsync(Guid facultyId, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<Dictionary<Guid, int>> GetStudentCountByMajorsAsync(CancellationToken cancellationToken = default)
+        => _context.Users
+            .AsNoTracking()
+            .Where(u => u.StudentProfile != null)
+            .GroupBy(u => u.StudentProfile!.MajorId)
+            .Select(g => new
+            {
+                MajorId = g.Key,
+                Count = g.Count()
+            })
+            .ToDictionaryAsync(
+                x => x.MajorId,
+                x => x.Count,
+                cancellationToken);
+
+        public Task<Dictionary<Guid, int>> GetLecturerCountByFacultyAsync(CancellationToken cancellationToken = default)
+        => _context.Users
+            .AsNoTracking()
+            .Where(u => u.LecturerProfile != null)
+            .GroupBy(u => u.LecturerProfile!.FacultyId)
+            .Select(g => new
+            {
+                FacultyId = g.Key,
+                Count = g.Count()
+            })
+            .ToDictionaryAsync(
+                x => x.FacultyId,
+                x => x.Count,
+                cancellationToken);
     }
 }

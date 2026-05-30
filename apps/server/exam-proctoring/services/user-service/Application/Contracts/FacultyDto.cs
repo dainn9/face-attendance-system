@@ -1,23 +1,20 @@
 namespace user_service.Application.Contracts
 {
-    public record FacultyListItemDto(
-        FacultyDto Faculty,
-        int StudentCount,
-        int LecturerCount,
-        MajorListItemDto[] Majors
-    );
-
     public record FacultyDto(
         Guid Id,
         string Name,
         string Code,
-        int MajorCount
+        int MajorCount,
+        int StudentCount,
+        int LecturerCount,
+        MajorDto[] Majors
     );
 
     public record MajorDto(
         Guid Id,
         string Name,
-        string Code
+        string Code,
+        int StudentCount
     );
 
     public record MajorListItemDto(
