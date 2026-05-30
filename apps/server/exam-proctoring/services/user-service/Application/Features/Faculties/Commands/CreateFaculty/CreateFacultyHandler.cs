@@ -22,10 +22,10 @@ namespace user_service.Application.Features.Faculties.Commands.CreateFaculty
 
         public async Task<Guid> Handle(CreateFacultyCommand request, CancellationToken cancellationToken)
         {
-            if (await _facultyRepository.ExitsByNameAsync(request.Name, cancellationToken))
+            if (await _facultyRepository.ExistsByNameAsync(request.Name, cancellationToken))
                 throw new BusinessRuleViolationException("Faculty name already exists.", ErrorCodes.FacultyNameAlreadyExists);
 
-            if (await _facultyRepository.ExitsByCodeAsync(request.Code, cancellationToken))
+            if (await _facultyRepository.ExistsByCodeAsync(request.Code, cancellationToken))
                 throw new BusinessRuleViolationException("Faculty code already exists.", ErrorCodes.FacultyCodeAlreadyExists);
 
             var faculty = Faculty.Create(request.Name, request.Code, clock.UtcNow);

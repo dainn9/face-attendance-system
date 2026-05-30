@@ -11,7 +11,7 @@ using user_service.Infrastructure.Persistence;
 namespace user_service.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260529143609_InitialCreate")]
+    [Migration("20260530072954_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -89,9 +89,17 @@ namespace user_service.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("UserCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("UserCode")
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
@@ -144,14 +152,20 @@ namespace user_service.Migrations
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("char(36)");
 
-                            b1.Property<string>("FacultyCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("varchar(20)");
+                            b1.Property<Guid>("FacultyId")
+                                .HasColumnType("char(36)");
 
                             b1.HasKey("UserId");
 
+                            b1.HasIndex("FacultyId");
+
                             b1.ToTable("lecturer_profiles", (string)null);
+
+                            b1.HasOne("user_service.Domain.Aggregates.Faculty.Faculty", null)
+                                .WithMany()
+                                .HasForeignKey("FacultyId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -162,20 +176,12 @@ namespace user_service.Migrations
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("char(36)");
 
-                            b1.Property<string>("ClassCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("varchar(20)");
-
-                            b1.Property<string>("StudentCode")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("varchar(20)");
+                            b1.Property<Guid>("MajorId")
+                                .HasColumnType("char(36)");
 
                             b1.HasKey("UserId");
 
-                            b1.HasIndex("StudentCode")
-                                .IsUnique();
+                            b1.HasIndex("MajorId");
 
                             b1.ToTable("student_profiles", (string)null);
 

@@ -37,6 +37,8 @@ namespace user_service.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     FullName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Gender = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
@@ -83,12 +85,17 @@ namespace user_service.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    FacultyCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    FacultyId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_lecturer_profiles", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_lecturer_profiles_faculties_FacultyId",
+                        column: x => x.FacultyId,
+                        principalTable: "faculties",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_lecturer_profiles_users_UserId",
                         column: x => x.UserId,
@@ -103,10 +110,7 @@ namespace user_service.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    StudentCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClassCode = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    MajorId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -133,6 +137,11 @@ namespace user_service.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_lecturer_profiles_FacultyId",
+                table: "lecturer_profiles",
+                column: "FacultyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Major_FacultyId_Code",
                 table: "majors",
                 columns: new[] { "FacultyId", "Code" },
@@ -145,15 +154,20 @@ namespace user_service.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_student_profiles_StudentCode",
+                name: "IX_student_profiles_MajorId",
                 table: "student_profiles",
-                column: "StudentCode",
-                unique: true);
+                column: "MajorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_Email",
                 table: "users",
                 column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_UserCode",
+                table: "users",
+                column: "UserCode",
                 unique: true);
         }
 
