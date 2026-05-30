@@ -11,12 +11,14 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
     public class CreateUserHandler : IRequestHandler<CreateUserCommand>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IFacultyRepository _facultyRepository;
         private readonly IClock _clock;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CreateUserHandler(IUserRepository userRepository, IClock clock, IUnitOfWork unitOfWork)
+        public CreateUserHandler(IUserRepository userRepository, IFacultyRepository facultyRepository, IClock clock, IUnitOfWork unitOfWork)
         {
             _userRepository = userRepository;
+            _facultyRepository = facultyRepository;
             _clock = clock;
             _unitOfWork = unitOfWork;
         }
@@ -44,16 +46,22 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             {
                 case UserRole.Student:
                     {
-                        user.AddStudentProfile(
-                            request.MajorId!.Value
-                        );
+                        var majorId = request.MajorId!.Value;
+                        if (!await _facultyRepository.ExistsByMajorIdAsync(majorId, cancellationToken))
+                            throw new EntityNotFoundException("Major", majorId);
+
+                        user.AddStudentProfile(majorId);
                     }
                     break;
 
                 case UserRole.Lecturer:
-                    user.AddLecturerProfile(
-                        request.FacultyId!.Value
-                    );
+                    {
+                        var facultyId = request.FacultyId!.Value;
+                        if (!await _facultyRepository.ExistsByIdAsync(facultyId, cancellationToken))
+                            throw new EntityNotFoundException("Faculty", facultyId);
+
+                        user.AddLecturerProfile(facultyId);
+                    }
                     break;
             }
 

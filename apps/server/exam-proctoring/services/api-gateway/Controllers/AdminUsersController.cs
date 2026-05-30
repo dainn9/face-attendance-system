@@ -38,14 +38,14 @@ namespace api_gateway.Controllers
                 await _userClient.CreateUserAsync(
                     new CreateUserRequest(
                         userId,
+                        request.UserCode,
                         request.FullName,
                         request.Gender,
                         request.DateOfBirth,
                         request.Email,
                         request.UserRole,
-                        request.StudentCode,
-                        request.ClassCode,
-                        request.FacultyCode
+                        request.FacultyId,
+                        request.MajorId
                     ), ct);
             }
             catch

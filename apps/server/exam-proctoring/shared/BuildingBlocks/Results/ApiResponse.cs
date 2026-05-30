@@ -6,7 +6,7 @@ namespace BuildingBlocks.Results
         public string? Message { get; set; }
         public string? ErrorCode { get; set; }
         public string? TraceId { get; set; }
-        public T? Errors { get; set; }
+        public object? Errors { get; set; }
         public T? Data { get; set; }
     }
 }

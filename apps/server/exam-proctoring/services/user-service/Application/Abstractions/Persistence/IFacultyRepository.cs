@@ -6,7 +6,9 @@ namespace user_service.Application.Abstractions.Persistence
     {
         void Add(Faculty faculty);
         void Update(Faculty faculty);
-        Task<bool> ExitsByNameAsync(string name, CancellationToken ct);
-        Task<bool> ExitsByCodeAsync(string code, CancellationToken ct);
+        Task<bool> ExistsByNameAsync(string name, CancellationToken ct);
+        Task<bool> ExistsByCodeAsync(string code, CancellationToken ct);
+        Task<bool> ExistsByIdAsync(Guid id, CancellationToken ct);
+        Task<bool> ExistsByMajorIdAsync(Guid majorId, CancellationToken ct);
     }
 }

@@ -53,11 +53,8 @@ namespace user_service.Infrastructure.Persistence.Configurations
                 sp.HasKey(x => x.UserId);
 
                 sp.Property(x => x.MajorId).IsRequired();
+                sp.HasIndex(x => x.MajorId);
 
-                sp.HasOne<Major>()
-                   .WithMany()
-                   .HasForeignKey(x => x.MajorId)
-                   .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.OwnsOne(x => x.LecturerProfile, lp =>

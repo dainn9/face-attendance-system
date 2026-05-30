@@ -27,7 +27,7 @@ namespace user_service.API.Controllers
 
             var facultyId = await _mediator.Send(command);
 
-            return Ok(new ApiResponse<Guid>
+            return Ok(new ApiResponse<object>
             {
                 Success = true,
                 Message = "Faculty created successfully",
