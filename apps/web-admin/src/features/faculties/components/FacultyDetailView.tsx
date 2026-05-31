@@ -61,7 +61,7 @@ const FacultyDetailView = ({ data, onCreateMajor }: Props) => {
                     </h2>
 
                     <button
-                        // onClick={onCreateMajor}
+                        onClick={onCreateMajor}
                         className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
                     >
                         <FiPlus className="size-4" />
