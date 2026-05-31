@@ -4,13 +4,13 @@ import {
     FiBriefcase,
     FiCpu,
     FiGlobe,
-    FiSave,
     FiSettings,
     FiX,
 } from "react-icons/fi";
 import { useCreateFaculty } from "../hooks/faculty.mutation";
 import { ValidationError } from "../../../shared/api/errors";
 import Spinner from "../../../shared/components/Spinner/Spinner";
+import Button from "../../../shared/components/Button/Button";
 
 type Props = {
     isOpen: boolean;
@@ -189,28 +189,18 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
                     </div>
 
                     <div className="flex justify-end gap-3 border-t border-gray-100 px-6 py-4">
-                        <button
-                            type="button"
-                            onClick={handleClose}
-                            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
-                        >
+                        <Button variant="secondary" onClick={handleClose}>
                             Hủy
-                        </button>
+                        </Button>
 
-                        <button
+                        <Button
+                            variant="primary"
                             type="submit"
                             disabled={isPending}
-                            className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
                         >
-                            {isPending ? (
-                                <Spinner />
-                            ) : (
-                                <>
-                                    <FiSave />
-                                    Thêm khoa
-                                </>
-                            )}
-                        </button>
+                            {isPending && <Spinner />}
+                            Thêm khoa
+                        </Button>
                     </div>
                 </form>
             </div>

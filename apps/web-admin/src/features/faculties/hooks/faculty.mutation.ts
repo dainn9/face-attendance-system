@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { facultyApi } from "../services/faculty.api"
 import type { CreateFacultyRequest } from "../types/faculty.types"
 import { useNavigate } from "react-router-dom";
@@ -22,16 +22,19 @@ export const useCreateFaculty = () => {
     })
 }
 
-// export const useCreateMajor = (facultyId: string) => {
-//     return useMutation({
-//         mutationFn: async (data: { name: string; code: string }) => 
-//             await facultyApi.createMajor(facultyId, data),
-//         onSuccess: () => {
-//             toastEmitter.success("Tạo ngành thành công!");
+export const useCreateMajor = (facultyId: string) => {
+    const queryClient = useQueryClient();
+       
+    return useMutation({
+        mutationFn: (data: { name: string; code: string }) => 
+            facultyApi.createMajor(facultyId, data),
 
-//             queryClient.invalidateQueries({
-//                 queryKey: facultyQueryKeys.all,
-//             });
-//         }
-//     })
-// }
+        onSuccess: () => {
+            toastEmitter.success("Tạo ngành thành công!");
+
+            queryClient.invalidateQueries({
+                queryKey: facultyQueryKeys.detail(facultyId),
+            });
+        }
+    })
+}
