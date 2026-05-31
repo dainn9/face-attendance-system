@@ -15,6 +15,24 @@ export type Faculty = {
     majors: Major[];
 };
 
+export type Lecturer = {
+    id: string;
+    name: string;
+    userCode: string;
+}
+
+export type FacultyDetail = {
+    id: string;
+    name: string;
+    code: string;
+    majorCount: number;
+    studentCount: number;
+    lecturerCount: number;
+    majors: Major[];
+    lecturers: Lecturer[];
+};
+
+// Request
 export type CreateFacultyRequest = {
     name: string;
     code: string;

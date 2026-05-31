@@ -1,8 +1,13 @@
 import { FiPlus } from "react-icons/fi";
 
-const CreateFacultyCard = () => {
+type Props = {
+    onClick: () => void;
+};
+
+const CreateFacultyCard = ({ onClick }: Props) => {
     return (
         <button
+            onClick={onClick}
             className="
                 flex
                 min-h-105

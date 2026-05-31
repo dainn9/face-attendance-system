@@ -3,7 +3,7 @@ import Layout from "../shared/components/Layout/Layout";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import FacultyListPage from "../features/faculties/pages/FacultyListPage";
-import CreateFacultyPage from "../features/faculties/pages/CreateFacultyPage";
+import FacultyDetailPage from "../features/faculties/pages/FacultyDetailPage";
 
 export const routes = [
     {
@@ -15,10 +15,12 @@ export const routes = [
                 element: <Layout />,
                 children: [
                     { index: true, element: <div>Admin Dashboard</div> },
-                    { path: "faculties", element: <FacultyListPage /> },
                     {
-                        path: "faculties/create",
-                        element: <CreateFacultyPage />,
+                        path: "faculties",
+                        children: [
+                            { index: true, element: <FacultyListPage /> },
+                            { path: ":id", element: <FacultyDetailPage /> },
+                        ],
                     },
                 ],
             },
