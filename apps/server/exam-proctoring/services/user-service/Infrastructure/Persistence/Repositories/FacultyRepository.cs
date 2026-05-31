@@ -16,19 +16,19 @@ namespace user_service.Infrastructure.Persistence.Repositories
         public void Add(Faculty faculty)
         => _context.Faculties.Add(faculty);
 
-        public Task<bool> ExistsByCodeAsync(string code, CancellationToken ct)
+        public async Task<Faculty?> GetWithMajorsAsync(Guid facultyId, CancellationToken ct)
+        => await _context.Faculties.Include(f => f.Majors).FirstOrDefaultAsync(f => f.Id == facultyId, ct);
+
+        public Task<bool> ExistsFacultyByCodeAsync(string code, CancellationToken ct)
         => _context.Faculties.AsNoTracking().AnyAsync(f => f.Code == code, ct);
 
-        public Task<bool> ExistsByNameAsync(string name, CancellationToken ct)
+        public Task<bool> ExistsFacultyByNameAsync(string name, CancellationToken ct)
         => _context.Faculties.AsNoTracking().AnyAsync(f => f.Name == name, ct);
 
-        public void Update(Faculty faculty)
-        => _context.Faculties.Update(faculty);
-
-        public Task<bool> ExistsByIdAsync(Guid id, CancellationToken ct)
+        public Task<bool> ExistsFacultyByIdAsync(Guid id, CancellationToken ct)
         => _context.Faculties.AsNoTracking().AnyAsync(f => f.Id == id, ct);
 
-        public Task<bool> ExistsByMajorIdAsync(Guid majorId, CancellationToken ct)
+        public Task<bool> ExistsMajorByIdAsync(Guid majorId, CancellationToken ct)
         => _context.Faculties.AsNoTracking().AnyAsync(f => f.Majors.Any(m => m.Id == majorId), ct);
     }
 }

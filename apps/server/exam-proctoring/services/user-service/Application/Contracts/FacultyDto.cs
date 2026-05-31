@@ -17,8 +17,14 @@ namespace user_service.Application.Contracts
         int StudentCount
     );
 
-    public record MajorListItemDto(
-        MajorDto Major,
-        int StudentCount
+    public record FacultyDetailDto(
+         Guid Id,
+        string Name,
+        string Code,
+        int MajorCount,
+        int StudentCount,
+        int LecturerCount,
+        MajorDto[] Majors,
+        LecturerDto[] Lecturers
     );
 }
