@@ -13,7 +13,7 @@ namespace user_service.Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IReadOnlyList<FacultyDto>> GetFacultiesAsync(CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<FacultyDto>> GetFacultiesAsync(CancellationToken ct = default)
         => await _context.Faculties
             .AsNoTracking()
             .Select(f => new FacultyDto(
@@ -30,6 +30,26 @@ namespace user_service.Infrastructure.Persistence.Repositories
                     0
                 )).ToArray()
             ))
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
+
+        public Task<FacultyDto?> GetFacultyByIdAsync(Guid id, CancellationToken ct = default)
+        => _context.Faculties
+            .AsNoTracking()
+            .Where(f => f.Id == id)
+            .Select(f => new FacultyDto(
+                f.Id,
+                f.Name,
+                f.Code,
+                f.Majors.Count,
+                0,
+                0,
+                f.Majors.Select(m => new MajorDto(
+                    m.Id,
+                    m.Name,
+                    m.Code,
+                    0
+                )).ToArray()
+            ))
+            .FirstOrDefaultAsync(ct);
     }
 }

@@ -10,7 +10,7 @@ namespace user_service.Infrastructure.Persistence.Repositories
 
         public UserReadRepository(UserDbContext Context) => _context = Context;
 
-        // public Task<UserDto?> GetProfileByIdAsync(Guid userId, CancellationToken cancellationToken)
+        // public Task<UserDto?> GetProfileByIdAsync(Guid userId, CancellationToken ct)
         // => _context.Users
         //     .AsNoTracking()
         //     .Where(u => u.Id == userId)
@@ -30,7 +30,7 @@ namespace user_service.Infrastructure.Persistence.Repositories
         //     ))
         //     .FirstOrDefaultAsync(cancellationToken);
 
-        public Task<Dictionary<Guid, int>> GetStudentCountByMajorsAsync(CancellationToken cancellationToken = default)
+        public Task<Dictionary<Guid, int>> GetStudentCountByMajorsAsync(CancellationToken ct = default)
         => _context.Users
             .AsNoTracking()
             .Where(u => u.StudentProfile != null)
@@ -43,9 +43,9 @@ namespace user_service.Infrastructure.Persistence.Repositories
             .ToDictionaryAsync(
                 x => x.MajorId,
                 x => x.Count,
-                cancellationToken);
+                ct);
 
-        public Task<Dictionary<Guid, int>> GetLecturerCountByFacultyAsync(CancellationToken cancellationToken = default)
+        public Task<Dictionary<Guid, int>> GetLecturerCountByFacultyAsync(CancellationToken ct = default)
         => _context.Users
             .AsNoTracking()
             .Where(u => u.LecturerProfile != null)
@@ -58,6 +58,42 @@ namespace user_service.Infrastructure.Persistence.Repositories
             .ToDictionaryAsync(
                 x => x.FacultyId,
                 x => x.Count,
-                cancellationToken);
+                ct);
+
+        public async Task<Dictionary<Guid, int>> GetStudentCountByFacultyIdAsync(Guid facultyId, CancellationToken ct = default)
+        {
+            var majorIds = await _context.Faculties
+                .AsNoTracking()
+                .Where(f => f.Id == facultyId)
+                .SelectMany(f => f.Majors.Select(m => m.Id))
+                .ToListAsync(ct);
+
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u =>
+                    u.StudentProfile != null &&
+                    majorIds.Contains(u.StudentProfile.MajorId))
+                .GroupBy(u => u.StudentProfile!.MajorId)
+                .Select(g => new
+                {
+                    MajorId = g.Key,
+                    Count = g.Count()
+                })
+                .ToDictionaryAsync(
+                    x => x.MajorId,
+                    x => x.Count,
+                    ct);
+        }
+
+        public async Task<IReadOnlyList<LecturerDto>> GetLecturersByFacultyIdAsync(Guid facultyId, CancellationToken ct = default)
+        => await _context.Users
+                .AsNoTracking()
+                .Where(u => u.LecturerProfile != null && u.LecturerProfile.FacultyId == facultyId)
+                .Select(u => new LecturerDto(
+                    u.Id,
+                    u.UserCode,
+                    u.FullName
+                ))
+                .ToListAsync(ct);
     }
 }

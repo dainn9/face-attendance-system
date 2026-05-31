@@ -70,7 +70,7 @@ namespace user_service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_majors", x => x.Id);
+                    table.PrimaryKey("PK_majors", x => new { x.FacultyId, x.Id });
                     table.ForeignKey(
                         name: "FK_majors_faculties_FacultyId",
                         column: x => x.FacultyId,

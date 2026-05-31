@@ -11,7 +11,7 @@ using user_service.Infrastructure.Persistence;
 namespace user_service.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20260530072954_InitialCreate")]
+    [Migration("20260530150051_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -109,8 +109,10 @@ namespace user_service.Migrations
                 {
                     b.OwnsMany("user_service.Domain.Aggregates.Faculty.Major", "Majors", b1 =>
                         {
+                            b1.Property<Guid>("FacultyId")
+                                .HasColumnType("char(36)");
+
                             b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("char(36)");
 
                             b1.Property<string>("Code")
@@ -118,15 +120,12 @@ namespace user_service.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("varchar(20)");
 
-                            b1.Property<Guid>("FacultyId")
-                                .HasColumnType("char(36)");
-
                             b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("varchar(100)");
 
-                            b1.HasKey("Id");
+                            b1.HasKey("FacultyId", "Id");
 
                             b1.HasIndex("FacultyId", "Code")
                                 .IsUnique()

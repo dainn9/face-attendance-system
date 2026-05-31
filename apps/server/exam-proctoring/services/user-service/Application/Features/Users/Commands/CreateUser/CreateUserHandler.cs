@@ -47,7 +47,7 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                 case UserRole.Student:
                     {
                         var majorId = request.MajorId!.Value;
-                        if (!await _facultyRepository.ExistsByMajorIdAsync(majorId, cancellationToken))
+                        if (!await _facultyRepository.ExistsMajorByIdAsync(majorId, cancellationToken))
                             throw new EntityNotFoundException("Major", majorId);
 
                         user.AddStudentProfile(majorId);
@@ -57,7 +57,7 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                 case UserRole.Lecturer:
                     {
                         var facultyId = request.FacultyId!.Value;
-                        if (!await _facultyRepository.ExistsByIdAsync(facultyId, cancellationToken))
+                        if (!await _facultyRepository.ExistsFacultyByIdAsync(facultyId, cancellationToken))
                             throw new EntityNotFoundException("Faculty", facultyId);
 
                         user.AddLecturerProfile(facultyId);

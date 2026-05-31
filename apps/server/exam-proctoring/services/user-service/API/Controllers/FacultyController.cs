@@ -7,6 +7,8 @@ using user_service.API.Contracts;
 using user_service.Application.Contracts;
 using user_service.Application.Features.Faculties.Commands.CreateFaculty;
 using user_service.Application.Features.Faculties.Queries.GetFaculties;
+using user_service.Application.Features.Faculties.Queries.GetFacultyDetail;
+using user_service.Application.Features.Majors.Commands;
 
 namespace user_service.API.Controllers
 {
@@ -17,6 +19,8 @@ namespace user_service.API.Controllers
     {
         private readonly IMediator _mediator;
         public FacultyController(IMediator mediator) => _mediator = mediator;
+
+        // ── Faculties ──────────────────────────────────────────
 
         // POST: api/v1/faculties
         [HttpPost]
@@ -37,6 +41,7 @@ namespace user_service.API.Controllers
             });
         }
 
+        // GET: api/v1/faculties
         [HttpGet]
         public async Task<IActionResult> GetFaculties()
         {
@@ -49,6 +54,37 @@ namespace user_service.API.Controllers
                 Message = "Faculties retrieved successfully",
                 Data = faculties
             });
+        }
+
+        [HttpGet("{facultyId:guid}")]
+        public async Task<IActionResult> GetById(Guid facultyId)
+        {
+            var query = new GetFacultyDetailQuery(facultyId);
+            var facultyDto = await _mediator.Send(query);
+
+            return Ok(new ApiResponse<FacultyDetailDto>
+            {
+                Success = true,
+                Message = "Faculty retrieved successfully",
+                Data = facultyDto
+            });
+        }
+
+        // ── Majors ──────────────────────────────────────────
+
+        // POST: api/v1/faculties/{facultyId}/majors
+        [HttpPost("{facultyId:guid}/majors")]
+        public async Task<IActionResult> AddMajor(Guid facultyId, [FromBody] AddMajorRequest request)
+        {
+            var command = new CreateMajorCommand(
+                facultyId,
+                request.Name,
+                request.Code
+            );
+
+            await _mediator.Send(command);
+
+            return NoContent();
         }
 
         // [HttpGet("{facultyId:guid}")]

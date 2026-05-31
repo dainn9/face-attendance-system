@@ -28,7 +28,13 @@ namespace user_service.Infrastructure.Persistence.Configurations
 
                 m.WithOwner().HasForeignKey("FacultyId");
 
-                m.HasKey("Id");
+                m.HasKey(x => new { x.FacultyId, x.Id });
+
+                m.Property(x => x.Id)
+                    .ValueGeneratedNever();
+
+                m.Property(x => x.FacultyId)
+                    .IsRequired();
 
                 m.Property(x => x.Name)
                     .IsRequired()
@@ -38,14 +44,13 @@ namespace user_service.Infrastructure.Persistence.Configurations
                     .IsRequired()
                     .HasMaxLength(20);
 
-                // === UNIQUE THEO TỪNG KHOA ===
-                m.HasIndex(new[] { "FacultyId", "Code" })      // Khoa + Code phải unique
-                  .IsUnique()
-                  .HasDatabaseName("IX_Major_FacultyId_Code");
+                m.HasIndex(x => new { x.FacultyId, x.Code })
+                    .IsUnique()
+                    .HasDatabaseName("IX_Major_FacultyId_Code");
 
-                m.HasIndex(new[] { "FacultyId", "Name" })      // Khoa + Tên ngành phải unique
-                  .IsUnique()
-                  .HasDatabaseName("IX_Major_FacultyId_Name");
+                m.HasIndex(x => new { x.FacultyId, x.Name })
+                    .IsUnique()
+                    .HasDatabaseName("IX_Major_FacultyId_Name");
             });
         }
     }
