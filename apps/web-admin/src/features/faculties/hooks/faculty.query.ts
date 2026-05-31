@@ -13,3 +13,9 @@ export const useFaculties = () =>
     queryKey: facultyQueryKeys.lists(),
     queryFn: facultyApi.list,
   });
+
+export const useFacultyDetail = (id: string) =>
+  useQuery({
+    queryKey: facultyQueryKeys.detail(id),
+    queryFn: () => facultyApi.detail(id),
+  });

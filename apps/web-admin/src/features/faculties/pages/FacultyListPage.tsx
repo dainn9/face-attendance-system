@@ -1,13 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
 import CreateFacultyCard from "../components/CreateFacultyCard";
 import FacultyCard from "../components/FacultyCard";
 import { useFaculties } from "../hooks/faculty.query";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { useState } from "react";
+import CreateFacultyModal from "../components/CreateFacultyModal";
 
 const FacultyListPage = () => {
-    const navigate = useNavigate();
     const { data: faculties = [], isLoading } = useFaculties();
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     if (isLoading) {
         return (
@@ -25,7 +26,7 @@ const FacultyListPage = () => {
                 </h1>
 
                 <button
-                    onClick={() => navigate("/faculties/create")}
+                    onClick={() => setIsCreateOpen(true)}
                     className="
                     rounded-xl
                     bg-blue-600
@@ -52,10 +53,13 @@ const FacultyListPage = () => {
                     <FacultyCard key={faculty.id} faculty={faculty} />
                 ))}
 
-                <Link to="/faculties/create" className="block">
-                    <CreateFacultyCard />
-                </Link>
+                <CreateFacultyCard onClick={() => setIsCreateOpen(true)} />
             </div>
+
+            <CreateFacultyModal
+                isOpen={isCreateOpen}
+                onClose={() => setIsCreateOpen(false)}
+            />
         </div>
     );
 };

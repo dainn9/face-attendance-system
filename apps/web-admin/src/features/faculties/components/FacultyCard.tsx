@@ -1,5 +1,6 @@
-import { FiCpu, FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiCpu, FiEdit2, FiTrash2 } from "react-icons/fi";
 import type { Faculty, Major } from "../types/faculty.types";
+import { Link } from "react-router-dom";
 
 type FacultyCardProps = {
     faculty: Faculty;
@@ -29,7 +30,7 @@ const MajorItem = ({ major }: { major: Major }) => {
 
 const FacultyCard = ({ faculty }: FacultyCardProps) => {
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex h-full flex-col">
             <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -79,21 +80,23 @@ const FacultyCard = ({ faculty }: FacultyCardProps) => {
                 </div>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-5 flex flex-1 flex-col">
                 <div className="mb-3 text-sm font-bold text-gray-900">
                     Danh sách ngành
                 </div>
 
-                <div className="space-y-3">
+                <div className="flex-1 space-y-3">
                     {faculty.majors.map((major) => (
                         <MajorItem key={major.id} major={major} />
                     ))}
                 </div>
 
-                <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 py-3 text-sm font-semibold text-gray-500 hover:border-blue-300 hover:text-blue-600">
-                    <FiPlus size={16} />
-                    Thêm ngành
-                </button>
+                <Link
+                    to={`/faculties/${faculty.id}`}
+                    className="mt-4 flex w-full items-center justify-center rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+                >
+                    Xem chi tiết
+                </Link>
             </div>
         </div>
     );
