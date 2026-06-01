@@ -20,9 +20,6 @@ const MajorItem = ({ major }: { major: Major }) => {
                 <span className="text-sm font-semibold text-blue-600">
                     {major.studentCount} SV
                 </span>
-                <button className="text-gray-400 hover:text-blue-600">
-                    <FiEdit2 size={14} />
-                </button>
             </div>
         </div>
     );
@@ -48,9 +45,12 @@ const FacultyCard = ({ faculty }: FacultyCardProps) => {
                 </div>
 
                 <div className="flex items-center gap-3 text-gray-400">
-                    <button className="hover:text-blue-600">
+                    <Link
+                        to={`/faculties/${faculty.id}`}
+                        className="hover:text-blue-600"
+                    >
                         <FiEdit2 size={17} />
-                    </button>
+                    </Link>
                     <button className="hover:text-red-600">
                         <FiTrash2 size={17} />
                     </button>

@@ -17,7 +17,7 @@ namespace user_service.Application.Features.Majors.Commands.CreateMajor
         }
         public async Task Handle(CreateMajorCommand request, CancellationToken cancellationToken)
         {
-            var faculty = await _facultyRepository.GetWithMajorsAsync(request.FacultyId, cancellationToken)
+            var faculty = await _facultyRepository.GetFacultyWithMajorsAsync(request.FacultyId, cancellationToken)
                 ?? throw new EntityNotFoundException("Faculty", request.FacultyId);
 
             faculty.AddMajor(request.Name, request.Code);

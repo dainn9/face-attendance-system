@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCreateMajor } from "../hooks/faculty.mutation";
 import Spinner from "../../../shared/components/Spinner/Spinner";
 import { FiCpu, FiX } from "react-icons/fi";
@@ -9,23 +9,44 @@ type Props = {
     facultyId: string;
     name: string;
     code: string;
+    mode: "create" | "edit";
+    initialData?: {
+        name: string;
+        code: string;
+    };
+    isPending?: boolean;
+    error?: unknown;
     isOpen: boolean;
     onClose: () => void;
+    onSubmit: (data: { name: string; code: string }) => void;
 };
 
-const CreateMajorModal = ({
+const MajorFormModal = ({
     facultyId,
     name,
     code,
+    mode,
+    initialData,
+    isPending,
+    error,
     isOpen,
     onClose,
+    onSubmit,
 }: Props) => {
+    const title = mode === "create" ? "Thêm ngành mới" : "Cập nhật ngành";
+    const submitText = mode === "create" ? "Thêm ngành" : "Lưu thay đổi";
+
     const initialState = {
         name: "",
         code: "",
     };
     const [formData, setFormData] = useState(initialState);
-    const { mutate, isPending, error, reset } = useCreateMajor(facultyId);
+
+    useEffect(() => {
+        setFormData(initialData ?? initialState);
+    }, [initialData, isOpen]);
+
+    // const { mutate, isPending, error, reset } = useCreateMajor(facultyId);
 
     if (!isOpen) return null;
 
@@ -38,20 +59,7 @@ const CreateMajorModal = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        mutate(formData, {
-            onSuccess: () => {
-                setFormData(initialState);
-                reset();
-                onClose();
-            },
-        });
-    };
-
-    const handleClose = () => {
-        setFormData(initialState);
-        reset();
-        onClose();
+        onSubmit(formData);
     };
 
     return (
@@ -62,12 +70,12 @@ const CreateMajorModal = ({
             >
                 <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
                     <h2 className="text-base font-semibold text-gray-900">
-                        Thêm ngành mới
+                        {title}
                     </h2>
 
                     <button
                         type="button"
-                        onClick={handleClose}
+                        onClick={onClose}
                         className="flex size-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200"
                     >
                         <FiX size={18} />
@@ -90,11 +98,12 @@ const CreateMajorModal = ({
                         </div>
                     </div>
 
-                    {error && !(error instanceof ValidationError) && (
-                        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                            {error.message}
-                        </div>
-                    )}
+                    {error instanceof Error &&
+                        !(error instanceof ValidationError) && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                                {error.message}
+                            </div>
+                        )}
 
                     <div className="mb-4">
                         <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -150,16 +159,17 @@ const CreateMajorModal = ({
                 </div>
 
                 <div className="flex justify-end gap-3 border-t border-gray-100 px-5 py-4">
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button variant="secondary" onClick={onClose}>
                         Hủy
                     </Button>
+
                     <Button
                         variant="primary"
                         type="submit"
                         disabled={isPending}
                     >
                         {isPending && <Spinner className="size-4 text-white" />}
-                        Thêm ngành
+                        {submitText}
                     </Button>
                 </div>
             </form>
@@ -167,4 +177,4 @@ const CreateMajorModal = ({
     );
 };
 
-export default CreateMajorModal;
+export default MajorFormModal;

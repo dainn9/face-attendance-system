@@ -5,10 +5,12 @@ namespace user_service.Application.Abstractions.Persistence
     public interface IFacultyRepository
     {
         void Add(Faculty faculty);
-        Task<Faculty?> GetWithMajorsAsync(Guid facultyId, CancellationToken ct);
+        Task<Faculty?> FindFacultyAsync(Guid facultyId, CancellationToken ct);
 
-        Task<bool> ExistsFacultyByNameAsync(string name, CancellationToken ct);
-        Task<bool> ExistsFacultyByCodeAsync(string code, CancellationToken ct);
+        Task<Faculty?> GetFacultyWithMajorsAsync(Guid facultyId, CancellationToken ct);
+
+        Task<bool> ExistsFacultyByNameAsync(string name, Guid? excludeId, CancellationToken ct);
+        Task<bool> ExistsFacultyByCodeAsync(string code, Guid? excludeId, CancellationToken ct);
         Task<bool> ExistsFacultyByIdAsync(Guid facultyId, CancellationToken ct);
 
         Task<bool> ExistsMajorByIdAsync(Guid majorId, CancellationToken ct);

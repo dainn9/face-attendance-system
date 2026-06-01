@@ -33,7 +33,12 @@ export type FacultyDetail = {
 };
 
 // Request
-export type CreateFacultyRequest = {
+export type FacultyRequest = {
+    name: string;
+    code: string;
+};
+
+export type MajorRequest = {
     name: string;
     code: string;
 };

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { facultyApi } from "../services/faculty.api"
-import type { CreateFacultyRequest } from "../types/faculty.types"
+import type { FacultyRequest, MajorRequest } from "../types/faculty.types"
 import { useNavigate } from "react-router-dom";
 import { toastEmitter } from "../../../shared/utils/toastEmitter";
 import { facultyQueryKeys } from "./faculty.query";
@@ -9,7 +9,7 @@ export const useCreateFaculty = () => {
     const navigate = useNavigate();
     
     return useMutation({
-        mutationFn: async (data: CreateFacultyRequest) =>
+        mutationFn: async (data: FacultyRequest) =>
             {
                 const response = await facultyApi.create(data);
                 return response;
@@ -22,11 +22,27 @@ export const useCreateFaculty = () => {
     })
 }
 
+export const useUpdateFaculty = (facultyId: string) => {
+    const queryClient = useQueryClient();
+       
+    return useMutation({
+        mutationFn: (data: FacultyRequest) => 
+            facultyApi.update(facultyId, data),
+
+        onSuccess: () => {
+            toastEmitter.success("Cập nhật khoa thành công!");
+            queryClient.invalidateQueries({
+                queryKey: facultyQueryKeys.detail(facultyId),
+            });
+        }
+    })
+}
+
 export const useCreateMajor = (facultyId: string) => {
     const queryClient = useQueryClient();
        
     return useMutation({
-        mutationFn: (data: { name: string; code: string }) => 
+        mutationFn: (data: MajorRequest) => 
             facultyApi.createMajor(facultyId, data),
 
         onSuccess: () => {
@@ -38,3 +54,21 @@ export const useCreateMajor = (facultyId: string) => {
         }
     })
 }
+
+export const useUpdateMajor = (facultyId: string, majorId: string) => {
+    const queryClient = useQueryClient();
+       
+    return useMutation({
+        mutationFn: (data: MajorRequest) => 
+            facultyApi.updateMajor(facultyId, majorId, data),
+
+        onSuccess: () => {
+            toastEmitter.success("Cập nhật ngành thành công!");
+
+            queryClient.invalidateQueries({
+                queryKey: facultyQueryKeys.detail(facultyId),
+            });
+        }
+    })
+}
+
