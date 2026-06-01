@@ -26,17 +26,18 @@ namespace user_service.Application.Features.Faculties.Queries.GetFaculties
             faculties = faculties
             .Select(f =>
             {
-                var majors = f.Majors
+                var majorsWithCounts = f.Majors
                     .Select(m => m with
                     {
                         StudentCount = studentCounts.GetValueOrDefault(m.Id)
                     })
+                    .OrderByDescending(m => m.StudentCount)
                     .ToArray();
 
                 return f with
                 {
-                    Majors = majors,
-                    StudentCount = majors.Sum(m => m.StudentCount),
+                    Majors = majorsWithCounts.Take(3).ToArray(),
+                    StudentCount = majorsWithCounts.Sum(m => m.StudentCount),
                     LecturerCount = lecturerCounts.GetValueOrDefault(f.Id)
                 };
             })
