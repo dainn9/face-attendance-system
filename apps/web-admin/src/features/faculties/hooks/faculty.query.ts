@@ -17,5 +17,6 @@ export const useFaculties = () =>
 export const useFacultyDetail = (id: string) =>
   useQuery({
     queryKey: facultyQueryKeys.detail(id),
-    queryFn: () => facultyApi.detail(id),
+    queryFn: () => facultyApi.detail(id!),
+    enabled: !!id,
   });

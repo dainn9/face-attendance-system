@@ -30,5 +30,23 @@ namespace user_service.Domain.Aggregates.Faculty
                 Code = code.Trim().ToUpperInvariant()
             };
         }
+
+        public void Update(string name, string code)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new BusinessRuleViolationException("Major name cannot be empty.", ErrorCodes.InvalidMajorData);
+
+            if (string.IsNullOrWhiteSpace(code))
+                throw new BusinessRuleViolationException("Major code cannot be empty.", ErrorCodes.InvalidMajorData);
+
+            var normalizedName = name.Trim();
+            var normalizedCode = code.Trim().ToUpperInvariant();
+
+            if (Name == normalizedName && Code == normalizedCode)
+                return;
+
+            Name = normalizedName;
+            Code = normalizedCode;
+        }
     }
 }

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { FacultyDetail } from "../types/faculty.types";
+import type { FacultyDetail, Major } from "../types/faculty.types";
 import {
     FiChevronRight,
     FiCpu,
@@ -13,9 +13,16 @@ import { getInitials } from "../../../shared/utils/getInitials";
 type Props = {
     data: FacultyDetail;
     onCreateMajor?: () => void;
+    onEditFaculty?: () => void;
+    onEditMajor?: (major: Major) => void;
 };
 
-const FacultyDetailView = ({ data, onCreateMajor }: Props) => {
+const FacultyDetailView = ({
+    data,
+    onCreateMajor,
+    onEditFaculty,
+    onEditMajor,
+}: Props) => {
     return (
         <div className="p-6">
             <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
@@ -42,7 +49,10 @@ const FacultyDetailView = ({ data, onCreateMajor }: Props) => {
                     </div>
                 </div>
 
-                <button className="flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button
+                    onClick={onEditFaculty}
+                    className="flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
                     <FiEdit className="size-4" />
                     Sửa
                 </button>
@@ -90,7 +100,10 @@ const FacultyDetailView = ({ data, onCreateMajor }: Props) => {
                                 </div>
 
                                 <div className="flex items-center gap-2 text-gray-400">
-                                    <button className="hover:text-blue-600">
+                                    <button
+                                        onClick={() => onEditMajor?.(major)}
+                                        className="hover:text-blue-600"
+                                    >
                                         <FiEdit className="size-4" />
                                     </button>
                                     <button className="hover:text-red-600">

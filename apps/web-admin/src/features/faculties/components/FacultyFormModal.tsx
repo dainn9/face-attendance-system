@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     FiBookOpen,
     FiBriefcase,
@@ -7,14 +7,21 @@ import {
     FiSettings,
     FiX,
 } from "react-icons/fi";
-import { useCreateFaculty } from "../hooks/faculty.mutation";
 import { ValidationError } from "../../../shared/api/errors";
 import Spinner from "../../../shared/components/Spinner/Spinner";
 import Button from "../../../shared/components/Button/Button";
 
 type Props = {
     isOpen: boolean;
+    mode: "create" | "edit";
+    initialData?: {
+        name: string;
+        code: string;
+    };
+    isPending?: boolean;
+    error?: unknown;
     onClose: () => void;
+    onSubmit: (data: { name: string; code: string }) => void;
 };
 
 const iconOptions = [
@@ -25,16 +32,29 @@ const iconOptions = [
     { value: "settings", label: "Kỹ thuật", Icon: FiSettings },
 ];
 
-const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
-    const { mutate, isPending, error, reset } = useCreateFaculty();
+const FacultyFormModal = ({
+    isOpen,
+    mode,
+    initialData,
+    isPending,
+    error,
+    onClose,
+    onSubmit,
+}: Props) => {
+    const title = mode === "create" ? "Thêm khoa mới" : "Cập nhật khoa";
+    const submitText = mode === "create" ? "Thêm khoa" : "Lưu thay đổi";
 
     const initialState = {
         name: "",
         code: "",
-        iconName: "cpu",
+        // iconName: "cpu",
     };
 
     const [formData, setFormData] = useState(initialState);
+
+    useEffect(() => {
+        setFormData(initialData ?? initialState);
+    }, [initialData, isOpen]);
 
     if (!isOpen) return null;
 
@@ -47,20 +67,7 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        mutate(formData, {
-            onSuccess: () => {
-                setFormData(initialState);
-                reset();
-                onClose();
-            },
-        });
-    };
-
-    const handleClose = () => {
-        setFormData(initialState);
-        reset();
-        onClose();
+        onSubmit(formData);
     };
 
     return (
@@ -69,7 +76,7 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
                 <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                     <div>
                         <h2 className="text-lg font-bold text-gray-900">
-                            Thêm khoa mới
+                            {title}
                         </h2>
                         <p className="text-sm text-gray-500">
                             Tạo thông tin khoa để quản lý ngành học.
@@ -78,7 +85,7 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
 
                     <button
                         type="button"
-                        onClick={handleClose}
+                        onClick={onClose}
                         className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                     >
                         <FiX size={20} />
@@ -87,11 +94,12 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
 
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-5 px-6 py-5">
-                        {error && !(error instanceof ValidationError) && (
-                            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                                {error.message}
-                            </div>
-                        )}
+                        {error instanceof Error &&
+                            !(error instanceof ValidationError) && (
+                                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                                    {error.message}
+                                </div>
+                            )}
 
                         <label className="block space-y-2">
                             <span className="text-sm font-semibold text-gray-700">
@@ -153,7 +161,7 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
                                 Mã khoa phải là duy nhất trong hệ thống.
                             </p>
                         </label>
-
+                        {/* 
                         <div>
                             <div className="mb-3 text-sm font-semibold text-gray-700">
                                 Icon hiển thị
@@ -185,11 +193,11 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
                                     );
                                 })}
                             </div>
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="flex justify-end gap-3 border-t border-gray-100 px-6 py-4">
-                        <Button variant="secondary" onClick={handleClose}>
+                        <Button variant="secondary" onClick={onClose}>
                             Hủy
                         </Button>
 
@@ -199,7 +207,7 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
                             disabled={isPending}
                         >
                             {isPending && <Spinner />}
-                            Thêm khoa
+                            {submitText}
                         </Button>
                     </div>
                 </form>
@@ -208,4 +216,4 @@ const CreateFacultyModal = ({ isOpen, onClose }: Props) => {
     );
 };
 
-export default CreateFacultyModal;
+export default FacultyFormModal;

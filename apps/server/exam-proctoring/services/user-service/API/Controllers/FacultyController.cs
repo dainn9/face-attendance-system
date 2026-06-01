@@ -6,9 +6,11 @@ using SharedKernel.Core.Enums;
 using user_service.API.Contracts;
 using user_service.Application.Contracts;
 using user_service.Application.Features.Faculties.Commands.CreateFaculty;
+using user_service.Application.Features.Faculties.Commands.UpdateFaculty;
 using user_service.Application.Features.Faculties.Queries.GetFaculties;
 using user_service.Application.Features.Faculties.Queries.GetFacultyDetail;
 using user_service.Application.Features.Majors.Commands;
+using user_service.Application.Features.Majors.Commands.UpdateMajor;
 
 namespace user_service.API.Controllers
 {
@@ -56,6 +58,7 @@ namespace user_service.API.Controllers
             });
         }
 
+        // GET: api/v1/faculties/{facultyId}
         [HttpGet("{facultyId:guid}")]
         public async Task<IActionResult> GetById(Guid facultyId)
         {
@@ -68,6 +71,20 @@ namespace user_service.API.Controllers
                 Message = "Faculty retrieved successfully",
                 Data = facultyDto
             });
+        }
+
+        // PUT: api/v1/faculties/{facultyId}
+        [HttpPut("{facultyId:guid}")]
+        public async Task<IActionResult> UpdateFaculty(Guid facultyId, [FromBody] UpdateFacultyRequest request)
+        {
+            var command = new UpdateFacultyCommand(
+                facultyId,
+                request.Name,
+                request.Code
+            );
+
+            await _mediator.Send(command);
+            return NoContent();
         }
 
         // ── Majors ──────────────────────────────────────────
@@ -84,6 +101,21 @@ namespace user_service.API.Controllers
 
             await _mediator.Send(command);
 
+            return NoContent();
+        }
+
+        // PUT: api/v1/faculties/{facultyId}/majors/{majorId}
+        [HttpPut("{facultyId:guid}/majors/{majorId:guid}")]
+        public async Task<IActionResult> UpdateMajor(Guid facultyId, Guid majorId, [FromBody] UpdateMajorRequest request)
+        {
+            var command = new UpdateMajorCommand(
+                facultyId,
+                majorId,
+                request.Name,
+                request.Code
+            );
+
+            await _mediator.Send(command);
             return NoContent();
         }
 

@@ -4,11 +4,32 @@ import { useFaculties } from "../hooks/faculty.query";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useState } from "react";
-import CreateFacultyModal from "../components/CreateFacultyModal";
+import FacultyFormModal from "../components/FacultyFormModal";
+import { useCreateFaculty } from "../hooks/faculty.mutation";
+import type { FacultyRequest } from "../types/faculty.types";
 
 const FacultyListPage = () => {
     const { data: faculties = [], isLoading } = useFaculties();
+    const {
+        mutate: createFaculty,
+        error,
+        reset,
+        isPending,
+    } = useCreateFaculty();
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+    const handleClose = () => {
+        reset();
+        setIsCreateOpen(false);
+    };
+
+    const handleSubmit = (data: FacultyRequest) => {
+        createFaculty(data, {
+            onSuccess: () => {
+                handleClose();
+            },
+        });
+    };
 
     if (isLoading) {
         return (
@@ -56,9 +77,13 @@ const FacultyListPage = () => {
                 <CreateFacultyCard onClick={() => setIsCreateOpen(true)} />
             </div>
 
-            <CreateFacultyModal
+            <FacultyFormModal
                 isOpen={isCreateOpen}
-                onClose={() => setIsCreateOpen(false)}
+                mode="create"
+                isPending={isPending}
+                error={error}
+                onClose={handleClose}
+                onSubmit={handleSubmit}
             />
         </div>
     );

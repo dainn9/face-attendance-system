@@ -14,7 +14,9 @@ export const API_ENDPOINTS = {
         CREATE: `${FACULTIES_PREFIX}/faculties`,
         LIST: `${FACULTIES_PREFIX}/faculties`,
         DETAIL: (id: string) => `${FACULTIES_PREFIX}/faculties/${id}`,
+        UPDATE: (id: string) => `${FACULTIES_PREFIX}/faculties/${id}`,
 
         CREATE_MAJOR: (facultyId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors`,
+        UPDATE_MAJOR: (facultyId: string, majorId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors/${majorId}`,
     }
 }
