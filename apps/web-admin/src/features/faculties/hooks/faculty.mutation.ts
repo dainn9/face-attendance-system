@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { facultyApi } from "../services/faculty.api"
+import { facultyApi } from "../../../shared/api/services/faculty.api"
 import type { FacultyRequest, MajorRequest } from "../types/faculty.types"
 import { useNavigate } from "react-router-dom";
 import { toastEmitter } from "../../../shared/utils/toastEmitter";

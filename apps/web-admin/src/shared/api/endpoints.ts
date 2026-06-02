@@ -1,5 +1,6 @@
-const AUTH_PREFIX = import.meta.env.VITE_PRIFIX_API_AUTH;
-const FACULTIES_PREFIX = import.meta.env.VITE_PRIFIX_API_USERS;
+const AUTH_PREFIX = import.meta.env.VITE_PREFIX_API_AUTH;
+const FACULTIES_PREFIX = import.meta.env.VITE_PREFIX_API_USERS;
+const ADMIN_PREFIX = import.meta.env.VITE_PREFIX_API_ADMIN;
 
 
 export const API_ENDPOINTS = {
@@ -18,5 +19,13 @@ export const API_ENDPOINTS = {
 
         CREATE_MAJOR: (facultyId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors`,
         UPDATE_MAJOR: (facultyId: string, majorId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors/${majorId}`,
+
+        FACULTY_LOOKUP: `${FACULTIES_PREFIX}/faculties/lookup`,
+        MAJOR_LOOKUP: (facultyId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors/lookup`
+    },
+
+    USERS: {
+        CREATE: `${ADMIN_PREFIX}/users`,
+        LIST: `${ADMIN_PREFIX}/users`,
     }
 }

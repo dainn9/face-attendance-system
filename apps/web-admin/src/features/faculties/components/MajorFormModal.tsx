@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useCreateMajor } from "../hooks/faculty.mutation";
 import Spinner from "../../../shared/components/Spinner/Spinner";
 import { FiCpu, FiX } from "react-icons/fi";
 import { ValidationError } from "../../../shared/api/errors";
@@ -22,7 +21,6 @@ type Props = {
 };
 
 const MajorFormModal = ({
-    facultyId,
     name,
     code,
     mode,
@@ -45,8 +43,6 @@ const MajorFormModal = ({
     useEffect(() => {
         setFormData(initialData ?? initialState);
     }, [initialData, isOpen]);
-
-    // const { mutate, isPending, error, reset } = useCreateMajor(facultyId);
 
     if (!isOpen) return null;
 
