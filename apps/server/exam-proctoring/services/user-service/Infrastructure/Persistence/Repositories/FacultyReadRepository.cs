@@ -51,5 +51,26 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 )).ToArray()
             ))
             .FirstOrDefaultAsync(ct);
+
+        public async Task<IReadOnlyList<FacultyLookupDto>> GetFacultyLookupAsync(CancellationToken ct = default)
+        => await _context.Faculties
+            .AsNoTracking()
+            .Select(f => new FacultyLookupDto(
+                f.Id,
+                f.Name
+            ))
+            .ToListAsync(ct);
+
+        public async Task<IReadOnlyList<MajorLookupDto>> GetMajorLookupByFacultyIdAsync(Guid facultyId, CancellationToken ct = default)
+        => await _context.Faculties
+            .AsNoTracking()
+            .Where(f => f.Id == facultyId)
+            .SelectMany(f => f.Majors)
+            .OrderBy(m => m.Name)
+            .Select(m => new MajorLookupDto(
+                m.Id,
+                m.Name
+            ))
+            .ToListAsync(ct);
     }
 }
