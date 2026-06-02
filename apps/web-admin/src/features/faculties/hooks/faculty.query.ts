@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { facultyApi } from "../services/faculty.api";
+import { facultyApi } from "../../../shared/api/services/faculty.api";
 
 export const facultyQueryKeys = {
     all: ["faculties"] as const,

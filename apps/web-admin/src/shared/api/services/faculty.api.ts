@@ -1,7 +1,7 @@
-import { api } from "../../../shared/api/client";
-import { API_ENDPOINTS } from "../../../shared/api/endpoints";
-import type { ApiResponse } from "../../../shared/api/types";
-import type { Faculty, FacultyDetail, FacultyRequest, MajorRequest } from "../types/faculty.types";
+import { api } from "../client";
+import { API_ENDPOINTS } from "../endpoints";
+import type { ApiResponse } from "../types";
+import type { Faculty, FacultyDetail, FacultyRequest, MajorRequest } from "../../../features/faculties/types/faculty.types";
 
 export const facultyApi = {
     create: async (data: FacultyRequest) : Promise<string> =>

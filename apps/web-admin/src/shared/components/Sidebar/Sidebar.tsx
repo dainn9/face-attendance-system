@@ -1,4 +1,4 @@
-import { FaHome, FaRegBuilding } from "react-icons/fa";
+import { FaHome, FaRegBuilding, FaUserFriends } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import LogoutButton from "../LogoutButton/LogoutButton";
 
@@ -40,6 +40,20 @@ const Sidebar = () => {
                 <div className="text-[10px] text-gray-400 px-4 pt-6 pb-1 uppercase tracking-wide">
                     Quản lý
                 </div>
+
+                <NavLink
+                    to="/users"
+                    className={({ isActive }) =>
+                        `${baseClass} ${
+                            isActive
+                                ? "bg-blue-50 text-blue-600"
+                                : "hover:bg-gray-100 text-gray-700"
+                        }`
+                    }
+                >
+                    <FaUserFriends />
+                    Người dùng
+                </NavLink>
 
                 <NavLink
                     to="/faculties"

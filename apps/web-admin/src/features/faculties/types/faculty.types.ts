@@ -1,11 +1,11 @@
-export type Major = {
+export interface Major {
     id: string;
     name: string;
     code: string;
     studentCount: number;
 };
 
-export type Faculty = {
+export interface Faculty {
     id: string;
     name: string;
     code: string;
@@ -15,13 +15,13 @@ export type Faculty = {
     majors: Major[];
 };
 
-export type Lecturer = {
+export interface Lecturer {
     id: string;
     name: string;
     userCode: string;
 }
 
-export type FacultyDetail = {
+export interface FacultyDetail {
     id: string;
     name: string;
     code: string;
@@ -33,12 +33,12 @@ export type FacultyDetail = {
 };
 
 // Request
-export type FacultyRequest = {
+export interface FacultyRequest {
     name: string;
     code: string;
 };
 
-export type MajorRequest = {
+export interface MajorRequest {
     name: string;
     code: string;
 };
