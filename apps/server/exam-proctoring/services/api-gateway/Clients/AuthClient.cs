@@ -46,5 +46,23 @@ namespace api_gateway.Clients
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             throw new DownstreamApiException((int)response.StatusCode, body);
         }
+
+        public async Task<Dictionary<Guid, bool>> GetStatusByIdsAsync(IReadOnlyList<Guid> userIds, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync(
+                "api/v1/internal/auth/accounts/status",
+                userIds,
+                cancellationToken
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<Dictionary<Guid, bool>>(cancellationToken: cancellationToken);
+                return result ?? new Dictionary<Guid, bool>();
+            }
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new DownstreamApiException((int)response.StatusCode, body);
+        }
     }
 }

@@ -1,5 +1,7 @@
 using api_gateway.Clients;
 using api_gateway.Contracts;
+using api_gateway.Contracts.Users;
+using api_gateway.Contracts.Userss;
 using BuildingBlocks.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +61,40 @@ namespace api_gateway.Controllers
             {
                 Success = true,
                 Message = "Registration successful"
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsers([FromQuery] GetUserPagedRequest request, CancellationToken cancellationToken)
+        {
+            // Bước 1: lấy paged users
+            var pagedUsers = await _userClient.GetUsersAsync(request, cancellationToken);
+
+            // Bước 2: lấy status
+            var userIds = pagedUsers.Items.Select(u => u.UserId).ToList();
+            var statusMap = await _authClient.GetStatusByIdsAsync(userIds, cancellationToken);
+
+            // Bước 3: merge
+            var items = pagedUsers.Items
+            .Select(u => u with
+            {
+                IsActive = statusMap.GetValueOrDefault(u.UserId)
+            })
+            .ToList();
+
+            var result = new PagedResult<UserPagedDto>
+            {
+                Items = items,
+                TotalCount = pagedUsers.TotalCount,
+                Page = pagedUsers.Page,
+                PageSize = pagedUsers.PageSize
+            };
+
+            return Ok(new ApiResponse<PagedResult<UserPagedDto>>
+            {
+                Success = true,
+                Message = "Users retrieved successfully",
+                Data = result
             });
         }
     }
