@@ -18,7 +18,7 @@ namespace user_service.Application.Contracts
     );
 
     public record FacultyDetailDto(
-         Guid Id,
+        Guid Id,
         string Name,
         string Code,
         int MajorCount,
@@ -26,5 +26,15 @@ namespace user_service.Application.Contracts
         int LecturerCount,
         MajorDto[] Majors,
         LecturerDto[] Lecturers
+    );
+
+    public record FacultyLookupDto(
+        Guid Id,
+        string Name
+    );
+
+    public record MajorLookupDto(
+        Guid Id,
+        string Name
     );
 }

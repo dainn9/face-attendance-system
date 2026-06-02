@@ -9,8 +9,10 @@ using user_service.Application.Features.Faculties.Commands.CreateFaculty;
 using user_service.Application.Features.Faculties.Commands.UpdateFaculty;
 using user_service.Application.Features.Faculties.Queries.GetFaculties;
 using user_service.Application.Features.Faculties.Queries.GetFacultyDetail;
+using user_service.Application.Features.Faculties.Queries.GetFacultyLookup;
 using user_service.Application.Features.Majors.Commands;
 using user_service.Application.Features.Majors.Commands.UpdateMajor;
+using user_service.Application.Features.Majors.Queries.GetMajorLookupByFacultyId;
 
 namespace user_service.API.Controllers
 {
@@ -26,14 +28,14 @@ namespace user_service.API.Controllers
 
         // POST: api/v1/faculties
         [HttpPost]
-        public async Task<IActionResult> CreateFaculty([FromBody] CreateFacultyRequest request)
+        public async Task<IActionResult> CreateFaculty([FromBody] CreateFacultyRequest request, CancellationToken cancellationToken)
         {
             var command = new CreateFacultyCommand(
                 request.Name,
                 request.Code
             );
 
-            var facultyId = await _mediator.Send(command);
+            var facultyId = await _mediator.Send(command, cancellationToken);
 
             return Ok(new ApiResponse<object>
             {
@@ -45,10 +47,10 @@ namespace user_service.API.Controllers
 
         // GET: api/v1/faculties
         [HttpGet]
-        public async Task<IActionResult> GetFaculties()
+        public async Task<IActionResult> GetFaculties(CancellationToken cancellationToken)
         {
             var query = new GetFacultiesQuery();
-            var faculties = await _mediator.Send(query);
+            var faculties = await _mediator.Send(query, cancellationToken);
 
             return Ok(new ApiResponse<IReadOnlyList<FacultyDto>>
             {
@@ -60,10 +62,10 @@ namespace user_service.API.Controllers
 
         // GET: api/v1/faculties/{facultyId}
         [HttpGet("{facultyId:guid}")]
-        public async Task<IActionResult> GetById(Guid facultyId)
+        public async Task<IActionResult> GetById(Guid facultyId, CancellationToken cancellationToken)
         {
             var query = new GetFacultyDetailQuery(facultyId);
-            var facultyDto = await _mediator.Send(query);
+            var facultyDto = await _mediator.Send(query, cancellationToken);
 
             return Ok(new ApiResponse<FacultyDetailDto>
             {
@@ -75,7 +77,7 @@ namespace user_service.API.Controllers
 
         // PUT: api/v1/faculties/{facultyId}
         [HttpPut("{facultyId:guid}")]
-        public async Task<IActionResult> UpdateFaculty(Guid facultyId, [FromBody] UpdateFacultyRequest request)
+        public async Task<IActionResult> UpdateFaculty(Guid facultyId, [FromBody] UpdateFacultyRequest request, CancellationToken cancellationToken)
         {
             var command = new UpdateFacultyCommand(
                 facultyId,
@@ -83,7 +85,7 @@ namespace user_service.API.Controllers
                 request.Code
             );
 
-            await _mediator.Send(command);
+            await _mediator.Send(command, cancellationToken);
             return NoContent();
         }
 
@@ -91,7 +93,7 @@ namespace user_service.API.Controllers
 
         // POST: api/v1/faculties/{facultyId}/majors
         [HttpPost("{facultyId:guid}/majors")]
-        public async Task<IActionResult> AddMajor(Guid facultyId, [FromBody] AddMajorRequest request)
+        public async Task<IActionResult> AddMajor(Guid facultyId, [FromBody] AddMajorRequest request, CancellationToken cancellationToken)
         {
             var command = new CreateMajorCommand(
                 facultyId,
@@ -99,14 +101,14 @@ namespace user_service.API.Controllers
                 request.Code
             );
 
-            await _mediator.Send(command);
+            await _mediator.Send(command, cancellationToken);
 
             return NoContent();
         }
 
         // PUT: api/v1/faculties/{facultyId}/majors/{majorId}
         [HttpPut("{facultyId:guid}/majors/{majorId:guid}")]
-        public async Task<IActionResult> UpdateMajor(Guid facultyId, Guid majorId, [FromBody] UpdateMajorRequest request)
+        public async Task<IActionResult> UpdateMajor(Guid facultyId, Guid majorId, [FromBody] UpdateMajorRequest request, CancellationToken cancellationToken)
         {
             var command = new UpdateMajorCommand(
                 facultyId,
@@ -115,8 +117,40 @@ namespace user_service.API.Controllers
                 request.Code
             );
 
-            await _mediator.Send(command);
+            await _mediator.Send(command, cancellationToken);
             return NoContent();
+        }
+
+        // ── Lookup ──────────────────────────────────────────
+
+        // GET: api/v1/faculties/{facultyId}/majors/lookup
+        [HttpGet("{facultyId:guid}/majors/lookup")]
+        public async Task<IActionResult> GetMajorLookupByFacultyId(Guid facultyId, CancellationToken cancellationToken)
+        {
+            var query = new GetMajorLookupByFacultyIdQuery(facultyId);
+            var majorLookups = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<IReadOnlyList<MajorLookupDto>>
+            {
+                Success = true,
+                Message = "Major lookups retrieved successfully",
+                Data = majorLookups
+            });
+        }
+
+        // GET: api/v1/faculties/lookup
+        [HttpGet("lookup")]
+        public async Task<IActionResult> GetFacultyLookup(CancellationToken cancellationToken)
+        {
+            var query = new GetFacultyLookupQuery();
+            var facultyLookups = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<IReadOnlyList<FacultyLookupDto>>
+            {
+                Success = true,
+                Message = "Faculty lookups retrieved successfully",
+                Data = facultyLookups
+            });
         }
 
         // [HttpGet("{facultyId:guid}")]
