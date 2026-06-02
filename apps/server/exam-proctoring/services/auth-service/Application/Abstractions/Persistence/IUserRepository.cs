@@ -12,5 +12,6 @@ namespace auth_service.Application.Abstractions.Persistence
         Task<bool> ExistsByEmailAsync(Email email, CancellationToken ct = default);
         Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task<User?> GetTrackedByIdAsync(Guid id, CancellationToken ct = default);
+        Task<Dictionary<Guid, bool>> GetStatusByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default);
     }
 }
