@@ -41,5 +41,11 @@ namespace auth_service.Infrastructure.Persistence.Repositories
         public Task<User?> GetTrackedByIdAsync(Guid id, CancellationToken ct = default)
             => _context.Users
                 .FirstOrDefaultAsync(u => u.Id == id, ct);
+
+        public Task<Dictionary<Guid, bool>> GetStatusByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
+        => _context.Users
+            .AsNoTracking()
+            .Where(u => ids.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u.IsActive, ct);
     }
 }

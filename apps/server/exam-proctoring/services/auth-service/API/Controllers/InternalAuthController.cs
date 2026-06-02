@@ -1,6 +1,7 @@
 using auth_service.API.Contracts;
 using auth_service.Application.Features.Auth.Commands.CreateAccount;
 using auth_service.Application.Features.Auth.Commands.DeleteAccount;
+using auth_service.Application.Features.Auth.Queries.GetStatusByIds;
 using BuildingBlocks.Security.Internal;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -36,6 +37,14 @@ namespace auth_service.API.Controllers
             var command = new DeleteAccountCommand(userId);
             await _mediator.Send(command);
             return NoContent();
+        }
+
+        [HttpPost("status")]
+        public async Task<IActionResult> GetStatusByIds([FromBody] IReadOnlyList<Guid> userIds)
+        {
+            var query = new GetStatusByIdsQuery(userIds);
+            var status = await _mediator.Send(query);
+            return Ok(status);
         }
     }
 }
