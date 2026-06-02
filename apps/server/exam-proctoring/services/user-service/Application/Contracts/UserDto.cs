@@ -7,6 +7,15 @@ namespace user_service.Application.Contracts
         string UserCode,
         string FullName
     );
+
+    public record UserPagedDto(
+        Guid UserId,
+        string UserCode,
+        string FullName,
+        string Email,
+        string RoleName,
+        string FacultyName
+    );
     //     public sealed record UserDto(
     //         Guid UserId,
     //         string UserCode,
