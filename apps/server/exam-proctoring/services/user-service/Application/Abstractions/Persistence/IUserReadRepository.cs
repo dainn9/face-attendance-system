@@ -1,3 +1,5 @@
+using BuildingBlocks.Results;
+using SharedKernel.Core.Enums;
 using user_service.Application.Contracts;
 
 namespace user_service.Application.Abstractions.Persistence
@@ -11,5 +13,13 @@ namespace user_service.Application.Abstractions.Persistence
         Task<Dictionary<Guid, int>> GetStudentCountByFacultyIdAsync(Guid facultyId, CancellationToken ct = default);
         Task<IReadOnlyList<LecturerDto>> GetLecturersByFacultyIdAsync(Guid facultyId, CancellationToken ct = default);
 
+        Task<PagedResult<UserPagedDto>> GetPagedAsync(
+            int page,
+            int pageSize,
+            string? searchQuery = null,
+            UserRole? role = null,
+            Guid? facultyId = null,
+            CancellationToken ct = default
+        );
     }
 }

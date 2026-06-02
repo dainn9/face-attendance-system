@@ -1,9 +1,12 @@
+using BuildingBlocks.Results;
 using BuildingBlocks.Security.Internal;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using user_service.API.Contracts;
+using user_service.Application.Contracts;
 using user_service.Application.Features.Users.Commands.CreateUser;
+using user_service.Application.Features.Users.Queries.GetUserPaged;
 
 namespace user_service.API.Controllers
 {
@@ -35,6 +38,30 @@ namespace user_service.API.Controllers
             await _mediator.Send(command);
             return NoContent();
         }
+
+        // GET: api/v1/users?page=1&pageSize=10&searchQuery=John&role=Admin&facultyId=123e4567-e89b-12d3-a456-426614174000
+        [HttpGet]
+        public async Task<IActionResult> GetUsers([FromQuery] GetUserPagedRequest request, CancellationToken cancellationToken)
+        {
+            var query = new GetUserPagedQuery(
+                request.Page,
+                request.PageSize,
+                request.SearchQuery,
+                request.Role,
+                request.FacultyId
+            );
+
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<PagedResult<UserPagedDto>>
+            {
+                Success = true,
+                Message = "Users retrieved successfully",
+                Data = result
+            });
+        }
+
+
 
         // // POST: api/v1/internal/users/validate-profile
         // [HttpPost("validate-profile")]

@@ -43,8 +43,6 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             When(x => x.Role == UserRole.Student, () =>
             {
                 RuleFor(x => x.MajorId)
-                    .NotEmpty()
-                    .WithMessage(ValidationMessages.InvalidGuid)
                     .NotNull()
                     .WithMessage(ValidationMessages.InvalidGuid);
 
@@ -56,8 +54,6 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             When(x => x.Role == UserRole.Lecturer, () =>
             {
                 RuleFor(x => x.FacultyId)
-                    .NotEmpty()
-                    .WithMessage(ValidationMessages.InvalidGuid)
                     .NotNull()
                     .WithMessage(ValidationMessages.InvalidGuid);
 
