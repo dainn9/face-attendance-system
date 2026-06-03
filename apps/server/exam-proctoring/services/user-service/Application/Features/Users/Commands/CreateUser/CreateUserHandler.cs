@@ -28,12 +28,15 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             if (await _userRepository.ExistsByIdAsync(request.UserId, cancellationToken))
                 return;
 
-            if (await _userRepository.ExistsByUserCodeAsync(request.UserCode, cancellationToken))
+            if (request.Role != UserRole.Admin &&
+                 !string.IsNullOrWhiteSpace(request.UserCode) &&
+                 await _userRepository.ExistsByUserCodeAsync(request.UserCode, cancellationToken))
+
                 throw new BusinessRuleViolationException($"User code {request.UserCode} already exists.", ErrorCodes.UserCodeAlreadyExists);
 
             var user = User.Create(
                 request.UserId,
-                request.UserCode,
+                request.Role == UserRole.Admin ? null : request.UserCode,
                 request.FullName,
                 request.Gender,
                 request.DateOfBirth,

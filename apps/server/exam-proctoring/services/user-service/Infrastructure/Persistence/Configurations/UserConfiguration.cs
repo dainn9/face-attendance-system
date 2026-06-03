@@ -14,7 +14,7 @@ namespace user_service.Infrastructure.Persistence.Configurations
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.UserCode)
-                    .IsRequired()
+                    .IsRequired(false)
                     .HasMaxLength(20);
 
             builder.Property(x => x.FullName)

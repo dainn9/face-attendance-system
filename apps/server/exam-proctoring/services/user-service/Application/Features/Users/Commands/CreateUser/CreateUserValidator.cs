@@ -11,11 +11,6 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
             RuleFor(x => x.UserId)
                 .ValidGuid();
 
-            RuleFor(x => x.UserCode)
-                .NotEmpty()
-                .WithMessage(ValidationMessages.Required)
-                .MaximumLength(20);
-
             RuleFor(x => x.FullName)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
@@ -49,6 +44,11 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                 RuleFor(x => x.FacultyId)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
+
+                RuleFor(x => x.UserCode)
+                   .NotEmpty()
+                   .WithMessage(ValidationMessages.Required)
+                   .MaximumLength(20);
             });
 
             When(x => x.Role == UserRole.Lecturer, () =>
@@ -60,6 +60,11 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                 RuleFor(x => x.MajorId)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
+
+                RuleFor(x => x.UserCode)
+                   .NotEmpty()
+                   .WithMessage(ValidationMessages.Required)
+                   .MaximumLength(20);
             });
 
             When(x => x.Role == UserRole.Admin, () =>
@@ -71,6 +76,8 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
                 RuleFor(x => x.MajorId)
                     .Empty()
                     .WithMessage(ValidationMessages.NotAllowed);
+
+                RuleFor(x => x.UserCode).Empty();
             });
         }
     }

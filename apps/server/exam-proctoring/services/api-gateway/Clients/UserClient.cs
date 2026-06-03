@@ -1,4 +1,3 @@
-using System.Text.Json;
 using api_gateway.Contracts;
 using api_gateway.Contracts.Users;
 using api_gateway.Contracts.Userss;
