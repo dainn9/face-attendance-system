@@ -45,7 +45,7 @@ namespace BuildingBlocks.Exceptions
         public const string InvalidFacultyData = "INVALID_FACULTY_DATA";
         public const string InvalidMajorData = "INVALID_MAJOR_DATA";
         public const string FacultyNameAlreadyExists = "FACULTY_NAME_ALREADY_EXISTS";
-        public const string FacultyCodeAlreadyExists = "FACULTY_Code_ALREADY_EXISTS";
+        public const string FacultyCodeAlreadyExists = "FACULTY_CODE_ALREADY_EXISTS";
 
         // ======= ATTENDANCE SERVICE =======
         public const string StudentAlreadyCheckedIn = "STUDENT_ALREADY_CHECKED_IN";
@@ -53,14 +53,28 @@ namespace BuildingBlocks.Exceptions
         public const string StudentNotEnrolled = "STUDENT_NOT_ENROLLED";
         public const string AttendanceSessionNotOpen = "ATTENDANCE_SESSION_NOT_OPEN";
 
-        // ======= COURSE =======
-        public const string CourseCodeAlreadyExists = "COURSE_CODE_ALREADY_EXISTS";
-        public const string InvalidCourseData = "INVALID_COURSE_DATA";
+        // ======= SUBJECT =======
+        public const string SubjectCodeAlreadyExists = "SUBJECT_CODE_ALREADY_EXISTS";
+        public const string InvalidSubjectData = "INVALID_SUBJECT_DATA";
 
         // ======= COURSE SECTION =======
         public const string InvalidCourseSectionData = "INVALID_COURSE_SECTION_DATA";
+        public const string CourseSectionFull = "COURSE_SECTION_FULL";
+        public const string CourseSectionDeactivated = "COURSE_SECTION_DEACTIVATED";
 
         // ======= ENROLLMENT =======
         public const string InvalidEnrollmentData = "INVALID_ENROLLMENT_DATA";
+
+        // ======= SCHEDULE =======
+        public const string InvalidScheduleData = "INVALID_SCHEDULE_DATA";
+        public const string ScheduleConflict = "SCHEDULE_CONFLICT";
+        public const string ScheduleNotFound = "SCHEDULE_NOT_FOUND";
+
+        // ======= ATTENDANCE SESSION =======
+        public const string InvalidAttendanceSessionData = "INVALID_ATTENDANCE_SESSION_DATA";
+
+        // ======= ATTENDANCE RECORD =======
+        public const string InvalidAttendanceRecordData = "INVALID_ATTENDANCE_RECORD_DATA";
+
     }
 }
