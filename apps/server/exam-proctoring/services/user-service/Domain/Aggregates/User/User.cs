@@ -1,12 +1,12 @@
+using BuildingBlocks.Exceptions;
 using SharedKernel.Core;
 using SharedKernel.Core.Enums;
-using BuildingBlocks.Exceptions;
 
 namespace user_service.Domain.Aggregates.User
 {
     public class User : AggregateRoot<Guid>
     {
-        public string UserCode { get; private set; } = null!;
+        public string? UserCode { get; private set; }
         public string FullName { get; private set; } = null!;
         public Gender Gender { get; private set; }
         public DateOnly DateOfBirth { get; private set; }
@@ -18,12 +18,12 @@ namespace user_service.Domain.Aggregates.User
 
         private User() { }
 
-        public static User Create(Guid userId, string userCode, string fullName, Gender gender, DateOnly dateOfBirth, string email, UserRole role, DateTime now)
+        public static User Create(Guid userId, string? userCode, string fullName, Gender gender, DateOnly dateOfBirth, string email, UserRole role, DateTime now)
         {
             if (userId == Guid.Empty)
                 throw new BusinessRuleViolationException("User ID cannot be empty.", ErrorCodes.InvalidUserData);
 
-            if (string.IsNullOrWhiteSpace(userCode))
+            if (role != UserRole.Admin && string.IsNullOrWhiteSpace(userCode))
                 throw new BusinessRuleViolationException("User code cannot be empty.", ErrorCodes.InvalidUserData);
 
             if (string.IsNullOrWhiteSpace(fullName))
@@ -38,7 +38,7 @@ namespace user_service.Domain.Aggregates.User
             var user = new User
             {
                 Id = userId,
-                UserCode = userCode,
+                UserCode = role == UserRole.Admin ? null : userCode,
                 FullName = fullName,
                 Gender = gender,
                 DateOfBirth = dateOfBirth,

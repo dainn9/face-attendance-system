@@ -3,7 +3,7 @@ using SharedKernel.Core.Enums;
 namespace api_gateway.Contracts
 {
     public record RegisterRequest(
-        string UserCode,
+        string? UserCode,
         string Email,
         string Password,
         UserRole UserRole,

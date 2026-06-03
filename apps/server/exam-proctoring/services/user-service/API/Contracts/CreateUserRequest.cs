@@ -4,7 +4,7 @@ namespace user_service.API.Contracts
 {
     public record CreateUserRequest(
         Guid UserId,
-        string UserCode,
+        string? UserCode,
         string FullName,
         Gender Gender,
         DateOnly DateOfBirth,

@@ -5,7 +5,7 @@ namespace user_service.Application.Features.Users.Commands.CreateUser
 {
     public record CreateUserCommand(
         Guid UserId,
-        string UserCode,
+        string? UserCode,
         string FullName,
         Gender Gender,
         DateOnly DateOfBirth,

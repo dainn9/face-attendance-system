@@ -7,11 +7,5 @@ namespace auth_service.Application.Features.Auth.Commands.CreateAccount
         string Email,
         string Password,
         UserRole UserRole
-    // string FullName,
-    // Gender Gender
-    // DateOnly DateOfBirth,
-    // string? StudentCode,
-    // string? ClassCode,
-    // string? FacultyCode
     ) : IRequest<Guid>;
 }
