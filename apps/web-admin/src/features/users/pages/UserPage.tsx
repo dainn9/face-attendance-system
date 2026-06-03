@@ -16,6 +16,7 @@ import Spinner from "../../../shared/components/Spinner/Spinner";
 import type { UserRole } from "../types/user.types";
 import { useState } from "react";
 import { useFacultyLookup } from "../hooks/lookup.query";
+import { Link } from "react-router-dom";
 
 const defaultPagedResult = {
     items: [],
@@ -60,10 +61,13 @@ const UserPage = () => {
             <div className="mb-5 flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-gray-900">Người dùng</h1>
 
-                <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                <Link
+                    to="/users/create"
+                    className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                >
                     <FiPlus size={16} />
                     Tạo người dùng
-                </button>
+                </Link>
             </div>
 
             <div className="mb-4 flex flex-wrap gap-3">
@@ -164,9 +168,12 @@ const UserPage = () => {
 
                                 <td className="px-4 py-3">
                                     <div className="flex items-center gap-3 text-gray-400">
-                                        <button className="hover:text-blue-600">
+                                        <Link
+                                            to={`/users/${user.userId}`}
+                                            className="hover:text-blue-600"
+                                        >
                                             <FiEye size={16} />
-                                        </button>
+                                        </Link>
                                         <button className="hover:text-blue-600">
                                             <FiEdit2 size={16} />
                                         </button>

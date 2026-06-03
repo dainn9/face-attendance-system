@@ -5,6 +5,8 @@ import PublicRoute from "./PublicRoute";
 import FacultyListPage from "../features/faculties/pages/FacultyListPage";
 import FacultyDetailPage from "../features/faculties/pages/FacultyDetailPage";
 import UserPage from "../features/users/pages/UserPage";
+import CreateUserPage from "../features/users/pages/CreateUserPage";
+import UserDetailPage from "../features/users/pages/UserDetailPage";
 
 export const routes = [
     {
@@ -27,8 +29,8 @@ export const routes = [
                         path: "users",
                         children: [
                             { index: true, element: <UserPage /> },
-                            { path: "create", element: <div>Create User</div> },
-                            { path: ":id", element: <div>User Detail</div> },
+                            { path: "create", element: <CreateUserPage /> },
+                            { path: ":id", element: <UserDetailPage /> },
                         ],
                     },
                 ],

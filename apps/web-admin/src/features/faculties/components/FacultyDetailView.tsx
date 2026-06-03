@@ -135,12 +135,12 @@ const FacultyDetailView = ({
                         >
                             <div className="flex items-center gap-3">
                                 <div className="flex size-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
-                                    {getInitials(lecturer.name)}
+                                    {getInitials(lecturer.fullName)}
                                 </div>
 
                                 <div>
                                     <div className="font-medium text-gray-900">
-                                        {lecturer.name}
+                                        {lecturer.fullName}
                                     </div>
                                     <div className="text-sm text-gray-500">
                                         {lecturer.userCode}

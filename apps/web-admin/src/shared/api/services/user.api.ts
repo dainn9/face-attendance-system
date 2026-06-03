@@ -1,7 +1,7 @@
 import { api } from "../client";
 import { API_ENDPOINTS } from "../endpoints";
 import type { ApiResponse, PagedResult } from "../types";
-import type { CreateUserRequest, GetUserPagedRequest, LookupDto, UserDto } from "../../../features/users/types/user.types";
+import type { CreateUserRequest, GetUserPagedRequest, UserDto } from "../../../features/users/types/user.types";
 
 export const userApi = {
     create: async (data: CreateUserRequest)=> {
