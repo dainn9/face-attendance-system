@@ -17,7 +17,7 @@ export interface Faculty {
 
 export interface Lecturer {
     id: string;
-    name: string;
+    fullName: string;
     userCode: string;
 }
 

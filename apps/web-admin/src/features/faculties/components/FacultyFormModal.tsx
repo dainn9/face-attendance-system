@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-    FiBookOpen,
-    FiBriefcase,
-    FiCpu,
-    FiGlobe,
-    FiSettings,
-    FiX,
-} from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import { ValidationError } from "../../../shared/api/errors";
 import Spinner from "../../../shared/components/Spinner/Spinner";
 import Button from "../../../shared/components/Button/Button";
@@ -23,14 +16,6 @@ type Props = {
     onClose: () => void;
     onSubmit: (data: { name: string; code: string }) => void;
 };
-
-const iconOptions = [
-    { value: "cpu", label: "Công nghệ", Icon: FiCpu },
-    { value: "book", label: "Giáo dục", Icon: FiBookOpen },
-    { value: "briefcase", label: "Kinh tế", Icon: FiBriefcase },
-    { value: "globe", label: "Ngoại ngữ", Icon: FiGlobe },
-    { value: "settings", label: "Kỹ thuật", Icon: FiSettings },
-];
 
 const FacultyFormModal = ({
     isOpen,

@@ -9,10 +9,10 @@ export interface UserDto {
 };
 
 export interface CreateUserRequest {
-    userCode: string;
+    userCode: string | null;
     email: string;
     password: string;
-    userRole: string;
+    userRole: UserRoleNumber;
     fullName: string;
     gender: number;
     dateOfBirth: string;
@@ -32,5 +32,14 @@ export interface LookupDto {
     id: string;
     name: string;
 }
+
+export const UserRoleValue = {
+    Admin: 1,
+    Lecturer: 2,
+    Student: 3,
+} as const;
+
+export type UserRoleNumber =
+    (typeof UserRoleValue)[keyof typeof UserRoleValue];
 
 export type UserRole = "Admin" | "Lecturer" | "Student";
