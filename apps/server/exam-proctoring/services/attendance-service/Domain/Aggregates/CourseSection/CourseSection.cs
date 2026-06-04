@@ -1,3 +1,4 @@
+using attendance_service.Domain.Enums;
 using BuildingBlocks.Exceptions;
 using SharedKernel.Core;
 
@@ -7,7 +8,7 @@ namespace attendance_service.Domain.Aggregates.CourseSection
     {
         public Guid SubjectId { get; private set; }
         public string CourseSectionCode { get; private set; } = null!;
-        public string Semester { get; private set; } = null!;
+        public Semester Semester { get; private set; }
         public string AcademicYear { get; private set; } = null!;
         public Guid LecturerId { get; private set; }
         public int MaxCapacity { get; private set; }
@@ -21,16 +22,13 @@ namespace attendance_service.Domain.Aggregates.CourseSection
 
         private CourseSection() { }
 
-        public static CourseSection Create(Guid subjectId, string courseSectionCode, string semester, string academicYear, Guid lecturerId, int maxCapacity, DateTime now)
+        public static CourseSection Create(Guid subjectId, string courseSectionCode, Semester semester, string academicYear, Guid lecturerId, int maxCapacity, DateTime now)
         {
             if (subjectId == Guid.Empty)
                 throw new BusinessRuleViolationException("Subject ID cannot be empty.", ErrorCodes.InvalidCourseSectionData);
 
             if (string.IsNullOrWhiteSpace(courseSectionCode))
                 throw new BusinessRuleViolationException("Course section code cannot be empty.", ErrorCodes.InvalidCourseSectionData);
-
-            if (string.IsNullOrWhiteSpace(semester))
-                throw new BusinessRuleViolationException("Semester cannot be empty.", ErrorCodes.InvalidCourseSectionData);
 
             if (string.IsNullOrWhiteSpace(academicYear))
                 throw new BusinessRuleViolationException("Academic year cannot be empty.", ErrorCodes.InvalidCourseSectionData);
@@ -46,7 +44,7 @@ namespace attendance_service.Domain.Aggregates.CourseSection
                 Id = Guid.NewGuid(),
                 SubjectId = subjectId,
                 CourseSectionCode = courseSectionCode.Trim().ToUpperInvariant(),
-                Semester = semester.Trim(),
+                Semester = semester,
                 AcademicYear = academicYear.Trim(),
                 LecturerId = lecturerId,
                 MaxCapacity = maxCapacity,
@@ -59,16 +57,13 @@ namespace attendance_service.Domain.Aggregates.CourseSection
             return courseSection;
         }
 
-        public void UpdateInfo(string courseSectionCode, string semester, string academicYear, Guid lecturerId, int maxCapacity, DateTime now)
+        public void UpdateInfo(string courseSectionCode, Semester semester, string academicYear, Guid lecturerId, int maxCapacity, DateTime now)
         {
             if (!IsActive)
                 throw new BusinessRuleViolationException("Cannot update an inactive course section.", ErrorCodes.CourseSectionDeactivated);
 
             if (string.IsNullOrWhiteSpace(courseSectionCode))
                 throw new BusinessRuleViolationException("Course section code cannot be empty.", ErrorCodes.InvalidCourseSectionData);
-
-            if (string.IsNullOrWhiteSpace(semester))
-                throw new BusinessRuleViolationException("Semester cannot be empty.", ErrorCodes.InvalidCourseSectionData);
 
             if (string.IsNullOrWhiteSpace(academicYear))
                 throw new BusinessRuleViolationException("Academic year cannot be empty.", ErrorCodes.InvalidCourseSectionData);
@@ -83,7 +78,7 @@ namespace attendance_service.Domain.Aggregates.CourseSection
                 throw new BusinessRuleViolationException("Maximum capacity cannot be less than current enrollment count.", ErrorCodes.InvalidCourseSectionData);
 
             CourseSectionCode = courseSectionCode.Trim().ToUpperInvariant();
-            Semester = semester.Trim();
+            Semester = semester;
             AcademicYear = academicYear.Trim();
             LecturerId = lecturerId;
             MaxCapacity = maxCapacity;

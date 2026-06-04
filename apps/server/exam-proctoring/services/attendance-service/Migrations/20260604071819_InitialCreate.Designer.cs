@@ -11,7 +11,7 @@ using attendance_service.Infrastructure.Persistence;
 namespace attendance_service.Migrations
 {
     [DbContext(typeof(AttendanceDbContext))]
-    [Migration("20260604070549_InitialCreate")]
+    [Migration("20260604071819_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
