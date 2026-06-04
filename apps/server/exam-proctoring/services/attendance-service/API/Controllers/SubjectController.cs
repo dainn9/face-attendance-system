@@ -3,6 +3,7 @@ using attendance_service.Application.Contracts;
 using attendance_service.Application.Features.Subjects.Commands.CreateSubject;
 using attendance_service.Application.Features.Subjects.Commands.UpdateSubject;
 using attendance_service.Application.Features.Subjects.Queries.GetById;
+using attendance_service.Application.Features.Subjects.Queries.GetSubjectLookup;
 using BuildingBlocks.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -70,6 +71,22 @@ namespace attendance_service.API.Controllers
                 Success = true,
                 Message = "Subject retrieved successfully",
                 Data = subjectDto
+            });
+        }
+
+        // ── Lookup ──────────────────────────────────────────
+
+        [HttpGet("lookup")]
+        public async Task<IActionResult> GetSubjectLookup([FromQuery] string? keyword)
+        {
+            var query = new GetSubjectLookupQuery(keyword);
+            var subjectLookups = await _mediator.Send(query);
+
+            return Ok(new ApiResponse<IReadOnlyList<SubjectLookupDto>>
+            {
+                Success = true,
+                Message = "Subject lookups retrieved successfully",
+                Data = subjectLookups
             });
         }
 
