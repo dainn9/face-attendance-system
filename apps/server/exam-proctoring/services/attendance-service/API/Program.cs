@@ -7,6 +7,8 @@ using attendance_service.Infrastructure.Persistence;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Middleware;
 using BuildingBlocks.Results;
+using BuildingBlocks.Security.Internal;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -131,7 +133,9 @@ builder.Services
                 });
         }
     };
-});
+})
+.AddScheme<AuthenticationSchemeOptions, InternalAuthenticationHandler>(
+        InternalAuthenticationHandler.SchemeName, options => { });
 
 builder.Services.AddAuthorization();
 

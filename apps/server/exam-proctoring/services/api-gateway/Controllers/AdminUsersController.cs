@@ -1,7 +1,6 @@
 using api_gateway.Clients;
 using api_gateway.Contracts;
 using api_gateway.Contracts.Users;
-using api_gateway.Contracts.Userss;
 using BuildingBlocks.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -71,8 +70,10 @@ namespace api_gateway.Controllers
             var pagedUsers = await _userClient.GetUsersAsync(request, cancellationToken);
 
             // Bước 2: lấy status
-            var userIds = pagedUsers.Items.Select(u => u.UserId).ToList();
-            var statusMap = await _authClient.GetStatusByIdsAsync(userIds, cancellationToken);
+            var userIds = pagedUsers.Items.Select(u => u.UserId).Distinct().ToList();
+            var statusMap = userIds.Any()
+                ? await _authClient.GetStatusByIdsAsync(userIds, cancellationToken)
+                : new Dictionary<Guid, bool>();
 
             // Bước 3: merge
             var items = pagedUsers.Items

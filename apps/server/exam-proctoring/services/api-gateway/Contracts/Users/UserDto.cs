@@ -1,4 +1,4 @@
-namespace api_gateway.Contracts.Userss
+namespace api_gateway.Contracts.Users
 {
     public record UserPagedDto(
         Guid UserId,
@@ -8,5 +8,10 @@ namespace api_gateway.Contracts.Userss
         string RoleName,
         string FacultyName,
         bool? IsActive  // merge từ AuthService
+    );
+
+    public record UserLookupDto(
+        Guid UserId,
+        string FullName
     );
 }

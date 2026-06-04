@@ -16,6 +16,11 @@ namespace user_service.Application.Contracts
         string RoleName,
         string FacultyName
     );
+    public record UserLookupDto(
+        Guid UserId,
+        string FullName
+    );
+
     //     public sealed record UserDto(
     //         Guid UserId,
     //         string UserCode,

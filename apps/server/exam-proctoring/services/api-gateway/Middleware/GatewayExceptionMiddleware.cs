@@ -23,6 +23,7 @@ namespace api_gateway.Middleware
             }
             catch (DownstreamApiException ex)
             {
+                _logger.LogError("Downstream error {StatusCode}: {Body}", ex.StatusCode, ex.ResponseBody);
                 context.Response.StatusCode = ex.StatusCode;
                 context.Response.ContentType = "application/json";
 

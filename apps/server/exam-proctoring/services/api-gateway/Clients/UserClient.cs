@@ -1,19 +1,14 @@
 using api_gateway.Contracts;
 using api_gateway.Contracts.Users;
-using api_gateway.Contracts.Userss;
 using api_gateway.Exceptions;
 using BuildingBlocks.Results;
 
 namespace api_gateway.Clients
 {
-    public class UserClient
+    public class UserClient : BaseHttpClient
     {
-        private readonly HttpClient _httpClient;
-
-        public UserClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+        public UserClient(HttpClient httpClient, ILogger<UserClient> logger)
+        : base(httpClient, logger) { }
 
         public async Task CreateUserAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
         {
@@ -21,6 +16,8 @@ namespace api_gateway.Clients
 
             if (response.IsSuccessStatusCode)
                 return;
+            else
+                await HandleErrorAsync(response, cancellationToken);
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             throw new DownstreamApiException((int)response.StatusCode, body);
@@ -44,9 +41,32 @@ namespace api_gateway.Clients
                 var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<UserPagedDto>>>(cancellationToken: cancellationToken);
                 return result?.Data ?? new PagedResult<UserPagedDto>();
             }
+            else
+                await HandleErrorAsync(response, cancellationToken);
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             throw new DownstreamApiException((int)response.StatusCode, body);
+        }
+
+        public async Task<Dictionary<Guid, UserLookupDto>> GetLecturersByIdsAsync(IReadOnlyList<Guid> lecturerIds, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync(
+                "api/v1/internal/users/get-lecturers-by-ids",
+                lecturerIds,
+                cancellationToken
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<Dictionary<Guid, UserLookupDto>>(cancellationToken: cancellationToken);
+                return result ?? new Dictionary<Guid, UserLookupDto>();
+            }
+            else
+                await HandleErrorAsync(response, cancellationToken);
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new DownstreamApiException((int)response.StatusCode, body);
+
         }
     }
 }
