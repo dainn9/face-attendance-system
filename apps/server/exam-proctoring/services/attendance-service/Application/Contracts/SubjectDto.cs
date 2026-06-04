@@ -6,4 +6,9 @@ namespace attendance_service.Application.Contracts
         string Code,
         int Credits
     );
+
+    public record SubjectLookupDto(
+        Guid Id,
+        string Name
+    );
 }

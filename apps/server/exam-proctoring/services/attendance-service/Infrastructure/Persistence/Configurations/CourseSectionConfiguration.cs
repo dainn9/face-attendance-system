@@ -41,7 +41,7 @@ namespace attendance_service.Infrastructure.Persistence.Configurations
             {
                 a.ToTable("enrollments");
 
-                a.WithOwner().HasForeignKey("CourseSectionId", "StudentId");
+                a.WithOwner().HasForeignKey("CourseSectionId");
 
                 a.HasKey(x => new { x.CourseSectionId, x.Id });
 
