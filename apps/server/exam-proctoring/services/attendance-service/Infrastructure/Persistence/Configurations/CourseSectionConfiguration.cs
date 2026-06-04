@@ -23,6 +23,7 @@ namespace attendance_service.Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.Semester)
                     .IsRequired()
+                    .HasConversion<string>()
                     .HasMaxLength(20);
 
             builder.Property(x => x.AcademicYear)
