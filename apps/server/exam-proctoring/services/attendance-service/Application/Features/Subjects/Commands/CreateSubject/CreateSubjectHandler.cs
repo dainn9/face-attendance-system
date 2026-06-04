@@ -22,12 +22,15 @@ namespace attendance_service.Application.Features.Subjects.Commands.CreateSubjec
 
         public async Task<Guid> Handle(CreateSubjectCommand request, CancellationToken cancellationToken)
         {
-            if (await _subjectRepository.ExistsByCodeAsync(request.Code, null, cancellationToken))
-                throw new BusinessRuleViolationException($"Subject with code '{request.Code}' already exists.", ErrorCodes.SubjectCodeAlreadyExists);
+            var normalizedCode = request.Code.Trim().ToUpperInvariant();
+
+            if (await _subjectRepository.ExistsByCodeAsync(normalizedCode, null, cancellationToken))
+                throw new BusinessRuleViolationException($"Subject with code '{normalizedCode}' already exists.", ErrorCodes.SubjectCodeAlreadyExists);
 
             var subject = Subject.Create(
+                request.FacultyId,
                 request.Name,
-                request.Code,
+                normalizedCode,
                 request.Credits,
                 _clock.UtcNow
             );

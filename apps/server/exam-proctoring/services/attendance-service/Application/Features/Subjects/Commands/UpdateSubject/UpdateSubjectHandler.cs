@@ -25,12 +25,15 @@ namespace attendance_service.Application.Features.Subjects.Commands.UpdateSubjec
             var subject = await _subjectRepository.FindAsync(request.SubjectId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(Subject), request.SubjectId);
 
-            if (await _subjectRepository.ExistsByCodeAsync(request.Code, request.SubjectId, cancellationToken))
+            var normalizedCode = request.Code.Trim().ToUpperInvariant();
+
+            if (await _subjectRepository.ExistsByCodeAsync(normalizedCode, request.SubjectId, cancellationToken))
                 throw new BusinessRuleViolationException($"Subject with code '{request.Code}' already exists.", ErrorCodes.SubjectCodeAlreadyExists);
 
             subject.Update(
+                request.FacultyId,
                 request.Name,
-                request.Code,
+                normalizedCode,
                 request.Credits,
                 _clock.UtcNow
             );

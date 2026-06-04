@@ -66,7 +66,6 @@ namespace attendance_service.Migrations
             modelBuilder.Entity("attendance_service.Domain.Aggregates.Subject.Subject", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Code")
@@ -80,6 +79,9 @@ namespace attendance_service.Migrations
                     b.Property<int>("Credits")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("FacultyId")
+                        .HasColumnType("char(36)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -92,6 +94,8 @@ namespace attendance_service.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique();
+
+                    b.HasIndex("FacultyId");
 
                     b.ToTable("subjects", (string)null);
                 });

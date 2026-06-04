@@ -26,6 +26,7 @@ namespace attendance_service.API.Controllers
         public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request)
         {
             var command = new CreateSubjectCommand(
+                request.FacultyId,
                 request.Name,
                 request.Code,
                 request.Credits
@@ -46,6 +47,7 @@ namespace attendance_service.API.Controllers
         {
             var command = new UpdateSubjectCommand(
                 subjectId,
+                request.FacultyId,
                 request.Name,
                 request.Code,
                 request.Credits

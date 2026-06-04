@@ -12,7 +12,10 @@ namespace attendance_service.Infrastructure.Persistence.Configurations
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Id).IsRequired();
+            builder.Property(x => x.Id)
+                .ValueGeneratedNever();
+
+            builder.HasIndex(x => x.FacultyId);
 
             builder.Property(x => x.Code)
                     .IsRequired()

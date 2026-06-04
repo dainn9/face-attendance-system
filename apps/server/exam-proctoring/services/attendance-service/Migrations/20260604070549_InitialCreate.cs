@@ -43,6 +43,7 @@ namespace attendance_service.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    FacultyId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Code = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
@@ -124,6 +125,11 @@ namespace attendance_service.Migrations
                 table: "subjects",
                 column: "Code",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_subjects_FacultyId",
+                table: "subjects",
+                column: "FacultyId");
         }
 
         /// <inheritdoc />
