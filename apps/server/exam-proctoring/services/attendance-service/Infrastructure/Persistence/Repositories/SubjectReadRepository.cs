@@ -36,7 +36,8 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 .Take(20)
                 .Select(x => new SubjectLookupDto(
                     x.Id,
-                     $"{x.Code} - {x.Name} ({x.Credits} TC)"
+                    $"{x.Code} - {x.Name} ({x.Credits} TC)",
+                    x.FacultyId
                 ))
                 .ToListAsync(cancellationToken);
         }

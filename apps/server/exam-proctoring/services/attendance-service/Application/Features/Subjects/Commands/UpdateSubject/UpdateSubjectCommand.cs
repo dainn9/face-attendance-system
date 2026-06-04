@@ -4,6 +4,7 @@ namespace attendance_service.Application.Features.Subjects.Commands.UpdateSubjec
 {
     public record UpdateSubjectCommand(
         Guid SubjectId,
+        Guid? FacultyId,
         string Name,
         string Code,
         int Credits

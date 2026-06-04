@@ -9,6 +9,7 @@ namespace attendance_service.Application.Contracts
 
     public record SubjectLookupDto(
         Guid Id,
-        string Name
+        string Name,
+        Guid? FacultyId
     );
 }
