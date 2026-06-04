@@ -47,6 +47,13 @@ builder.Services.AddHttpClient<AuthClient>(
             client,
             "AuthService"));
 
+builder.Services.AddHttpClient<AttendanceClient>(
+    (sp, client) =>
+        ConfigureInternalClient(
+            sp,
+            client,
+            "AttendanceService"));
+
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
     {

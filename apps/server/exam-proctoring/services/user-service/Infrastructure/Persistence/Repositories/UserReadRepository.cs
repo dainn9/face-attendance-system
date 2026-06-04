@@ -224,6 +224,22 @@ namespace user_service.Infrastructure.Persistence.Repositories
             };
         }
 
+        public async Task<Dictionary<Guid, UserLookupDto>> GetLecturersByIdsAsync(
+            IEnumerable<Guid> userIds,
+            CancellationToken cancellationToken)
+        {
+            var ids = userIds.Distinct().ToList();
+
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => ids.Contains(u.Id) && u.LecturerProfile != null)
+                .Select(u => new UserLookupDto(
+                    u.Id,
+                    u.FullName
+                ))
+                .ToDictionaryAsync(u => u.UserId, cancellationToken);
+        }
+
         public record UserPagedProjection(
             Guid Id,
             string UserCode,

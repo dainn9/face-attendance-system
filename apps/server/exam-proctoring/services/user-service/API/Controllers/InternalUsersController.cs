@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using user_service.API.Contracts;
 using user_service.Application.Contracts;
 using user_service.Application.Features.Users.Commands.CreateUser;
+using user_service.Application.Features.Users.Queries.GetLecturersByIds;
 using user_service.Application.Features.Users.Queries.GetUserPaged;
 
 namespace user_service.API.Controllers
@@ -61,7 +62,14 @@ namespace user_service.API.Controllers
             });
         }
 
-
+        // POST: api/v1/internal/users/get-lecturers-by-ids
+        [HttpPost("get-lecturers-by-ids")]
+        public async Task<IActionResult> GetLecturersByIds([FromBody] IReadOnlyList<Guid> userIds, CancellationToken cancellationToken)
+        {
+            var query = new GetLecturersByIdsQuery(userIds);
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
 
         // // POST: api/v1/internal/users/validate-profile
         // [HttpPost("validate-profile")]

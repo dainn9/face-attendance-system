@@ -23,7 +23,7 @@ namespace attendance_service.API.Controllers
 
         // POST: api/v1/subjects
         [HttpPost]
-        public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request)
+        public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request, CancellationToken cancellationToken)
         {
             var command = new CreateSubjectCommand(
                 request.FacultyId,
@@ -32,7 +32,7 @@ namespace attendance_service.API.Controllers
                 request.Credits
             );
 
-            var subjectId = await _mediator.Send(command);
+            var subjectId = await _mediator.Send(command, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { subjectId }, new ApiResponse<Guid>
             {
                 Success = true,
@@ -43,7 +43,7 @@ namespace attendance_service.API.Controllers
 
         // PUT: api/v1/subjects/{subjectId}
         [HttpPut("{subjectId:guid}")]
-        public async Task<IActionResult> UpdateSubject(Guid subjectId, [FromBody] UpdateSubjectRequest request)
+        public async Task<IActionResult> UpdateSubject(Guid subjectId, [FromBody] UpdateSubjectRequest request, CancellationToken cancellationToken)
         {
             var command = new UpdateSubjectCommand(
                 subjectId,
@@ -53,7 +53,7 @@ namespace attendance_service.API.Controllers
                 request.Credits
             );
 
-            await _mediator.Send(command);
+            await _mediator.Send(command, cancellationToken);
             return Ok(new ApiResponse<object>
             {
                 Success = true,
@@ -63,10 +63,10 @@ namespace attendance_service.API.Controllers
 
         // GET: api/v1/subjects/{subjectId}
         [HttpGet("{subjectId:guid}")]
-        public async Task<IActionResult> GetById(Guid subjectId)
+        public async Task<IActionResult> GetById(Guid subjectId, CancellationToken cancellationToken)
         {
             var query = new GetByIdQuery(subjectId);
-            var subjectDto = await _mediator.Send(query);
+            var subjectDto = await _mediator.Send(query, cancellationToken);
 
             return Ok(new ApiResponse<SubjectDto>
             {
@@ -79,10 +79,10 @@ namespace attendance_service.API.Controllers
         // ── Lookup ──────────────────────────────────────────
 
         [HttpGet("lookup")]
-        public async Task<IActionResult> GetSubjectLookup([FromQuery] string? keyword)
+        public async Task<IActionResult> GetSubjectLookup([FromQuery] string? keyword, CancellationToken cancellationToken)
         {
             var query = new GetSubjectLookupQuery(keyword);
-            var subjectLookups = await _mediator.Send(query);
+            var subjectLookups = await _mediator.Send(query, cancellationToken);
 
             return Ok(new ApiResponse<IReadOnlyList<SubjectLookupDto>>
             {
