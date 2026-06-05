@@ -138,8 +138,10 @@ namespace attendance_service.Migrations
                             b1.Property<Guid>("Id")
                                 .HasColumnType("char(36)");
 
-                            b1.Property<int>("DayOfWeek")
-                                .HasColumnType("int");
+                            b1.Property<string>("DayOfWeek")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(20)");
 
                             b1.Property<TimeOnly>("EndTime")
                                 .HasColumnType("time(6)");

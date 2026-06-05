@@ -32,6 +32,7 @@ namespace attendance_service.Infrastructure.DependencyInjection
             // ==========================
             services.AddScoped<ISubjectRepository, SubjectRepository>();
             services.AddScoped<ISubjectReadRepository, SubjectReadRepository>();
+            services.AddScoped<ICourseSectionRepository, CourseSectionRepository>();
             services.AddScoped<ICourseSectionReadRepository, CourseSectionReadRepository>();
 
             // ==========================

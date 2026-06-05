@@ -1,0 +1,15 @@
+using attendance_service.Application.Abstractions.Persistence;
+using attendance_service.Domain.Aggregates.CourseSection;
+
+namespace attendance_service.Infrastructure.Persistence.Repositories
+{
+    public class CourseSectionRepository : ICourseSectionRepository
+    {
+        private readonly AttendanceDbContext _context;
+
+        public CourseSectionRepository(AttendanceDbContext Context) =>
+            _context = Context;
+        public void Add(CourseSection courseSection)
+        => _context.CourseSections.Add(courseSection);
+    }
+}

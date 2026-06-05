@@ -22,4 +22,12 @@ namespace attendance_service.Application.Contracts
         TimeOnly EndTime,
         string Room
     );
+
+    public record ScheduleConflictDto(
+        string CourseSectionCode,
+        DayOfWeek DayOfWeek,
+        TimeOnly StartTime,
+        TimeOnly EndTime,
+        string Room
+    );
 }
