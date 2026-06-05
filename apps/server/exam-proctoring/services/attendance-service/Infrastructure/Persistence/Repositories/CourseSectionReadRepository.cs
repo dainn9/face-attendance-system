@@ -103,5 +103,41 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 PageSize = pageSize
             };
         }
+
+        public Task<bool> ExistsByCodeAsync(string code, Guid? excludedId = null, CancellationToken cancellationToken = default)
+        => _context.CourseSections.AnyAsync(cs => cs.CourseSectionCode == code && (!excludedId.HasValue || cs.Id != excludedId.Value), cancellationToken);
+
+        public async Task<ScheduleConflictDto?> GetRoomScheduleConflictAsync(
+            IReadOnlyList<ScheduleDto> schedules,
+            Guid? excludeCourseSectionId = null,
+            CancellationToken cancellationToken = default)
+        {
+            foreach (var newS in schedules)
+            {
+                var conflict = await _context.CourseSections
+                    .AsNoTracking()
+                    .Where(cs => !excludeCourseSectionId.HasValue || cs.Id != excludeCourseSectionId.Value)
+                    .SelectMany(cs => cs.Schedules, (cs, s) => new { cs, s })
+                    .Where(x =>
+                        x.s.Room == newS.Room &&
+                        x.s.DayOfWeek == newS.DayOfWeek &&
+                        x.s.StartTime < newS.EndTime &&
+                        x.s.EndTime > newS.StartTime
+                    )
+                    .Select(x => new ScheduleConflictDto(
+                        x.cs.CourseSectionCode,
+                        x.s.DayOfWeek,
+                        x.s.StartTime,
+                        x.s.EndTime,
+                        x.s.Room
+                    ))
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (conflict != null)
+                    return conflict;
+            }
+
+            return null;
+        }
     }
 }

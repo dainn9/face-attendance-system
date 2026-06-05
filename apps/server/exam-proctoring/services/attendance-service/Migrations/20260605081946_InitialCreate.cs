@@ -85,7 +85,8 @@ namespace attendance_service.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CourseSectionId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    DayOfWeek = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
                     Room = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)

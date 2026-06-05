@@ -16,5 +16,12 @@ namespace attendance_service.Application.Abstractions.Persistence
             bool? isActive = null,
             CancellationToken cancellationToken = default
         );
+
+        Task<bool> ExistsByCodeAsync(string code, Guid? excludedId = null, CancellationToken cancellationToken = default);
+
+        Task<ScheduleConflictDto?> GetRoomScheduleConflictAsync(
+            IReadOnlyList<ScheduleDto> schedules,
+            Guid? excludeCourseSectionId = null,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -11,7 +11,7 @@ using attendance_service.Infrastructure.Persistence;
 namespace attendance_service.Migrations
 {
     [DbContext(typeof(AttendanceDbContext))]
-    [Migration("20260604071819_InitialCreate")]
+    [Migration("20260605081946_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -141,8 +141,10 @@ namespace attendance_service.Migrations
                             b1.Property<Guid>("Id")
                                 .HasColumnType("char(36)");
 
-                            b1.Property<int>("DayOfWeek")
-                                .HasColumnType("int");
+                            b1.Property<string>("DayOfWeek")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(20)");
 
                             b1.Property<TimeOnly>("EndTime")
                                 .HasColumnType("time(6)");

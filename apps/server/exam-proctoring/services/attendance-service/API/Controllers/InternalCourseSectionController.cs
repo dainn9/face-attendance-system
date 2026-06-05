@@ -1,5 +1,6 @@
 using attendance_service.API.Contracts.CourseSections;
 using attendance_service.Application.Contracts;
+using attendance_service.Application.Features.CourseSections.Commands.CreateCourseSection;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionPaged;
 using BuildingBlocks.Results;
 using BuildingBlocks.Security.Internal;
@@ -22,7 +23,7 @@ namespace attendance_service.API.Controllers
         public async Task<IActionResult> GetCourseSections(
             [FromQuery] GetCourseSectionPagedRequest request,
 
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             var query = new GetCourseSectionPagedQuery(
                 request.Page,
@@ -41,6 +42,29 @@ namespace attendance_service.API.Controllers
                 Success = true,
                 Message = "Course sections retrieved successfully",
                 Data = result
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCourseSection([FromBody] CreateCourseSectionRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new CreateCourseSectionCommand(
+                request.SubjectId,
+                request.CourseSectionCode,
+                request.Semester,
+                request.AcademicYear,
+                request.LecturerId,
+                request.MaxCapacity,
+                request.Schedules
+            );
+
+            var courseSectionId = await _mediator.Send(command, cancellationToken);
+            return Ok(new ApiResponse<Guid>
+            {
+                Success = true,
+                Message = "Course section created successfully",
+                Data = courseSectionId
             });
         }
     }

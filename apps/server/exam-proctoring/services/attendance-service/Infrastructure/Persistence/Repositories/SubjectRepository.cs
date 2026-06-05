@@ -21,5 +21,8 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
 
         public Task<bool> ExistsByCodeAsync(string code, Guid? excludeSubjectId, CancellationToken cancellationToken)
         => _context.Subjects.AsNoTracking().AnyAsync(s => s.Code == code && s.Id != excludeSubjectId, cancellationToken);
+
+        public Task<bool> ExistsByIdAsync(Guid subjectId, CancellationToken cancellationToken)
+        => _context.Subjects.AsNoTracking().AnyAsync(s => s.Id == subjectId, cancellationToken);
     }
 }

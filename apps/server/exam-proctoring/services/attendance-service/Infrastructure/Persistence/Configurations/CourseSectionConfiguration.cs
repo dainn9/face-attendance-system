@@ -72,8 +72,12 @@ namespace attendance_service.Infrastructure.Persistence.Configurations
                 a.Property(x => x.Id)
                     .ValueGeneratedNever();
 
+                a.Property(x => x.DayOfWeek)
+                    .IsRequired()
+                    .HasConversion<string>()
+                    .HasMaxLength(20);
+
                 a.Property(e => e.CourseSectionId).IsRequired();
-                a.Property(e => e.DayOfWeek).IsRequired();
                 a.Property(e => e.StartTime).IsRequired();
                 a.Property(e => e.EndTime).IsRequired();
                 a.Property(e => e.Room)
