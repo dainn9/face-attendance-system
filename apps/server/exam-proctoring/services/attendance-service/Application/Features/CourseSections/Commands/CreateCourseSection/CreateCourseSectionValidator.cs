@@ -25,7 +25,9 @@ namespace attendance_service.Application.Features.CourseSections.Commands.Create
             RuleFor(x => x.AcademicYear)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
-                .MaxLength(20);
+                .MaxLength(20)
+                .Matches(@"^\d{4}-\d{4}$")
+                .WithMessage("Academic year must have format YYYY-YYYY.");
 
             RuleFor(x => x.LecturerId)
                 .ValidGuid();

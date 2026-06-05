@@ -109,6 +109,9 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
 
         public async Task<ScheduleConflictDto?> GetRoomScheduleConflictAsync(
             IReadOnlyList<ScheduleDto> schedules,
+            Semester semester,
+            string academicYear,
+            Guid LecturerId,
             Guid? excludeCourseSectionId = null,
             CancellationToken cancellationToken = default)
         {
@@ -116,7 +119,9 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
             {
                 var conflict = await _context.CourseSections
                     .AsNoTracking()
-                    .Where(cs => !excludeCourseSectionId.HasValue || cs.Id != excludeCourseSectionId.Value)
+                    .Where(cs => (!excludeCourseSectionId.HasValue || cs.Id != excludeCourseSectionId.Value)
+                        && cs.Semester == semester
+                        && cs.AcademicYear == academicYear)
                     .SelectMany(cs => cs.Schedules, (cs, s) => new { cs, s })
                     .Where(x =>
                         x.s.Room == newS.Room &&
@@ -129,12 +134,38 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                         x.s.DayOfWeek,
                         x.s.StartTime,
                         x.s.EndTime,
-                        x.s.Room
+                        x.s.Room,
+                        ScheduleConflictReason.Room
                     ))
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (conflict != null)
                     return conflict;
+
+                var lecturerConflict = await _context.CourseSections
+                    .AsNoTracking()
+                    .Where(cs => (!excludeCourseSectionId.HasValue || cs.Id != excludeCourseSectionId.Value)
+                        && cs.Semester == semester
+                        && cs.AcademicYear == academicYear
+                        && cs.LecturerId == LecturerId)
+                    .SelectMany(cs => cs.Schedules, (cs, s) => new { cs, s })
+                    .Where(x =>
+                        x.s.DayOfWeek == newS.DayOfWeek &&
+                        x.s.StartTime < newS.EndTime &&
+                        x.s.EndTime > newS.StartTime
+                    )
+                    .Select(x => new ScheduleConflictDto(
+                        x.cs.CourseSectionCode,
+                        x.s.DayOfWeek,
+                        x.s.StartTime,
+                        x.s.EndTime,
+                        x.s.Room,
+                        ScheduleConflictReason.Lecturer
+                    ))
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (lecturerConflict != null)
+                    return lecturerConflict;
             }
 
             return null;
