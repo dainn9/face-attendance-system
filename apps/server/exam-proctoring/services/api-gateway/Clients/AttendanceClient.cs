@@ -1,5 +1,4 @@
 using api_gateway.Contracts.Attendance;
-using api_gateway.Exceptions;
 using BuildingBlocks.Results;
 
 namespace api_gateway.Clients
@@ -24,16 +23,22 @@ namespace api_gateway.Clients
 
             var response = await _httpClient.GetAsync($"api/v1/internal/course-sections{queryString}", cancellationToken);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<CourseSectionPagedDto>>>(cancellationToken: cancellationToken);
-                return result?.Data ?? new PagedResult<CourseSectionPagedDto>();
-            }
-            else
+            if (!response.IsSuccessStatusCode)
                 await HandleErrorAsync(response, cancellationToken);
 
-            var body = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new DownstreamApiException((int)response.StatusCode, body);
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<CourseSectionPagedDto>>>(cancellationToken: cancellationToken);
+            return result?.Data ?? new PagedResult<CourseSectionPagedDto>();
+        }
+
+        public async Task<Guid> CreateCourseSectionAsync(CreateCourseSectionRequest request, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/v1/internal/course-sections", request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>(cancellationToken: cancellationToken);
+            return result?.Data ?? throw new InvalidOperationException("Attendance service returned empty response.");
         }
     }
 }

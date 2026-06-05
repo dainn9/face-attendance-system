@@ -8,7 +8,7 @@ namespace api_gateway.Contracts.Attendance
         Guid LecturerId,
         Guid? FacultyId,
         bool IsActive,
-        string Semester,
+        int Semester,
         string AcademicYear,
         int StudentCount,
         ScheduleDto? FirstSchedule,

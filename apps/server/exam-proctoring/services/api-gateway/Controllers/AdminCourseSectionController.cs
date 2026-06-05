@@ -62,5 +62,27 @@ namespace api_gateway.Controllers
                 Data = result
             });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCourseSection([FromBody] CreateCourseSectionRequest request, CancellationToken cancellationToken)
+        {
+            if (!await _userClient.CheckLecturerExistsAsync(request.LecturerId, cancellationToken))
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Lecturer with ID {request.LecturerId} does not exist"
+                });
+            }
+
+            var courseSectionId = await _attendanceClient.CreateCourseSectionAsync(request, cancellationToken);
+
+            return Ok(new ApiResponse<Guid>
+            {
+                Success = true,
+                Message = "Course section created successfully",
+                Data = courseSectionId
+            });
+        }
     }
 }
