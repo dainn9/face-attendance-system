@@ -14,13 +14,10 @@ namespace api_gateway.Clients
         {
             var response = await _httpClient.PostAsJsonAsync("api/v1/internal/users", request, cancellationToken);
 
-            if (response.IsSuccessStatusCode)
-                return;
-            else
+            if (!response.IsSuccessStatusCode)
                 await HandleErrorAsync(response, cancellationToken);
 
-            var body = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new DownstreamApiException((int)response.StatusCode, body);
+            return;
         }
 
         public async Task<PagedResult<UserPagedDto>> GetUsersAsync(GetUserPagedRequest request, CancellationToken cancellationToken = default)
@@ -36,16 +33,11 @@ namespace api_gateway.Clients
 
             var response = await _httpClient.GetAsync($"api/v1/internal/users{queryString}", cancellationToken);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<UserPagedDto>>>(cancellationToken: cancellationToken);
-                return result?.Data ?? new PagedResult<UserPagedDto>();
-            }
-            else
+            if (!response.IsSuccessStatusCode)
                 await HandleErrorAsync(response, cancellationToken);
 
-            var body = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new DownstreamApiException((int)response.StatusCode, body);
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<UserPagedDto>>>(cancellationToken: cancellationToken);
+            return result?.Data ?? new PagedResult<UserPagedDto>();
         }
 
         public async Task<Dictionary<Guid, UserLookupDto>> GetLecturersByIdsAsync(IReadOnlyList<Guid> lecturerIds, CancellationToken cancellationToken = default)
@@ -56,17 +48,22 @@ namespace api_gateway.Clients
                 cancellationToken
             );
 
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<Dictionary<Guid, UserLookupDto>>(cancellationToken: cancellationToken);
-                return result ?? new Dictionary<Guid, UserLookupDto>();
-            }
-            else
+            if (!response.IsSuccessStatusCode)
                 await HandleErrorAsync(response, cancellationToken);
 
-            var body = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new DownstreamApiException((int)response.StatusCode, body);
+            var result = await response.Content.ReadFromJsonAsync<Dictionary<Guid, UserLookupDto>>(cancellationToken: cancellationToken);
+            return result ?? new Dictionary<Guid, UserLookupDto>();
+        }
 
+        public async Task<bool> CheckLecturerExistsAsync(Guid lecturerId, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.GetAsync($"api/v1/internal/users/lecturers/{lecturerId}/exists", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>(cancellationToken: cancellationToken);
+            return result?.Data ?? throw new InvalidOperationException("User service returned empty response.");
         }
     }
 }
