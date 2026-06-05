@@ -23,5 +23,7 @@ namespace user_service.Application.Abstractions.Persistence
         );
 
         Task<Dictionary<Guid, UserLookupDto>> GetLecturersByIdsAsync(IEnumerable<Guid> userIds, CancellationToken cancellationToken);
+
+        Task<IReadOnlyList<UserLookupDto>> GetLecturerLookupByFacultyIdAsync(Guid? facultyId, string? keyword, CancellationToken cancellationToken);
     }
 }

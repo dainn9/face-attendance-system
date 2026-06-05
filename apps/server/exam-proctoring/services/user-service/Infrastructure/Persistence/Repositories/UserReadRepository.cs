@@ -240,6 +240,27 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 .ToDictionaryAsync(u => u.UserId, cancellationToken);
         }
 
+        public async Task<IReadOnlyList<UserLookupDto>> GetLecturerLookupByFacultyIdAsync(Guid? facultyId, string? keyWord, CancellationToken cancellationToken)
+        {
+            var query = _context.Users
+                .AsNoTracking()
+                .Where(u => u.LecturerProfile != null);
+
+            if (facultyId.HasValue)
+                query = query.Where(u => u.LecturerProfile!.FacultyId == facultyId.Value);
+
+            if (!string.IsNullOrWhiteSpace(keyWord))
+                query = query.Where(u => u.FullName.Contains(keyWord) || u.UserCode.Contains(keyWord));
+
+            return await query
+            .OrderBy(u => u.FullName)
+            .Select(u => new UserLookupDto(
+                u.Id,
+                $"{u.FullName} ({u.UserCode})"
+            )).ToListAsync(cancellationToken);
+        }
+
+
         public record UserPagedProjection(
             Guid Id,
             string UserCode,
