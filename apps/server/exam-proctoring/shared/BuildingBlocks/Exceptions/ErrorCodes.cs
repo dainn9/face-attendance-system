@@ -61,6 +61,8 @@ namespace BuildingBlocks.Exceptions
         public const string InvalidCourseSectionData = "INVALID_COURSE_SECTION_DATA";
         public const string CourseSectionFull = "COURSE_SECTION_FULL";
         public const string CourseSectionDeactivated = "COURSE_SECTION_DEACTIVATED";
+        public const string CourseSectionCodeAlreadyExists = "COURSE_SECTION_CODE_ALREADY_EXISTS";
+        public const string CourseSectionMustHaveSchedule = "COURSE_SECTION_MUST_HAVE_SCHEDULE";
 
         // ======= ENROLLMENT =======
         public const string InvalidEnrollmentData = "INVALID_ENROLLMENT_DATA";
