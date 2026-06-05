@@ -1,4 +1,3 @@
-using user_service.Application.Contracts;
 using user_service.Domain.Aggregates.User;
 
 namespace user_service.Application.Abstractions.Persistence

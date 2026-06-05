@@ -260,6 +260,8 @@ namespace user_service.Infrastructure.Persistence.Repositories
             )).ToListAsync(cancellationToken);
         }
 
+        public Task<bool> CheckLecturerExistsByIdAsync(Guid lecturerId, CancellationToken cancellationToken)
+        => _context.Users.AnyAsync(u => u.Id == lecturerId && u.LecturerProfile != null, cancellationToken);
 
         public record UserPagedProjection(
             Guid Id,

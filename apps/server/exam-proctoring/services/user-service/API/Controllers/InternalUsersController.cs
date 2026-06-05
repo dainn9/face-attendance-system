@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using user_service.API.Contracts;
 using user_service.Application.Contracts;
 using user_service.Application.Features.Users.Commands.CreateUser;
+using user_service.Application.Features.Users.Queries.CheckLecturerExists;
 using user_service.Application.Features.Users.Queries.GetLecturersByIds;
 using user_service.Application.Features.Users.Queries.GetUserPaged;
 
@@ -69,6 +70,20 @@ namespace user_service.API.Controllers
             var query = new GetLecturersByIdsQuery(userIds);
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
+        }
+
+        // GET: api/v1/internal/users/lecturers/{lecturerId}/exists
+        [HttpGet("lecturers/{lecturerId:guid}/exists")]
+        public async Task<IActionResult> CheckLecturerExists(Guid lecturerId, CancellationToken cancellationToken)
+        {
+            var query = new CheckLecturerExistsQuery(lecturerId);
+            var exists = await _mediator.Send(query, cancellationToken);
+            return Ok(new ApiResponse<bool>
+            {
+                Success = true,
+                Message = "Lecturer existence check completed",
+                Data = exists
+            });
         }
 
         // // POST: api/v1/internal/users/validate-profile
