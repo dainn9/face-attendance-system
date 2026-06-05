@@ -28,6 +28,13 @@ namespace attendance_service.Application.Contracts
         DayOfWeek DayOfWeek,
         TimeOnly StartTime,
         TimeOnly EndTime,
-        string Room
+        string Room,
+        ScheduleConflictReason ConflictReason
     );
+
+    public enum ScheduleConflictReason
+    {
+        Room,
+        Lecturer
+    }
 }

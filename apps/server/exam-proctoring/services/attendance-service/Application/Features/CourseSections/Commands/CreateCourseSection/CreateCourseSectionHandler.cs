@@ -1,4 +1,5 @@
 using attendance_service.Application.Abstractions.Persistence;
+using attendance_service.Application.Contracts;
 using attendance_service.Domain.Aggregates.CourseSection;
 using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Exceptions;
@@ -48,12 +49,23 @@ namespace attendance_service.Application.Features.CourseSections.Commands.Create
             if (!request.Schedules.Any())
                 throw new BusinessRuleViolationException("Course section must have at least one schedule.", ErrorCodes.CourseSectionMustHaveSchedule);
 
-            var conflict = await _courseSectionReadRepository.GetRoomScheduleConflictAsync(request.Schedules, null, cancellationToken);
+            var conflict = await _courseSectionReadRepository.GetRoomScheduleConflictAsync(
+                request.Schedules,
+                request.Semester,
+                request.AcademicYear,
+                request.LecturerId,
+                null,
+                cancellationToken
+            );
 
             if (conflict != null)
-                throw new BusinessRuleViolationException(
-                    $"Room '{conflict.Room}' is already booked for {conflict.CourseSectionCode} on {conflict.DayOfWeek} {conflict.StartTime}-{conflict.EndTime}.",
-                    ErrorCodes.ScheduleConflict);
+            {
+                var message = conflict.ConflictReason == ScheduleConflictReason.Room
+                    ? $"Room '{conflict.Room}' is already booked for {conflict.CourseSectionCode} on {conflict.DayOfWeek} {conflict.StartTime}-{conflict.EndTime}."
+                    : $"Lecturer is already teaching {conflict.CourseSectionCode} on {conflict.DayOfWeek} {conflict.StartTime}-{conflict.EndTime}.";
+
+                throw new BusinessRuleViolationException(message, ErrorCodes.ScheduleConflict);
+            }
 
             foreach (var schedule in request.Schedules)
             {

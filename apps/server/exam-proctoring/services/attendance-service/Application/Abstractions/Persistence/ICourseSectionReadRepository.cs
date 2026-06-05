@@ -21,6 +21,9 @@ namespace attendance_service.Application.Abstractions.Persistence
 
         Task<ScheduleConflictDto?> GetRoomScheduleConflictAsync(
             IReadOnlyList<ScheduleDto> schedules,
+            Semester semester,
+            string academicYear,
+            Guid lecturerId,
             Guid? excludeCourseSectionId = null,
             CancellationToken cancellationToken = default);
     }
