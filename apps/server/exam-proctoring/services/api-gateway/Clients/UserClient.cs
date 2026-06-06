@@ -65,5 +65,31 @@ namespace api_gateway.Clients
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>(cancellationToken: cancellationToken);
             return result?.Data ?? throw new InvalidOperationException("User service returned empty response.");
         }
+
+        public async Task<LecturerDto?> GetLecturerByIdAsync(Guid lecturerId, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.GetAsync($"api/v1/internal/users/lecturers/{lecturerId}", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<LecturerDto?>>(cancellationToken: cancellationToken);
+            return result?.Data;
+        }
+
+        public async Task<Dictionary<Guid, StudentSummaryDto>> GetStudentSummariesByIdsAsync(IReadOnlyList<Guid> studentIds, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync(
+                "api/v1/internal/users/get-student-summaries-by-ids",
+                studentIds,
+                cancellationToken
+            );
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<Guid, StudentSummaryDto>>>(cancellationToken: cancellationToken);
+            return result?.Data ?? new Dictionary<Guid, StudentSummaryDto>();
+        }
     }
 }

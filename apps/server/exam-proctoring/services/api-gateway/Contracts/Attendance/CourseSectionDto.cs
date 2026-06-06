@@ -1,3 +1,5 @@
+using api_gateway.Contracts.Users;
+
 namespace api_gateway.Contracts.Attendance
 {
     public record CourseSectionPagedDto(
@@ -20,5 +22,40 @@ namespace api_gateway.Contracts.Attendance
        TimeOnly StartTime,
        TimeOnly EndTime,
        string Room
-   );
+    );
+
+    public record ScheduleDetailDto(
+        Guid Id,
+        DayOfWeek DayOfWeek,
+        TimeOnly StartTime,
+        TimeOnly EndTime,
+        string Room
+    );
+    public record CourseSectionDetailDto(
+        Guid Id,
+        string SubjectName,
+        int Credits,
+        string CourseSectionCode,
+        Guid LecturerId,
+        bool IsActive,
+        int Semester,
+        string AcademicYear,
+        int MaxCapacity,
+        int StudentCount,
+        List<ScheduleDetailDto> Schedules
+    );
+
+    public record CourseSectionDetailResponse(
+        Guid Id,
+        string SubjectName,
+        int Credits,
+        string CourseSectionCode,
+        bool IsActive,
+        int Semester,
+        string AcademicYear,
+        int MaxCapacity,
+        int StudentCount,
+        LecturerDto Lecturer,
+        List<ScheduleDetailDto> Schedules
+    );
 }

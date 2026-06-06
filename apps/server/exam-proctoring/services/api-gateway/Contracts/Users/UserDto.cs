@@ -14,4 +14,17 @@ namespace api_gateway.Contracts.Users
         Guid UserId,
         string FullName
     );
+
+    public record StudentSummaryDto(
+        Guid UserId,
+        string UserCode,
+        string FullName,
+        string FacultyName
+    );
+
+    public record LecturerDto(
+        Guid UserId,
+        string UserCode,
+        string FullName
+    );
 }
