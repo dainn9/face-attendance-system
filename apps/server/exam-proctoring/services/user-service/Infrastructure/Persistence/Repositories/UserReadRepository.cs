@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using SharedKernel.Core.Enums;
 using user_service.Application.Abstractions.Persistence;
 using user_service.Application.Contracts;
+using user_service.Application.Contracts.Lecturers;
+using user_service.Application.Contracts.Users;
 
 namespace user_service.Infrastructure.Persistence.Repositories
 {
@@ -273,55 +275,6 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 u.FullName
             ))
             .FirstOrDefaultAsync(cancellationToken);
-
-        public async Task<Dictionary<Guid, StudentSummaryDto>> GetStudentSummariesByIdsAsync(
-            IEnumerable<Guid> studentIds,
-            CancellationToken cancellationToken
-        )
-        {
-            var ids = studentIds.Distinct().ToList();
-
-            if (ids.Count == 0)
-                return new Dictionary<Guid, StudentSummaryDto>();
-
-            var students = await _context.Users
-                .AsNoTracking()
-                .Where(u => ids.Contains(u.Id) && u.StudentProfile != null)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.FullName,
-                    u.UserCode,
-                    MajorId = u.StudentProfile!.MajorId
-                })
-                .ToListAsync(cancellationToken);
-
-            var majorIds = students
-                .Select(s => s.MajorId)
-                .Distinct()
-                .ToList();
-
-            var majorFacultyNames = await _context.Faculties
-                .AsNoTracking()
-                .SelectMany(f => f.Majors
-                    .Where(m => majorIds.Contains(m.Id))
-                    .Select(m => new
-                    {
-                        MajorId = m.Id,
-                        FacultyName = f.Name
-                    }))
-                .ToDictionaryAsync(x => x.MajorId, x => x.FacultyName, cancellationToken);
-
-            return students.ToDictionary(
-                s => s.Id,
-                s => new StudentSummaryDto(
-                    s.Id,
-                    s.FullName,
-                    s.UserCode ?? "",
-                    majorFacultyNames.GetValueOrDefault(s.MajorId, "-")
-                )
-            );
-        }
 
         public record UserPagedProjection(
             Guid Id,

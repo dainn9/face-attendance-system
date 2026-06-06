@@ -1,6 +1,6 @@
 using MediatR;
 using user_service.Application.Abstractions.Persistence;
-using user_service.Application.Contracts;
+using user_service.Application.Contracts.Users;
 
 namespace user_service.Application.Features.Users.Queries.GetLecturersByIds
 {

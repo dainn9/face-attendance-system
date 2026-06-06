@@ -1,10 +1,9 @@
-using BuildingBlocks.Extensions;
 using BuildingBlocks.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using user_service.API.Contracts;
-using user_service.Application.Contracts;
+using user_service.API.Contracts.Lecturers;
+using user_service.Application.Contracts.Users;
 using user_service.Application.Features.Users.Queries.GetLecturerLookupByFacultyId;
 
 namespace user_service.API.Controllers

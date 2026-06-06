@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using user_service.Application.Abstractions.Persistence;
-using user_service.Application.Contracts;
+using user_service.Application.Contracts.Faculties;
+using user_service.Application.Contracts.Majors;
 
 namespace user_service.Infrastructure.Persistence.Repositories
 {

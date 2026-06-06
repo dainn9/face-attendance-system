@@ -1,4 +1,6 @@
 using user_service.Application.Contracts;
+using user_service.Application.Contracts.Faculties;
+using user_service.Application.Contracts.Majors;
 
 namespace user_service.Application.Abstractions.Persistence
 {
