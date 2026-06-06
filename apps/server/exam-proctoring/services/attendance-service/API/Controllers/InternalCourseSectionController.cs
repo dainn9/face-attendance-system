@@ -4,6 +4,7 @@ using attendance_service.Application.Contracts;
 using attendance_service.Application.Features.CourseSections.Commands.CreateCourseSection;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionDetail;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionPaged;
+using attendance_service.Application.Features.Enrollments.Commands.AddEnrollments;
 using attendance_service.Application.Features.Enrollments.Queries.GetEnrolledStudentIdsPaged;
 using BuildingBlocks.Results;
 using BuildingBlocks.Security.Internal;
@@ -101,6 +102,18 @@ namespace attendance_service.API.Controllers
                 Success = true,
                 Message = "Enrolled student IDs retrieved successfully",
                 Data = result
+            });
+        }
+
+        [HttpPost("{courseSectionId:guid}/enrollments")]
+        public async Task<IActionResult> AddEnrollments(Guid courseSectionId, [FromBody] IReadOnlyList<Guid> studentIds, CancellationToken cancellationToken)
+        {
+            var command = new AddEnrollmentsCommand(courseSectionId, studentIds);
+            await _mediator.Send(command, cancellationToken);
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Enrollments added successfully",
             });
         }
     }
