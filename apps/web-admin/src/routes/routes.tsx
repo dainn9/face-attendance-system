@@ -7,6 +7,9 @@ import FacultyDetailPage from "../features/faculties/pages/FacultyDetailPage";
 import UserPage from "../features/users/pages/UserPage";
 import CreateUserPage from "../features/users/pages/CreateUserPage";
 import UserDetailPage from "../features/users/pages/UserDetailPage";
+import CourseListPage from "../features/courses/pages/CourseListPage";
+import CreateCourseSectionPage from "../features/courses/pages/CreateCourseSectionPage";
+import CourseSectionDetailPage from "../features/courses/pages/CourseSectionDetailPage";
 
 export const routes = [
     {
@@ -31,6 +34,14 @@ export const routes = [
                             { index: true, element: <UserPage /> },
                             { path: "create", element: <CreateUserPage /> },
                             { path: ":id", element: <UserDetailPage /> },
+                        ],
+                    },
+                    {
+                        path: "courses",
+                        children: [
+                            { index: true, element: <CourseListPage /> },
+                            { path: "create", element: <CreateCourseSectionPage /> },
+                            { path: ":id", element: <CourseSectionDetailPage /> },
                         ],
                     },
                 ],

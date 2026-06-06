@@ -33,6 +33,12 @@ export interface LookupDto {
     name: string;
 }
 
+export interface UserLookupDto {
+    userId: string;
+    fullName: string;
+}
+
+
 export const UserRoleValue = {
     Admin: 1,
     Lecturer: 2,
