@@ -1,7 +1,10 @@
 using attendance_service.API.Contracts.CourseSections;
+using attendance_service.API.Contracts.Enrollments;
 using attendance_service.Application.Contracts;
 using attendance_service.Application.Features.CourseSections.Commands.CreateCourseSection;
+using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionDetail;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionPaged;
+using attendance_service.Application.Features.Enrollments.Queries.GetEnrolledStudentIdsPaged;
 using BuildingBlocks.Results;
 using BuildingBlocks.Security.Internal;
 using MediatR;
@@ -65,6 +68,39 @@ namespace attendance_service.API.Controllers
                 Success = true,
                 Message = "Course section created successfully",
                 Data = courseSectionId
+            });
+        }
+
+        [HttpGet("{courseSectionId:guid}")]
+        public async Task<IActionResult> GetCourseSectionDetail(Guid courseSectionId,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetCourseSectionDetailQuery(courseSectionId);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<CourseSectionDetailDto>
+            {
+                Success = true,
+                Message = "Course section detail retrieved successfully",
+                Data = result
+            });
+        }
+
+        [HttpGet("{courseSectionId:guid}/students")]
+        public async Task<IActionResult> GetEnrolledStudentIdsPaged(
+            Guid courseSectionId,
+            [FromQuery] GetEnrolledStudentIdsPagedRequest request,
+            CancellationToken cancellationToken
+)
+        {
+            var query = new GetEnrolledStudentIdsPagedQuery(courseSectionId, request.Page, request.PageSize);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<PagedResult<Guid>>
+            {
+                Success = true,
+                Message = "Enrolled student IDs retrieved successfully",
+                Data = result
             });
         }
     }

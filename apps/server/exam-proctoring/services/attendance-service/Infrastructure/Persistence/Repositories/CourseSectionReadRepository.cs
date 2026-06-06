@@ -170,5 +170,69 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
 
             return null;
         }
+
+        public Task<CourseSectionDetailDto?> GetCourseSectionDetailAsync(Guid id, CancellationToken cancellationToken = default)
+        => _context.CourseSections
+                .AsNoTracking()
+                .Where(cs => cs.Id == id)
+                .Join(
+                    _context.Subjects.AsNoTracking(),
+                    cs => cs.SubjectId,
+                    s => s.Id,
+                    (cs, s) => new CourseSectionDetailDto(
+                        cs.Id,
+                        s.Name,
+                        s.Credits,
+                        cs.CourseSectionCode,
+                        cs.LecturerId,
+                        cs.IsActive,
+                        cs.Semester,
+                        cs.AcademicYear,
+                        cs.MaxCapacity,
+                        cs.Enrollments.Count,
+                        cs.Schedules
+                            .OrderBy(s => s.DayOfWeek)
+                            .ThenBy(s => s.StartTime)
+                            .Select(s => new ScheduleDetailDto(
+                                s.Id,
+                                s.DayOfWeek,
+                                s.StartTime,
+                                s.EndTime,
+                                s.Room
+                            ))
+                            .ToList()
+                    )
+                )
+                .FirstOrDefaultAsync(cancellationToken);
+
+        public async Task<PagedResult<Guid>> GetEnrolledStudentIdsPagedAsync(
+            Guid courseSectionId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var query = _context.CourseSections
+                .AsNoTracking()
+                .Where(cs => cs.Id == courseSectionId)
+                .SelectMany(cs => cs.Enrollments)
+                .OrderBy(e => e.EnrolledAt);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(e => e.StudentId)
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<Guid>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
     }
 }
