@@ -77,5 +77,19 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 ))
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<IReadOnlyList<Guid>> GetExistingStudentIdsAsync(IEnumerable<Guid> studentIds, CancellationToken cancellationToken)
+        {
+            var ids = studentIds.Distinct().ToList();
+
+            if (ids.Count == 0)
+                return [];
+
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => ids.Contains(u.Id) && u.StudentProfile != null)
+                .Select(u => u.Id)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

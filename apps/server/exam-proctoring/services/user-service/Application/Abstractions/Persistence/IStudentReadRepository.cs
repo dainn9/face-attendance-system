@@ -13,5 +13,10 @@ namespace user_service.Application.Abstractions.Persistence
             string? keyword,
             CancellationToken cancellationToken
         );
+
+        Task<IReadOnlyList<Guid>> GetExistingStudentIdsAsync(
+            IEnumerable<Guid> studentIds,
+            CancellationToken cancellationToken
+        );
     }
 }

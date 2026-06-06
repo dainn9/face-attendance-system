@@ -13,6 +13,7 @@ using user_service.API.Contracts.Users;
 using user_service.Application.Contracts.Users;
 using user_service.Application.Contracts.Lecturers;
 using user_service.Application.Contracts.Students;
+using user_service.Application.Features.Students.Queries.GetExistingStudentIds;
 
 namespace user_service.API.Controllers
 {
@@ -104,6 +105,7 @@ namespace user_service.API.Controllers
             });
         }
 
+        // POST: api/v1/internal/users/get-students-by-ids
         [HttpPost("get-students-by-ids")]
         public async Task<IActionResult> GetStudentsByIds([FromBody] IReadOnlyList<Guid> studentIds, CancellationToken cancellationToken)
         {
@@ -114,6 +116,20 @@ namespace user_service.API.Controllers
                 Success = true,
                 Message = "Student summaries retrieved successfully",
                 Data = studentSummaries
+            });
+        }
+
+        // POST: api/v1/internal/users/get-existing-student-ids
+        [HttpPost("get-existing-student-ids")]
+        public async Task<IActionResult> GetExistingStudentIds([FromBody] IReadOnlyList<Guid> studentIds, CancellationToken cancellationToken)
+        {
+            var query = new GetExistingStudentIdsQuery(studentIds);
+            var validStudentIds = await _mediator.Send(query, cancellationToken);
+            return Ok(new ApiResponse<IReadOnlyList<Guid>>
+            {
+                Success = true,
+                Message = "Student IDs checked successfully",
+                Data = validStudentIds
             });
         }
 
