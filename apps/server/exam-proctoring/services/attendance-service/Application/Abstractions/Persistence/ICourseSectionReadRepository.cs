@@ -26,5 +26,13 @@ namespace attendance_service.Application.Abstractions.Persistence
             Guid lecturerId,
             Guid? excludeCourseSectionId = null,
             CancellationToken cancellationToken = default);
+
+        Task<CourseSectionDetailDto?> GetCourseSectionDetailAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<PagedResult<Guid>> GetEnrolledStudentIdsPagedAsync(
+            Guid courseSectionId,
+            int page = 1,
+            int pageSize = 12,
+            CancellationToken cancellationToken = default
+        );
     }
 }
