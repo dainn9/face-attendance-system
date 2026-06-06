@@ -84,5 +84,89 @@ namespace api_gateway.Controllers
                 Data = courseSectionId
             });
         }
+
+        [HttpGet("{courseSectionId:guid}")]
+        public async Task<IActionResult> GetCourseSectionDetailById(
+            Guid courseSectionId,
+            CancellationToken cancellationToken)
+        {
+            var courseSection = await _attendanceClient.GetCourseSectionDetailAsync(courseSectionId, cancellationToken);
+            if (courseSection == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Course section with ID {courseSectionId} not found"
+                });
+            }
+
+            var lecturer = await _userClient.GetLecturerByIdAsync(courseSection.LecturerId, cancellationToken);
+
+            var result = new CourseSectionDetailResponse(
+                Id: courseSection.Id,
+                SubjectName: courseSection.SubjectName,
+                Credits: courseSection.Credits,
+                CourseSectionCode: courseSection.CourseSectionCode,
+                IsActive: courseSection.IsActive,
+                Semester: courseSection.Semester,
+                AcademicYear: courseSection.AcademicYear,
+                MaxCapacity: courseSection.MaxCapacity,
+                StudentCount: courseSection.StudentCount,
+                Lecturer: lecturer ?? new LecturerDto(Guid.Empty, "Unknown", "Unknown"),
+                Schedules: courseSection.Schedules
+            );
+
+            return Ok(new ApiResponse<CourseSectionDetailResponse>
+            {
+                Success = true,
+                Message = "Course section retrieved successfully",
+                Data = result
+            });
+        }
+
+        [HttpGet("{courseSectionId:guid}/students")]
+        public async Task<IActionResult> GetEnrolledStudentsByCourseSectionId(
+            Guid courseSectionId,
+            [FromQuery] GetEnrolledStudentIdsPageRequest request,
+            CancellationToken cancellationToken)
+        {
+            var studentIdsPaged = await _attendanceClient.GetEnrolledStudentIdsPagedAsync(
+                courseSectionId,
+                request.Page,
+                request.PageSize,
+                cancellationToken
+            );
+
+            if (studentIdsPaged == null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Course section with ID {courseSectionId} not found"
+                });
+            }
+
+            var students = studentIdsPaged.Items.Any()
+                ? await _userClient.GetStudentSummariesByIdsAsync(studentIdsPaged.Items, cancellationToken)
+                : new Dictionary<Guid, StudentSummaryDto>();
+
+            var result = new PagedResult<StudentSummaryDto>
+            {
+                Items = studentIdsPaged.Items
+                    .Where(id => students.ContainsKey(id))
+                    .Select(id => students[id])
+                    .ToList(),
+                TotalCount = studentIdsPaged.TotalCount,
+                Page = studentIdsPaged.Page,
+                PageSize = studentIdsPaged.PageSize
+            };
+
+            return Ok(new ApiResponse<PagedResult<StudentSummaryDto>>
+            {
+                Success = true,
+                Message = "Enrolled students retrieved successfully",
+                Data = result
+            });
+        }
     }
 }

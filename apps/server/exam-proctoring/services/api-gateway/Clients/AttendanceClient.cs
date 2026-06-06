@@ -40,5 +40,38 @@ namespace api_gateway.Clients
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<Guid>>(cancellationToken: cancellationToken);
             return result?.Data ?? throw new InvalidOperationException("Attendance service returned empty response.");
         }
+
+        public async Task<CourseSectionDetailDto> GetCourseSectionDetailAsync(Guid courseSectionId, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.GetAsync($"api/v1/internal/course-sections/{courseSectionId}", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<CourseSectionDetailDto>>(cancellationToken: cancellationToken);
+            return result?.Data ?? throw new InvalidOperationException("Attendance service returned empty response.");
+        }
+
+        public async Task<PagedResult<Guid>> GetEnrolledStudentIdsPagedAsync(
+            Guid courseSectionId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken
+        )
+        {
+            var queryString = QueryString.Create(new Dictionary<string, string?>
+            {
+                ["page"] = page.ToString(),
+                ["pageSize"] = pageSize.ToString()
+            });
+
+            var response = await _httpClient.GetAsync($"api/v1/internal/course-sections/{courseSectionId}/students{queryString}", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<Guid>>>(cancellationToken: cancellationToken);
+            return result?.Data ?? new PagedResult<Guid>();
+        }
     }
 }
