@@ -9,6 +9,12 @@ export const lookupQueryKeys = {
 
     majorsByFaculty: (facultyId: string) =>
         [...lookupQueryKeys.all, "majors", facultyId] as const,
+
+    subjects: (keyWord: string | undefined) =>
+        [...lookupQueryKeys.all, "subjects", keyWord] as const,
+
+    lecturers: (keyWord: string | undefined, facultyId: string | undefined) =>
+        [...lookupQueryKeys.all, "lecturers", keyWord, facultyId] as const
 };
 
 export const useFacultyLookup = () =>
@@ -23,5 +29,19 @@ export const useMajorLookup = (facultyId?: string) =>
         queryKey: lookupQueryKeys.majorsByFaculty(facultyId ?? ""),
         queryFn: () => lookupApi.major(facultyId!),
         enabled: !!facultyId,
+        placeholderData: (previousData) => previousData,
+    });
+
+export const useSubjectLookup = (keyWord?: string) =>
+    useQuery({
+        queryKey: lookupQueryKeys.subjects(keyWord),
+        queryFn: () => lookupApi.subject(keyWord),
+        placeholderData: (previousData) => previousData,
+    });
+
+export const useLecturerLookup = (keyWord?: string, facultyId?: string) =>
+    useQuery({
+        queryKey: lookupQueryKeys.lecturers(keyWord, facultyId),
+        queryFn: () => lookupApi.lecturer(keyWord, facultyId),
         placeholderData: (previousData) => previousData,
     });

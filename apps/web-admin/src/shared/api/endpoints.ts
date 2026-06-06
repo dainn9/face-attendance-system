@@ -1,6 +1,7 @@
 const AUTH_PREFIX = import.meta.env.VITE_PREFIX_API_AUTH;
-const FACULTIES_PREFIX = import.meta.env.VITE_PREFIX_API_USERS;
+const USERS_PREFIX = import.meta.env.VITE_PREFIX_API_USERS;
 const ADMIN_PREFIX = import.meta.env.VITE_PREFIX_API_ADMIN;
+const ATTENDANCE_PREFIX = import.meta.env.VITE_PREFIX_API_ATTENDANCE;
 
 
 export const API_ENDPOINTS = {
@@ -12,20 +13,45 @@ export const API_ENDPOINTS = {
         ME: `${AUTH_PREFIX}/auth/me`,
     },
     FACULTIES: {
-        CREATE: `${FACULTIES_PREFIX}/faculties`,
-        LIST: `${FACULTIES_PREFIX}/faculties`,
-        DETAIL: (id: string) => `${FACULTIES_PREFIX}/faculties/${id}`,
-        UPDATE: (id: string) => `${FACULTIES_PREFIX}/faculties/${id}`,
+        CREATE: `${USERS_PREFIX}/faculties`,
+        LIST: `${USERS_PREFIX}/faculties`,
+        DETAIL: (id: string) => `${USERS_PREFIX}/faculties/${id}`,
+        UPDATE: (id: string) => `${USERS_PREFIX}/faculties/${id}`,
 
-        CREATE_MAJOR: (facultyId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors`,
-        UPDATE_MAJOR: (facultyId: string, majorId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors/${majorId}`,
+        CREATE_MAJOR: (facultyId: string) => `${USERS_PREFIX}/faculties/${facultyId}/majors`,
+        UPDATE_MAJOR: (facultyId: string, majorId: string) => `${USERS_PREFIX}/faculties/${facultyId}/majors/${majorId}`,
 
-        FACULTY_LOOKUP: `${FACULTIES_PREFIX}/faculties/lookup`,
-        MAJOR_LOOKUP: (facultyId: string) => `${FACULTIES_PREFIX}/faculties/${facultyId}/majors/lookup`
+        FACULTY_LOOKUP: `${USERS_PREFIX}/faculties/lookup`,
+        MAJOR_LOOKUP: (facultyId: string) => `${USERS_PREFIX}/faculties/${facultyId}/majors/lookup`
     },
 
     USERS: {
         CREATE: `${ADMIN_PREFIX}/users`,
         LIST: `${ADMIN_PREFIX}/users`,
+        LECTURER_LOOKUP: (keyWord?: string, facultyId?: string) => {
+            const params = new URLSearchParams();
+
+            if (keyWord) {
+                params.append("keyword", keyWord);
+            }
+
+            if (facultyId) {
+                params.append("facultyId", facultyId);
+            }
+
+            return `${USERS_PREFIX}/users/lookup/lecturers${
+                params.toString() ? `?${params.toString()}` : ""
+            }`;
+        },
+    },
+
+    COURSES: {
+        CREATE: `${ADMIN_PREFIX}/course-sections`,
+        LIST: `${ADMIN_PREFIX}/course-sections`,
+        DETAIL: (id: string) => `${ADMIN_PREFIX}/course-sections/${id}`,
+    },
+    
+    SUBJECTS: {
+        SUBJECT_LOOKUP: (keyWord?: string) => `${ATTENDANCE_PREFIX}/subjects/lookup${keyWord ? `?keyword=${encodeURIComponent(keyWord)}` : ""}`,
     }
 }

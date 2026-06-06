@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 export const useCreateUser = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    
 
     return useMutation({
         mutationFn: (data: CreateUserRequest) => 
