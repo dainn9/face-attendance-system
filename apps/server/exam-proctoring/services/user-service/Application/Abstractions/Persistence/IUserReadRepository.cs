@@ -27,5 +27,10 @@ namespace user_service.Application.Abstractions.Persistence
         Task<IReadOnlyList<UserLookupDto>> GetLecturerLookupByFacultyIdAsync(Guid? facultyId, string? keyword, CancellationToken cancellationToken);
 
         Task<bool> CheckLecturerExistsByIdAsync(Guid lecturerId, CancellationToken cancellationToken);
+        Task<LecturerDto?> GetLecturerByIdAsync(Guid lecturerId, CancellationToken cancellationToken);
+        Task<Dictionary<Guid, StudentSummaryDto>> GetStudentSummariesByIdsAsync(
+            IEnumerable<Guid> studentIds,
+            CancellationToken cancellationToken
+        );
     }
 }

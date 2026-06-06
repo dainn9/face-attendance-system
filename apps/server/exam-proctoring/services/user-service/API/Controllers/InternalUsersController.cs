@@ -7,7 +7,9 @@ using user_service.API.Contracts;
 using user_service.Application.Contracts;
 using user_service.Application.Features.Users.Commands.CreateUser;
 using user_service.Application.Features.Users.Queries.CheckLecturerExists;
+using user_service.Application.Features.Users.Queries.GetLecturerById;
 using user_service.Application.Features.Users.Queries.GetLecturersByIds;
+using user_service.Application.Features.Users.Queries.GetStudentSummariesByIds;
 using user_service.Application.Features.Users.Queries.GetUserPaged;
 
 namespace user_service.API.Controllers
@@ -83,6 +85,33 @@ namespace user_service.API.Controllers
                 Success = true,
                 Message = "Lecturer existence check completed",
                 Data = exists
+            });
+        }
+
+        // GET: api/v1/internal/users/lecturers/{lecturerId}
+        [HttpGet("lecturers/{lecturerId:guid}")]
+        public async Task<IActionResult> GetLecturerById(Guid lecturerId, CancellationToken cancellationToken)
+        {
+            var query = new GetLecturerByIdQuery(lecturerId);
+            var lecturer = await _mediator.Send(query, cancellationToken);
+            return Ok(new ApiResponse<LecturerDto>
+            {
+                Success = true,
+                Message = "Lecturer retrieved successfully",
+                Data = lecturer
+            });
+        }
+
+        [HttpPost("get-students-by-ids")]
+        public async Task<IActionResult> GetStudentsByIds([FromBody] IReadOnlyList<Guid> studentIds, CancellationToken cancellationToken)
+        {
+            var query = new GetStudentSummariesByIdsQuery(studentIds);
+            var studentSummaries = await _mediator.Send(query, cancellationToken);
+            return Ok(new ApiResponse<Dictionary<Guid, StudentSummaryDto>>
+            {
+                Success = true,
+                Message = "Student summaries retrieved successfully",
+                Data = studentSummaries
             });
         }
 

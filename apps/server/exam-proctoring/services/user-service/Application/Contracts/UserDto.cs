@@ -21,6 +21,13 @@ namespace user_service.Application.Contracts
         string FullName
     );
 
+    public record StudentSummaryDto(
+        Guid UserId,
+        string UserCode,
+        string FullName,
+        string FacultyName
+    );
+
     //     public sealed record UserDto(
     //         Guid UserId,
     //         string UserCode,
