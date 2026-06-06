@@ -9,6 +9,7 @@ namespace user_service.Infrastructure.Persistence.Repositories
         private readonly UserDbContext _context;
 
         public StudentReadRepository(UserDbContext Context) => _context = Context;
+
         public async Task<Dictionary<Guid, StudentSummaryDto>> GetStudentSummariesByIdsAsync(IEnumerable<Guid> studentIds, CancellationToken cancellationToken)
         {
             var ids = studentIds.Distinct().ToList();
@@ -53,6 +54,28 @@ namespace user_service.Infrastructure.Persistence.Repositories
                     majorFacultyNames.GetValueOrDefault(s.MajorId, "-")
                 )
             );
+        }
+
+        public async Task<IReadOnlyList<StudentLookupDto>> GetStudentLookupAsync(string? keyword, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrEmpty(keyword) || keyword.Length < 3)
+                return [];
+
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u =>
+                    u.StudentProfile != null &&
+                    (u.FullName.Contains(keyword) ||
+                        u.Email.Contains(keyword) ||
+                        u.UserCode!.Contains(keyword)))
+                .Take(20)
+                .Select(u => new StudentLookupDto(
+                    u.Id,
+                    u.FullName,
+                    u.UserCode!,
+                    u.Email
+                ))
+                .ToListAsync(cancellationToken);
         }
     }
 }
