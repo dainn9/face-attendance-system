@@ -3,14 +3,16 @@ using BuildingBlocks.Security.Internal;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using user_service.API.Contracts;
-using user_service.Application.Contracts;
 using user_service.Application.Features.Users.Commands.CreateUser;
 using user_service.Application.Features.Users.Queries.CheckLecturerExists;
 using user_service.Application.Features.Users.Queries.GetLecturerById;
 using user_service.Application.Features.Users.Queries.GetLecturersByIds;
-using user_service.Application.Features.Users.Queries.GetStudentSummariesByIds;
+using user_service.Application.Features.Students.Queries.GetStudentSummariesByIds;
 using user_service.Application.Features.Users.Queries.GetUserPaged;
+using user_service.API.Contracts.Users;
+using user_service.Application.Contracts.Users;
+using user_service.Application.Contracts.Lecturers;
+using user_service.Application.Contracts.Students;
 
 namespace user_service.API.Controllers
 {

@@ -1,6 +1,6 @@
 using SharedKernel.Core.Enums;
 
-namespace user_service.API.Contracts
+namespace user_service.API.Contracts.Users
 {
     public record CreateUserRequest(
         Guid UserId,

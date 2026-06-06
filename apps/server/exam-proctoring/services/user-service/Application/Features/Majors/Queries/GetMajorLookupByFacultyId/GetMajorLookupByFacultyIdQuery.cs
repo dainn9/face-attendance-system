@@ -1,5 +1,5 @@
 using MediatR;
-using user_service.Application.Contracts;
+using user_service.Application.Contracts.Majors;
 
 namespace user_service.Application.Features.Majors.Queries.GetMajorLookupByFacultyId
 {

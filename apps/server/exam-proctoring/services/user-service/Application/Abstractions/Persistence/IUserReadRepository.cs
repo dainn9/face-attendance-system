@@ -1,6 +1,7 @@
 using BuildingBlocks.Results;
 using SharedKernel.Core.Enums;
-using user_service.Application.Contracts;
+using user_service.Application.Contracts.Lecturers;
+using user_service.Application.Contracts.Users;
 
 namespace user_service.Application.Abstractions.Persistence
 {
@@ -28,9 +29,5 @@ namespace user_service.Application.Abstractions.Persistence
 
         Task<bool> CheckLecturerExistsByIdAsync(Guid lecturerId, CancellationToken cancellationToken);
         Task<LecturerDto?> GetLecturerByIdAsync(Guid lecturerId, CancellationToken cancellationToken);
-        Task<Dictionary<Guid, StudentSummaryDto>> GetStudentSummariesByIdsAsync(
-            IEnumerable<Guid> studentIds,
-            CancellationToken cancellationToken
-        );
     }
 }
