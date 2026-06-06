@@ -4,6 +4,7 @@ namespace user_service.Application.Contracts.Students
        Guid UserId,
        string UserCode,
        string FullName,
-       string FacultyName
+       string FacultyName,
+       string Email
    );
 }

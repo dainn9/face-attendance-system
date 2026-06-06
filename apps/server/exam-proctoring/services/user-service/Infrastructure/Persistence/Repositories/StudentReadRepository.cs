@@ -25,7 +25,8 @@ namespace user_service.Infrastructure.Persistence.Repositories
                     u.Id,
                     u.FullName,
                     u.UserCode,
-                    MajorId = u.StudentProfile!.MajorId
+                    MajorId = u.StudentProfile!.MajorId,
+                    u.Email
                 })
                 .ToListAsync(cancellationToken);
 
@@ -49,9 +50,10 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 s => s.Id,
                 s => new StudentSummaryDto(
                     s.Id,
-                    s.FullName,
                     s.UserCode ?? "",
-                    majorFacultyNames.GetValueOrDefault(s.MajorId, "-")
+                    s.FullName,
+                    majorFacultyNames.GetValueOrDefault(s.MajorId, "-"),
+                    s.Email
                 )
             );
         }

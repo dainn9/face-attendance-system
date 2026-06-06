@@ -19,7 +19,8 @@ namespace api_gateway.Contracts.Users
         Guid UserId,
         string UserCode,
         string FullName,
-        string FacultyName
+        string FacultyName,
+        string Email
     );
 
     public record LecturerDto(

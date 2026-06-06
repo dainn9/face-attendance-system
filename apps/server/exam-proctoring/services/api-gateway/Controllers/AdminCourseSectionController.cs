@@ -10,7 +10,7 @@ using SharedKernel.Core.Enums;
 namespace api_gateway.Controllers
 {
     [ApiController]
-    // [Authorize(Roles = nameof(UserRole.Admin))]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [Route("api/v1/admin/course-sections")]
     public class AdminCourseSectionController : ControllerBase
     {
