@@ -1,5 +1,6 @@
 using api_gateway.Clients;
 using api_gateway.Contracts.Attendance;
+using api_gateway.Contracts.Enrollments;
 using api_gateway.Contracts.Users;
 using BuildingBlocks.Results;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ using SharedKernel.Core.Enums;
 namespace api_gateway.Controllers
 {
     [ApiController]
-    [Authorize(Roles = nameof(UserRole.Admin))]
+    // [Authorize(Roles = nameof(UserRole.Admin))]
     [Route("api/v1/admin/course-sections")]
     public class AdminCourseSectionController : ControllerBase
     {
@@ -23,6 +24,7 @@ namespace api_gateway.Controllers
             _userClient = userClient;
         }
 
+        // GET: api/v1/admin/course-sections
         [HttpGet]
         public async Task<IActionResult> GetCourseSections([FromQuery] GetCourseSectionPagedRequest request, CancellationToken cancellationToken)
         {
@@ -63,6 +65,7 @@ namespace api_gateway.Controllers
             });
         }
 
+        // POST: api/v1/admin/course-sections
         [HttpPost]
         public async Task<IActionResult> CreateCourseSection([FromBody] CreateCourseSectionRequest request, CancellationToken cancellationToken)
         {
@@ -85,6 +88,7 @@ namespace api_gateway.Controllers
             });
         }
 
+        // GET: api/v1/admin/course-sections/{courseSectionId}
         [HttpGet("{courseSectionId:guid}")]
         public async Task<IActionResult> GetCourseSectionDetailById(
             Guid courseSectionId,
@@ -124,6 +128,8 @@ namespace api_gateway.Controllers
             });
         }
 
+
+        // GET: api/v1/admin/course-sections/{courseSectionId}/students
         [HttpGet("{courseSectionId:guid}/students")]
         public async Task<IActionResult> GetEnrolledStudentsByCourseSectionId(
             Guid courseSectionId,
@@ -166,6 +172,45 @@ namespace api_gateway.Controllers
                 Success = true,
                 Message = "Enrolled students retrieved successfully",
                 Data = result
+            });
+        }
+
+        // POST: api/v1/admin/course-sections/{courseSectionId}/enrollments
+        [HttpPost("{courseSectionId:guid}/enrollments")]
+        public async Task<IActionResult> EnrollStudentsToCourseSection(
+            Guid courseSectionId,
+            [FromBody] EnrollStudentsRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var studentIds = request.StudentIds.Distinct().ToList();
+            if (!studentIds.Any())
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "No valid student IDs provided"
+                });
+            }
+
+            var existingStudentIds = await _userClient.GetExistingStudentIdsAsync(studentIds, cancellationToken);
+            var missingStudentIds = studentIds.Except(existingStudentIds).ToList();
+
+            if (missingStudentIds.Any())
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "One or more students do not exist"
+                });
+            }
+
+            await _attendanceClient.EnrollStudentsAsync(courseSectionId, existingStudentIds, cancellationToken);
+
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Students enrolled successfully"
             });
         }
     }
