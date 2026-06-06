@@ -73,5 +73,15 @@ namespace api_gateway.Clients
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<Guid>>>(cancellationToken: cancellationToken);
             return result?.Data ?? new PagedResult<Guid>();
         }
+
+        public async Task EnrollStudentsAsync(Guid courseSectionId, IReadOnlyList<Guid> studentIds, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"api/v1/internal/course-sections/{courseSectionId}/enrollments", studentIds, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            return;
+        }
     }
 }
