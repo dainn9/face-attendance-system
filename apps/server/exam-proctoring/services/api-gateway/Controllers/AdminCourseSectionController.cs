@@ -207,11 +207,7 @@ namespace api_gateway.Controllers
 
             await _attendanceClient.EnrollStudentsAsync(courseSectionId, existingStudentIds, cancellationToken);
 
-            return Ok(new ApiResponse<object>
-            {
-                Success = true,
-                Message = "Students enrolled successfully"
-            });
+            return NoContent();
         }
     }
 }
