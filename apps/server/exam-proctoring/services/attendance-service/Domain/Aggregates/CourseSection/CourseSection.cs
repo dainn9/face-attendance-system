@@ -153,7 +153,7 @@ namespace attendance_service.Domain.Aggregates.CourseSection
         public void RemoveEnrollment(Guid studentId, DateTime now)
         {
             if (!IsActive)
-                throw new BusinessRuleViolationException("Cannot remove enrollment from an inactive course section.", ErrorCodes.CourseSectionDeactivated);
+                throw new BusinessRuleViolationException("Cannot remove enrollment from an ended course section.", ErrorCodes.CourseSectionDeactivated);
 
             var enrollment = _enrollments.FirstOrDefault(e => e.StudentId == studentId)
                 ?? throw new BusinessRuleViolationException("Student not enrolled.", ErrorCodes.StudentNotEnrolled);
@@ -165,7 +165,7 @@ namespace attendance_service.Domain.Aggregates.CourseSection
         public void AddSchedule(DayOfWeek dayOfWeek, TimeOnly startTime, TimeOnly endTime, string room, DateTime now)
         {
             if (!IsActive)
-                throw new BusinessRuleViolationException("Cannot add schedule to an inactive course section.", ErrorCodes.CourseSectionDeactivated);
+                throw new BusinessRuleViolationException("Cannot add schedule to an ended course section.", ErrorCodes.CourseSectionDeactivated);
 
             if (startTime >= endTime)
                 throw new BusinessRuleViolationException("Start time must be before end time.", ErrorCodes.InvalidScheduleData);
@@ -189,7 +189,7 @@ namespace attendance_service.Domain.Aggregates.CourseSection
         public void UpdateSchedule(Guid scheduleId, DayOfWeek dayOfWeek, TimeOnly startTime, TimeOnly endTime, string room, DateTime now)
         {
             if (!IsActive)
-                throw new BusinessRuleViolationException("Cannot update schedule for an inactive course section.", ErrorCodes.CourseSectionDeactivated);
+                throw new BusinessRuleViolationException("Cannot update schedule for an ended course section.", ErrorCodes.CourseSectionDeactivated);
 
             var schedule = _schedules.FirstOrDefault(s => s.Id == scheduleId)
                 ?? throw new BusinessRuleViolationException("Schedule not found.", ErrorCodes.ScheduleNotFound);
@@ -216,7 +216,7 @@ namespace attendance_service.Domain.Aggregates.CourseSection
         public void RemoveSchedule(Guid scheduleId, DateTime now)
         {
             if (!IsActive)
-                throw new BusinessRuleViolationException("Cannot remove schedule from an inactive course section.", ErrorCodes.CourseSectionDeactivated);
+                throw new BusinessRuleViolationException("Cannot remove schedule from an ended course section.", ErrorCodes.CourseSectionDeactivated);
 
             var schedule = _schedules.FirstOrDefault(s => s.Id == scheduleId)
                 ?? throw new BusinessRuleViolationException("Schedule not found.", ErrorCodes.ScheduleNotFound);
