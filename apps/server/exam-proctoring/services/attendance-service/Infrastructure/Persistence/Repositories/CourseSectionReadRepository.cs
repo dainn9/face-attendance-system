@@ -234,5 +234,108 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 PageSize = pageSize
             };
         }
+
+        public async Task<PagedResult<LecturerCourseSectionDto>> GetLecturerCourseSectionsAsync(
+            Guid lecturerId,
+            int page,
+            int pageSize,
+            string? searchQuery = null,
+            Semester? semester = null,
+            string? academicYear = null,
+            bool? isActive = null,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var query = _context.CourseSections
+                .AsNoTracking()
+                .Where(cs => cs.LecturerId == lecturerId)
+                .Join(
+                    _context.Subjects.AsNoTracking(),
+                    cs => cs.SubjectId,
+                    s => s.Id,
+                    (cs, s) => new
+                    {
+                        Id = cs.Id,
+                        SubjectName = s.Name,
+                        SubjectCode = s.Code,
+                        CourseSectionCode = cs.CourseSectionCode,
+                        IsActive = cs.IsActive,
+                        Semester = cs.Semester,
+                        AcademicYear = cs.AcademicYear,
+                        EnrollmentCount = cs.Enrollments.Count,
+                        Schedules = cs.Schedules
+                            .OrderBy(s => s.DayOfWeek)
+                            .ThenBy(s => s.StartTime)
+                            .Select(s => new ScheduleDto(
+                                s.DayOfWeek,
+                                s.StartTime,
+                                s.EndTime,
+                                s.Room
+                            ))
+                            .ToList()
+                    }
+                );
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+                query = query.Where(c => c.SubjectName.Contains(searchQuery));
+
+            if (semester.HasValue)
+                query = query.Where(c => c.Semester == semester.Value);
+
+            if (!string.IsNullOrWhiteSpace(academicYear))
+                query = query.Where(c => c.AcademicYear == academicYear);
+
+            if (isActive.HasValue)
+                query = query.Where(c => c.IsActive == isActive.Value);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .OrderBy(c => c.SubjectName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new LecturerCourseSectionDto(
+                    c.Id,
+                    c.SubjectName,
+                    c.SubjectCode,
+                    c.CourseSectionCode,
+                    c.IsActive,
+                    c.Semester,
+                    c.AcademicYear,
+                    c.EnrollmentCount,
+                    c.Schedules
+                ))
+                .ToListAsync();
+
+            return new PagedResult<LecturerCourseSectionDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<IReadOnlyList<LecturerCourseSectionLookupDto>> GetLecturerCourseSectionLookupAsync(
+            Guid lecturerId,
+            CancellationToken cancellationToken = default
+        )
+        => await _context.CourseSections
+            .AsNoTracking()
+            .Where(cs => cs.LecturerId == lecturerId)
+            .Select(cs => new
+            {
+                cs.Semester,
+                cs.AcademicYear
+            })
+            .Distinct()
+            .OrderBy(x => x.AcademicYear)
+            .ThenBy(x => x.Semester)
+            .Select(x => new LecturerCourseSectionLookupDto(
+                x.Semester,
+                x.AcademicYear,
+                $"{x.Semester} - {x.AcademicYear}"
+            ))
+            .ToListAsync(cancellationToken);
     }
 }
