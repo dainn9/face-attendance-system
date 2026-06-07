@@ -34,5 +34,21 @@ namespace attendance_service.Application.Abstractions.Persistence
             int pageSize = 12,
             CancellationToken cancellationToken = default
         );
+
+        Task<PagedResult<LecturerCourseSectionDto>> GetLecturerCourseSectionsAsync(
+            Guid lecturerId,
+            int page = 1,
+            int pageSize = 12,
+            string? searchQuery = null,
+            Semester? semester = null,
+            string? academicYear = null,
+            bool? isActive = null,
+            CancellationToken cancellationToken = default
+        );
+
+        Task<IReadOnlyList<LecturerCourseSectionLookupDto>> GetLecturerCourseSectionLookupAsync(
+            Guid lecturerId,
+            CancellationToken cancellationToken = default
+        );
     }
 }

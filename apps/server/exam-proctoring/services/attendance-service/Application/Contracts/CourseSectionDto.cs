@@ -59,4 +59,22 @@ namespace attendance_service.Application.Contracts
         int StudentCount,
         List<ScheduleDetailDto> Schedules
     );
+
+    public record LecturerCourseSectionDto(
+        Guid Id,
+        string SubjectName,
+        string SubjectCode,
+        string CourseSectionCode,
+        bool IsActive,
+        Semester Semester,
+        string AcademicYear,
+        int StudentCount,
+        List<ScheduleDto> Schedules
+    );
+
+    public record LecturerCourseSectionLookupDto(
+        Semester Semester,
+        string AcademicYear,
+        string Label
+    );
 }
