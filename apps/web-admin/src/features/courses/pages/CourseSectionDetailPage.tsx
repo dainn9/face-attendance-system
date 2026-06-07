@@ -8,47 +8,177 @@ import {
     FiEdit2,
     FiMapPin,
     FiPlus,
+    FiTrash2,
     FiX,
 } from "react-icons/fi";
 import { Link, useParams } from "react-router-dom";
+import { ApiError, ValidationError } from "../../../shared/api/errors";
 import Spinner from "../../../shared/components/Spinner/Spinner";
 import { getInitials } from "../../../shared/utils/getInitials";
-import { availableStudents } from "../data/mockCourses";
-import { useCourse } from "../hooks/course.query";
+import {
+    useEnrollCourseSection,
+    useRemoveEnrollCourseSection,
+} from "../hooks/course.mutation";
+import {
+    useCourse,
+    useEnrolledStudents,
+    useStudentLookup,
+} from "../hooks/course.query";
 import {
     formatDayOfWeek,
     formatSemester,
     formatTimeToMinute,
+    type StudentLookupDto,
+    type StudentSummary,
 } from "../types/course.types";
+
+const defaultStudentsPagedResult = {
+    items: [],
+    totalCount: 0,
+    page: 1,
+    pageSize: 20,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+};
+
+const getApiErrorMessage = (
+    error: unknown,
+    fallbackMessage: string,
+    validationFallbackMessage: string,
+) => {
+    if (!error) return undefined;
+
+    if (error instanceof ValidationError) {
+        const messages = Object.values(error.errors).flat();
+        return messages.length ? messages.join(" ") : validationFallbackMessage;
+    }
+
+    if (error instanceof ApiError || error instanceof Error) {
+        return error.message;
+    }
+
+    return fallbackMessage;
+};
 
 const CourseSectionDetailPage = () => {
     const { id = "" } = useParams();
     const { data: course, isError, isLoading } = useCourse(id);
+    const {
+        data: enrolledStudents = defaultStudentsPagedResult,
+        isError: isStudentsError,
+        isLoading: isStudentsLoading,
+    } = useEnrolledStudents(id, {
+        page: 1,
+        pageSize: 20,
+    });
+    const enrollCourseSection = useEnrollCourseSection(id);
+    const removeEnrollCourseSection = useRemoveEnrollCourseSection(id);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [studentToRemove, setStudentToRemove] =
+        useState<StudentSummary | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([
-        availableStudents[0].id,
-        availableStudents[1].id,
-    ]);
+    const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+    const [selectedStudents, setSelectedStudents] = useState<
+        StudentLookupDto[]
+    >([]);
+    const trimmedSearchQuery = searchQuery.trim();
+    const {
+        data: studentLookup = [],
+        isError: isStudentLookupError,
+        isFetching: isStudentLookupLoading,
+    } = useStudentLookup(trimmedSearchQuery);
 
-    const filteredStudents = useMemo(() => {
-        const normalizedSearch = searchQuery.trim().toLowerCase();
+    const enrolledStudentIds = useMemo(
+        () => new Set(enrolledStudents.items.map((student) => student.userId)),
+        [enrolledStudents.items],
+    );
 
-        return availableStudents.filter(
-            (student) =>
-                !normalizedSearch ||
-                student.fullName.toLowerCase().includes(normalizedSearch) ||
-                student.code.toLowerCase().includes(normalizedSearch) ||
-                student.major.toLowerCase().includes(normalizedSearch),
+    const availableLookupStudents = useMemo(
+        () =>
+            studentLookup.filter(
+                (student) =>
+                    !selectedStudentIds.includes(student.userId) &&
+                    !enrolledStudentIds.has(student.userId),
+            ),
+        [enrolledStudentIds, selectedStudentIds, studentLookup],
+    );
+
+    const enrollmentErrorMessage = useMemo(() => {
+        return getApiErrorMessage(
+            enrollCourseSection.error,
+            "Không thể thêm sinh viên vào lớp học phần.",
+            "Dữ liệu thêm sinh viên chưa hợp lệ.",
         );
-    }, [searchQuery]);
+    }, [enrollCourseSection.error]);
 
-    const toggleStudent = (studentId: string) => {
+    const removeEnrollmentErrorMessage = useMemo(() => {
+        return getApiErrorMessage(
+            removeEnrollCourseSection.error,
+            "Không thể xóa sinh viên khỏi lớp học phần.",
+            "Dữ liệu xóa sinh viên chưa hợp lệ.",
+        );
+    }, [removeEnrollCourseSection.error]);
+
+    const closeEnrollmentModal = () => {
+        setIsModalOpen(false);
+        enrollCourseSection.reset();
+    };
+
+    const removeSelectedStudent = (studentId: string) => {
+        enrollCourseSection.reset();
+        setSelectedStudentIds((ids) => ids.filter((id) => id !== studentId));
+        setSelectedStudents((students) =>
+            students.filter((student) => student.userId !== studentId),
+        );
+    };
+
+    const selectStudent = (student: StudentLookupDto) => {
+        enrollCourseSection.reset();
         setSelectedStudentIds((ids) =>
-            ids.includes(studentId)
-                ? ids.filter((id) => id !== studentId)
-                : [...ids, studentId],
+            ids.includes(student.userId) ? ids : [...ids, student.userId],
         );
+        setSelectedStudents((students) =>
+            students.some((item) => item.userId === student.userId)
+                ? students
+                : [...students, student],
+        );
+    };
+
+    const submitSelectedStudents = () => {
+        if (!selectedStudentIds.length) return;
+
+        enrollCourseSection.mutate(
+            { studentIds: selectedStudentIds },
+            {
+                onSuccess: () => {
+                    setSelectedStudentIds([]);
+                    setSelectedStudents([]);
+                    setSearchQuery("");
+                    setIsModalOpen(false);
+                },
+            },
+        );
+    };
+
+    const openRemoveStudentModal = (student: StudentSummary) => {
+        removeEnrollCourseSection.reset();
+        setStudentToRemove(student);
+    };
+
+    const closeRemoveStudentModal = () => {
+        removeEnrollCourseSection.reset();
+        setStudentToRemove(null);
+    };
+
+    const submitRemoveStudent = () => {
+        if (!studentToRemove) return;
+
+        removeEnrollCourseSection.mutate(studentToRemove.userId, {
+            onSuccess: () => {
+                setStudentToRemove(null);
+            },
+        });
     };
 
     if (isLoading) {
@@ -215,8 +345,82 @@ const CourseSectionDetailPage = () => {
                     </button>
                 </div>
 
-                <div className="p-6 text-center text-sm text-gray-500">
-                    Chưa có sinh viên nào đăng ký lớp học phần này.
+                <div className="p-6 text-sm text-gray-500">
+                    {isStudentsLoading && (
+                        <div className="flex justify-center">
+                            <Spinner className="size-8 text-blue-600" />
+                        </div>
+                    )}
+
+                    {isStudentsError && !isStudentsLoading && (
+                        <div className="text-center">
+                            Không thể tải danh sách sinh viên của lớp học phần.
+                        </div>
+                    )}
+
+                    {!isStudentsLoading &&
+                        !isStudentsError &&
+                        !enrolledStudents.items.length && (
+                            <div className="text-center">
+                                Chưa có sinh viên nào đăng ký lớp học phần này.
+                            </div>
+                        )}
+
+                    {!isStudentsLoading &&
+                        !isStudentsError &&
+                        enrolledStudents.items.length > 0 && (
+                            <div className="overflow-hidden rounded-xl border border-gray-200 text-left">
+                                <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(110px,0.7fr)_minmax(0,1.2fr)_minmax(0,1fr)_48px] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase text-gray-500">
+                                    <div>Sinh viên</div>
+                                    <div>Mã SV</div>
+                                    <div>Email</div>
+                                    <div>Khoa</div>
+                                    <div />
+                                </div>
+                                <div className="divide-y divide-gray-100">
+                                    {enrolledStudents.items.map((student) => (
+                                        <div
+                                            key={student.userId}
+                                            className="grid grid-cols-[minmax(0,1.3fr)_minmax(110px,0.7fr)_minmax(0,1.2fr)_minmax(0,1fr)_48px] items-center gap-3 px-4 py-3 text-sm"
+                                        >
+                                            <div className="flex min-w-0 items-center gap-3">
+                                                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600">
+                                                    {getInitials(
+                                                        student.fullName,
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="truncate font-medium text-gray-900">
+                                                        {student.fullName}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="truncate font-medium text-gray-700">
+                                                {student.userCode}
+                                            </div>
+                                            <div className="truncate text-gray-500">
+                                                {student.email}
+                                            </div>
+                                            <div className="truncate text-gray-500">
+                                                {student.facultyName}
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    openRemoveStudentModal(
+                                                        student,
+                                                    )
+                                                }
+                                                className="flex size-8 items-center justify-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600"
+                                                aria-label={`Xóa ${student.fullName} khỏi lớp`}
+                                            >
+                                                <FiTrash2 size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                 </div>
             </section>
 
@@ -229,7 +433,7 @@ const CourseSectionDetailPage = () => {
                             </h2>
                             <button
                                 type="button"
-                                onClick={() => setIsModalOpen(false)}
+                                onClick={closeEnrollmentModal}
                                 className="flex size-8 items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:text-gray-700"
                                 aria-label="Dong"
                             >
@@ -237,31 +441,86 @@ const CourseSectionDetailPage = () => {
                             </button>
                         </div>
 
-                        <div className="border-b border-gray-200 px-5 py-3">
+                        <div className="space-y-3 border-b border-gray-200 px-5 py-3">
+                            {selectedStudents.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedStudents.map((student) => (
+                                        <span
+                                            key={student.userId}
+                                            className="inline-flex max-w-full items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700"
+                                        >
+                                            <span className="truncate">
+                                                {student.fullName} (
+                                                {student.userCode})
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    removeSelectedStudent(
+                                                        student.userId,
+                                                    )
+                                                }
+                                                className="flex size-4 shrink-0 items-center justify-center rounded-full text-blue-500 hover:bg-blue-100 hover:text-blue-700"
+                                                aria-label={`Xóa ${student.fullName} khỏi danh sách đã chọn`}
+                                            >
+                                                <FiX size={12} />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                             <input
                                 value={searchQuery}
                                 onChange={(event) =>
                                     setSearchQuery(event.target.value)
                                 }
-                                placeholder="Tìm tên, mã SV, ngành..."
+                                placeholder="Tìm tên, mã SV, email..."
                                 className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
                             />
                         </div>
 
                         <div className="flex-1 overflow-y-auto">
-                            {filteredStudents.map((student) => {
-                                const isSelected = selectedStudentIds.includes(
-                                    student.id,
-                                );
+                            {trimmedSearchQuery.length < 3 && (
+                                <div className="px-5 py-6 text-center text-sm text-gray-500">
+                                    Nhập ít nhất 3 ký tự để tìm sinh viên.
+                                </div>
+                            )}
 
-                                return (
+                            {trimmedSearchQuery.length >= 3 &&
+                                isStudentLookupLoading && (
+                                    <div className="flex justify-center px-5 py-6">
+                                        <Spinner className="size-7 text-blue-600" />
+                                    </div>
+                                )}
+
+                            {trimmedSearchQuery.length >= 3 &&
+                                isStudentLookupError &&
+                                !isStudentLookupLoading && (
+                                    <div className="px-5 py-6 text-center text-sm text-gray-500">
+                                        Không thể tìm sinh viên.
+                                    </div>
+                                )}
+
+                            {trimmedSearchQuery.length >= 3 &&
+                                !isStudentLookupLoading &&
+                                !isStudentLookupError &&
+                                !availableLookupStudents.length && (
+                                <div className="px-5 py-6 text-center text-sm text-gray-500">
+                                    Không có sinh viên phù hợp.
+                                </div>
+                            )}
+
+                            {trimmedSearchQuery.length >= 3 &&
+                                !isStudentLookupError &&
+                                !isStudentLookupLoading &&
+                                availableLookupStudents.map((student) => (
                                     <button
-                                        key={student.id}
+                                        key={student.userId}
                                         type="button"
                                         onClick={() =>
-                                            toggleStudent(student.id)
+                                            selectStudent(student)
                                         }
-                                        className="flex w-full items-center justify-between gap-4 border-b border-gray-200 px-5 py-3 text-left hover:bg-gray-50"
+                                        className="group flex w-full items-center justify-between gap-4 border-b border-gray-200 px-5 py-3 text-left hover:bg-gray-50"
                                     >
                                         <div className="flex min-w-0 items-center gap-3">
                                             <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600">
@@ -272,26 +531,23 @@ const CourseSectionDetailPage = () => {
                                                     {student.fullName}
                                                 </div>
                                                 <div className="truncate text-xs text-gray-500">
-                                                    {student.code} -{" "}
-                                                    {student.major}
+                                                    {student.userCode} -{" "}
+                                                    {student.email}
                                                 </div>
                                             </div>
                                         </div>
-                                        <span
-                                            className={`flex size-5 shrink-0 items-center justify-center rounded-md border text-xs ${
-                                                isSelected
-                                                    ? "border-blue-600 bg-blue-600 text-white"
-                                                    : "border-gray-300 bg-white"
-                                            }`}
-                                        >
-                                            {isSelected ? (
-                                                <FiCheck size={13} />
-                                            ) : null}
+                                        <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-xs text-white group-hover:border-blue-600 group-hover:bg-blue-600">
+                                            <FiCheck size={13} />
                                         </span>
                                     </button>
-                                );
-                            })}
+                                ))}
                         </div>
+
+                        {enrollmentErrorMessage && (
+                            <div className="border-t border-red-100 bg-red-50 px-5 py-3 text-sm text-red-700">
+                                {enrollmentErrorMessage}
+                            </div>
+                        )}
 
                         <div className="flex items-center justify-between gap-3 border-t border-gray-200 px-5 py-4">
                             <div className="text-sm text-gray-500">
@@ -300,18 +556,80 @@ const CourseSectionDetailPage = () => {
                             <div className="flex gap-2">
                                 <button
                                     type="button"
-                                    onClick={() => setIsModalOpen(false)}
+                                    onClick={closeEnrollmentModal}
                                     className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
                                 >
                                     Hủy
                                 </button>
                                 <button
                                     type="button"
-                                    className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                                    onClick={submitSelectedStudents}
+                                    disabled={
+                                        !selectedStudentIds.length ||
+                                        enrollCourseSection.isPending
+                                    }
+                                    className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                                 >
-                                    Thêm vào lớp học phần
+                                    {enrollCourseSection.isPending
+                                        ? "Đang thêm..."
+                                        : "Thêm vào lớp học phần"}
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {studentToRemove && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+                        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+                            <h2 className="text-base font-semibold text-gray-900">
+                                Xóa sinh viên khỏi lớp
+                            </h2>
+                            <button
+                                type="button"
+                                onClick={closeRemoveStudentModal}
+                                className="flex size-8 items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:text-gray-700"
+                                aria-label="Đóng"
+                            >
+                                <FiX size={18} />
+                            </button>
+                        </div>
+
+                        <div className="px-5 py-4 text-sm text-gray-600">
+                            Bạn có muốn xóa{" "}
+                            <span className="font-semibold text-gray-900">
+                                {studentToRemove.fullName}
+                            </span>{" "}
+                            ({studentToRemove.userCode}) khỏi lớp học phần này
+                            không?
+                        </div>
+
+                        {removeEnrollmentErrorMessage && (
+                            <div className="border-t border-red-100 bg-red-50 px-5 py-3 text-sm text-red-700">
+                                {removeEnrollmentErrorMessage}
+                            </div>
+                        )}
+
+                        <div className="flex justify-end gap-2 border-t border-gray-200 px-5 py-4">
+                            <button
+                                type="button"
+                                onClick={closeRemoveStudentModal}
+                                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                type="button"
+                                onClick={submitRemoveStudent}
+                                disabled={removeEnrollCourseSection.isPending}
+                                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                            >
+                                {removeEnrollCourseSection.isPending
+                                    ? "Đang xóa..."
+                                    : "Xóa khỏi lớp"}
+                            </button>
                         </div>
                     </div>
                 </div>

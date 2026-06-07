@@ -31,22 +31,6 @@ export type CourseSectionSchedule = {
     room: string;
 };
 
-export interface CourseSection {
-    id: string;
-    courseName: string;
-    courseCode: string;
-    classCode: string;
-    faculty: string;
-    lecturerName: string;
-    semester: string;
-    schoolYear: string;
-    credits: number;
-    maxStudents: number;
-    status: CourseSectionStatus;
-    schedules: CourseSectionSchedule[];
-    students: CourseStudent[];
-}
-
 export interface CourseSectionDto {
     id: string;
     subjectName: string;
@@ -137,4 +121,24 @@ export interface CourseSectionDetail {
     maxCapacity: number;
     lecturer: LecturerDto;
     schedules: ScheduleDetailDto[];
+}
+
+export interface StudentSummary {
+    userId: string;
+    userCode: string;
+    fullName: string;
+    facultyName: string;
+    email: string;
+}
+
+export interface GetEnrolledStudentsRequest {
+    page: number;
+    pageSize: number;
+}
+
+export interface StudentLookupDto {
+    userId: string;
+    userCode: string;
+    fullName: string;
+    email: string;
 }
