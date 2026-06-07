@@ -1,3 +1,4 @@
+import type { StudentLookupDto } from "../../../features/courses/types/course.types";
 import type { SubjectLookupDto } from "../../../features/courses/types/subject.types";
 import type { LookupDto, UserLookupDto } from "../../../features/users/types/user.types";
 import { api } from "../client";
@@ -22,6 +23,11 @@ export const lookupApi = {
 
     lecturer: async (keyWord?: string, facultyId?: string) : Promise<UserLookupDto[]> => {
         const res = await api.get<unknown, ApiResponse<UserLookupDto[]>>(API_ENDPOINTS.USERS.LECTURER_LOOKUP(keyWord, facultyId));
+        return res.data;
+    },
+
+    student: async (keyWord?: string) : Promise<StudentLookupDto[]> => {
+        const res = await api.get<unknown, ApiResponse<StudentLookupDto[]>>(API_ENDPOINTS.USERS.STUDENT_LOOKUP(keyWord));
         return res.data;
     }
 }

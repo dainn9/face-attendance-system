@@ -43,12 +43,26 @@ export const API_ENDPOINTS = {
                 params.toString() ? `?${params.toString()}` : ""
             }`;
         },
+        STUDENT_LOOKUP: (keyWord?: string) => {
+            const params = new URLSearchParams();
+
+            if (keyWord) {
+                params.append("keyword", keyWord);
+            }
+
+            return `${USERS_PREFIX}/users/lookup/students${
+                params.toString() ? `?${params.toString()}` : ""
+            }`;
+        }
     },
 
     COURSES: {
         CREATE: `${ADMIN_PREFIX}/course-sections`,
         LIST: `${ADMIN_PREFIX}/course-sections`,
         DETAIL: (id: string) => `${ADMIN_PREFIX}/course-sections/${id}`,
+        ENROLLED_STUDENTS: (courseSectionId: string) => `${ADMIN_PREFIX}/course-sections/${courseSectionId}/students`,
+        ENROLLMENTS: (courseSectionId: string) => `${ADMIN_PREFIX}/course-sections/${courseSectionId}/enrollments`,
+        REMOVE_ENROLLMENT: (courseSectionId: string, studentId: string) => `${ATTENDANCE_PREFIX}/course-sections/${courseSectionId}/enrollments/${studentId}`
     },
     
     SUBJECTS: {

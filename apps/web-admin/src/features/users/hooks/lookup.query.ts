@@ -14,7 +14,10 @@ export const lookupQueryKeys = {
         [...lookupQueryKeys.all, "subjects", keyWord] as const,
 
     lecturers: (keyWord: string | undefined, facultyId: string | undefined) =>
-        [...lookupQueryKeys.all, "lecturers", keyWord, facultyId] as const
+        [...lookupQueryKeys.all, "lecturers", keyWord, facultyId] as const,
+
+    students: (keyWord: string | undefined) =>
+        [...lookupQueryKeys.all, "students", keyWord] as const,
 };
 
 export const useFacultyLookup = () =>
