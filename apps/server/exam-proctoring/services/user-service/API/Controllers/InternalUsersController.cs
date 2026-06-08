@@ -14,6 +14,7 @@ using user_service.Application.Contracts.Users;
 using user_service.Application.Contracts.Lecturers;
 using user_service.Application.Contracts.Students;
 using user_service.Application.Features.Students.Queries.GetExistingStudentIds;
+using user_service.Application.Features.Students.Queries.GetStudentBasicsByIds;
 
 namespace user_service.API.Controllers
 {
@@ -130,6 +131,23 @@ namespace user_service.API.Controllers
                 Success = true,
                 Message = "Student IDs checked successfully",
                 Data = validStudentIds
+            });
+        }
+
+        [HttpPost("get-student-basics-by-ids")]
+        public async Task<IActionResult> GetStudentBasicsByIds(
+            [FromBody] IReadOnlyList<Guid> studentIds,
+            CancellationToken cancellationToken
+        )
+        {
+            var query = new GetStudentBasicsByIdsQuery(studentIds);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<Dictionary<Guid, StudentBasicDto>>
+            {
+                Success = true,
+                Message = "Student basics retrieved successfully",
+                Data = result
             });
         }
 
