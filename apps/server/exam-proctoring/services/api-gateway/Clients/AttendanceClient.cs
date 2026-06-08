@@ -1,4 +1,5 @@
 using api_gateway.Contracts.Attendance;
+using api_gateway.Contracts.Users;
 using BuildingBlocks.Results;
 using SharedKernel.Core.Enums;
 
@@ -89,6 +90,25 @@ namespace api_gateway.Clients
                 await HandleErrorAsync(response, cancellationToken);
 
             return;
+        }
+
+        public async Task<Dictionary<Guid, StudentAttendanceSummaryDto>> GetStudentAttendanceSummariesAsync(
+            Guid courseSectionId,
+            IReadOnlyList<Guid> studentIds,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var response = await _httpClient.PostAsJsonAsync(
+                $"api/v1/internal/course-sections/{courseSectionId}/students/attendance-summaries",
+                studentIds,
+                cancellationToken
+            );
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<Guid, StudentAttendanceSummaryDto>>>(cancellationToken: cancellationToken);
+            return result?.Data ?? new Dictionary<Guid, StudentAttendanceSummaryDto>();
         }
     }
 }
