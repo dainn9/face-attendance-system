@@ -337,5 +337,9 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 $"{x.Semester} - {x.AcademicYear}"
             ))
             .ToListAsync(cancellationToken);
+
+        public Task<bool> IsStudentEnrolledAsync(Guid courseSectionId, Guid userId, CancellationToken cancellationToken = default)
+        => _context.CourseSections
+            .AnyAsync(cs => cs.Id == courseSectionId && cs.Enrollments.Any(e => e.StudentId == userId), cancellationToken);
     }
 }
