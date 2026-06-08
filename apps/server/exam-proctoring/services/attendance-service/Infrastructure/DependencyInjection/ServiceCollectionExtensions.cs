@@ -34,6 +34,7 @@ namespace attendance_service.Infrastructure.DependencyInjection
             services.AddScoped<ISubjectReadRepository, SubjectReadRepository>();
             services.AddScoped<ICourseSectionRepository, CourseSectionRepository>();
             services.AddScoped<ICourseSectionReadRepository, CourseSectionReadRepository>();
+            services.AddScoped<IAttendanceSessionReadRepository, AttendanceSessionReadRepository>();
 
             // ==========================
             // Unit of Work

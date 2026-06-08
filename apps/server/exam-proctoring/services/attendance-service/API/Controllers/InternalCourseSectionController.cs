@@ -1,6 +1,8 @@
 using attendance_service.API.Contracts.CourseSections;
 using attendance_service.API.Contracts.Enrollments;
 using attendance_service.Application.Contracts;
+using attendance_service.Application.Contracts.AttendanceSession;
+using attendance_service.Application.Features.Attendances.Queries.GetStudentAttendanceSummaries;
 using attendance_service.Application.Features.CourseSections.Commands.CreateCourseSection;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionDetail;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionPaged;
@@ -24,6 +26,7 @@ namespace attendance_service.API.Controllers
 
         public InternalCourseSectionController(IMediator mediator) => _mediator = mediator;
 
+        // GET: api/v1/internal/course-sections?searchQuery=math&page=1&pageSize=10&facultyId=123&semester=Fall&academicYear=2023&isActive=true
         [HttpGet]
         public async Task<IActionResult> GetCourseSections(
             [FromQuery] GetCourseSectionPagedRequest request,
@@ -50,6 +53,7 @@ namespace attendance_service.API.Controllers
             });
         }
 
+        // POST: api/v1/internal/course-sections
         [HttpPost]
         public async Task<IActionResult> CreateCourseSection([FromBody] CreateCourseSectionRequest request,
             CancellationToken cancellationToken)
@@ -73,6 +77,7 @@ namespace attendance_service.API.Controllers
             });
         }
 
+        // GET: api/v1/internal/course-sections/{courseSectionId}?userId=123&role=Lecturer
         [HttpGet("{courseSectionId:guid}")]
         public async Task<IActionResult> GetCourseSectionDetail(
             Guid courseSectionId,
@@ -91,6 +96,7 @@ namespace attendance_service.API.Controllers
             });
         }
 
+        // GET: api/v1/internal/course-sections/{courseSectionId}/students?page=1&pageSize=10
         [HttpGet("{courseSectionId:guid}/students")]
         public async Task<IActionResult> GetEnrolledStudentIdsPaged(
             Guid courseSectionId,
@@ -109,6 +115,7 @@ namespace attendance_service.API.Controllers
             });
         }
 
+        // POST: api/v1/internal/course-sections/{courseSectionId}/enrollments
         [HttpPost("{courseSectionId:guid}/enrollments")]
         public async Task<IActionResult> AddEnrollments(Guid courseSectionId, [FromBody] IReadOnlyList<Guid> studentIds, CancellationToken cancellationToken)
         {
@@ -118,6 +125,24 @@ namespace attendance_service.API.Controllers
             {
                 Success = true,
                 Message = "Enrollments added successfully",
+            });
+        }
+
+        // POST: api/v1/internal/course-sections/{courseSectionId}/students/attendance-summaries
+        [HttpPost("{courseSectionId:guid}/students/attendance-summaries")]
+        public async Task<IActionResult> GetStudentAttendanceSummariesByIds(
+            Guid courseSectionId,
+            [FromBody] IReadOnlyList<Guid> studentIds,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetStudentAttendanceSummariesQuery(courseSectionId, studentIds);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<Dictionary<Guid, StudentAttendanceSummaryDto>>
+            {
+                Success = true,
+                Message = "Student attendance summaries retrieved successfully",
+                Data = result
             });
         }
     }
