@@ -93,5 +93,35 @@ namespace user_service.Infrastructure.Persistence.Repositories
                 .Select(u => u.Id)
                 .ToListAsync(cancellationToken);
         }
+
+        public async Task<Dictionary<Guid, StudentBasicDto>> GetStudentBasicsByIdsAsync(IEnumerable<Guid> studentIds, CancellationToken cancellationToken)
+        {
+            var ids = studentIds.Distinct().ToList();
+
+            if (ids.Count == 0)
+                return new Dictionary<Guid, StudentBasicDto>();
+
+            var students = await _context.Users
+                .AsNoTracking()
+                .Where(u => ids.Contains(u.Id) && u.StudentProfile != null)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.FullName,
+                    u.UserCode,
+                    u.Email
+                })
+                .ToListAsync(cancellationToken);
+
+            return students.ToDictionary(
+                s => s.Id,
+                s => new StudentBasicDto(
+                    s.Id,
+                    s.UserCode ?? "",
+                    s.FullName,
+                    s.Email
+                )
+            );
+        }
     }
 }

@@ -18,5 +18,10 @@ namespace user_service.Application.Abstractions.Persistence
             IEnumerable<Guid> studentIds,
             CancellationToken cancellationToken
         );
+
+        Task<Dictionary<Guid, StudentBasicDto>> GetStudentBasicsByIdsAsync(
+            IEnumerable<Guid> studentIds,
+            CancellationToken cancellationToken
+        );
     }
 }
