@@ -1,6 +1,3 @@
-using System.Security.Cryptography;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using api_gateway.Clients;
 using api_gateway.Middleware;
 using BuildingBlocks.Exceptions;
@@ -8,6 +5,9 @@ using BuildingBlocks.Results;
 using BuildingBlocks.Security.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,7 +88,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:5173", "http://localhost:3001")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

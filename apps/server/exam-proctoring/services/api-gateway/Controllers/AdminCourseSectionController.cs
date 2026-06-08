@@ -88,47 +88,6 @@ namespace api_gateway.Controllers
             });
         }
 
-        // GET: api/v1/admin/course-sections/{courseSectionId}
-        [HttpGet("{courseSectionId:guid}")]
-        public async Task<IActionResult> GetCourseSectionDetailById(
-            Guid courseSectionId,
-            CancellationToken cancellationToken)
-        {
-            var courseSection = await _attendanceClient.GetCourseSectionDetailAsync(courseSectionId, cancellationToken);
-            if (courseSection == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = $"Course section with ID {courseSectionId} not found"
-                });
-            }
-
-            var lecturer = await _userClient.GetLecturerByIdAsync(courseSection.LecturerId, cancellationToken);
-
-            var result = new CourseSectionDetailResponse(
-                Id: courseSection.Id,
-                SubjectName: courseSection.SubjectName,
-                Credits: courseSection.Credits,
-                CourseSectionCode: courseSection.CourseSectionCode,
-                IsActive: courseSection.IsActive,
-                Semester: courseSection.Semester,
-                AcademicYear: courseSection.AcademicYear,
-                MaxCapacity: courseSection.MaxCapacity,
-                StudentCount: courseSection.StudentCount,
-                Lecturer: lecturer ?? new LecturerDto(Guid.Empty, "Unknown", "Unknown"),
-                Schedules: courseSection.Schedules
-            );
-
-            return Ok(new ApiResponse<CourseSectionDetailResponse>
-            {
-                Success = true,
-                Message = "Course section retrieved successfully",
-                Data = result
-            });
-        }
-
-
         // GET: api/v1/admin/course-sections/{courseSectionId}/students
         [HttpGet("{courseSectionId:guid}/students")]
         public async Task<IActionResult> GetEnrolledStudentsByCourseSectionId(

@@ -11,6 +11,7 @@ using BuildingBlocks.Security.Internal;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Core.Enums;
 
 namespace attendance_service.API.Controllers
 {
@@ -73,10 +74,13 @@ namespace attendance_service.API.Controllers
         }
 
         [HttpGet("{courseSectionId:guid}")]
-        public async Task<IActionResult> GetCourseSectionDetail(Guid courseSectionId,
+        public async Task<IActionResult> GetCourseSectionDetail(
+            Guid courseSectionId,
+            [FromQuery] Guid userId,
+            [FromQuery] UserRole role,
             CancellationToken cancellationToken)
         {
-            var query = new GetCourseSectionDetailQuery(courseSectionId);
+            var query = new GetCourseSectionDetailQuery(userId, role, courseSectionId);
             var result = await _mediator.Send(query, cancellationToken);
 
             return Ok(new ApiResponse<CourseSectionDetailDto>

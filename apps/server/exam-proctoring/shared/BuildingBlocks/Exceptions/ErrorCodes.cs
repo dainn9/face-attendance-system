@@ -11,6 +11,7 @@ namespace BuildingBlocks.Exceptions
         public const string InvalidSessionType = "INVALID_SESSION_TYPE";
         public const string InvalidRefreshToken = "INVALID_REFRESH_TOKEN";
         public const string ConfigurationError = "CONFIGURATION_ERROR";
+        public const string Forbidden = "FORBIDDEN";
 
         // ======= ACCOUNT =======
         public const string AccountNotFound = "ACCOUNT_NOT_FOUND";

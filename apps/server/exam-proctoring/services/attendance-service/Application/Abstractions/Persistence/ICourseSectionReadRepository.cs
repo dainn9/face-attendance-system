@@ -50,5 +50,7 @@ namespace attendance_service.Application.Abstractions.Persistence
             Guid lecturerId,
             CancellationToken cancellationToken = default
         );
+
+        Task<bool> IsStudentEnrolledAsync(Guid courseSectionId, Guid userId, CancellationToken cancellationToken = default);
     }
 }
