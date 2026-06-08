@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using attendance_service.Infrastructure.Persistence;
 
@@ -10,9 +11,11 @@ using attendance_service.Infrastructure.Persistence;
 namespace attendance_service.Migrations
 {
     [DbContext(typeof(AttendanceDbContext))]
-    partial class AttendanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608081248_AddAttendanceSession")]
+    partial class AddAttendanceSession
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
