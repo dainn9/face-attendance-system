@@ -1,5 +1,6 @@
 using api_gateway.Contracts.Attendance;
 using BuildingBlocks.Results;
+using SharedKernel.Core.Enums;
 
 namespace api_gateway.Clients
 {
@@ -41,9 +42,15 @@ namespace api_gateway.Clients
             return result?.Data ?? throw new InvalidOperationException("Attendance service returned empty response.");
         }
 
-        public async Task<CourseSectionDetailDto> GetCourseSectionDetailAsync(Guid courseSectionId, CancellationToken cancellationToken = default)
+        public async Task<CourseSectionDetailDto> GetCourseSectionDetailAsync(
+            Guid courseSectionId,
+            Guid userId,
+            UserRole role,
+            CancellationToken cancellationToken = default)
         {
-            var response = await _httpClient.GetAsync($"api/v1/internal/course-sections/{courseSectionId}", cancellationToken);
+            var response = await _httpClient.GetAsync($"api/v1/internal/course-sections/{courseSectionId}" +
+            $"?userId={userId}&role={role}"
+            , cancellationToken);
 
             if (!response.IsSuccessStatusCode)
                 await HandleErrorAsync(response, cancellationToken);
