@@ -1,3 +1,4 @@
+using BuildingBlocks.Extensions;
 using BuildingBlocks.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,7 @@ using user_service.Application.Contracts.Students;
 using user_service.Application.Contracts.Users;
 using user_service.Application.Features.Students.Queries.GetStudentLookup;
 using user_service.Application.Features.Users.Queries.GetLecturerLookupByFacultyId;
+using user_service.Application.Features.Users.Queries.GetUserProfile;
 
 namespace user_service.API.Controllers
 {
@@ -18,20 +20,20 @@ namespace user_service.API.Controllers
         private readonly IMediator _mediator;
         public UserController(IMediator mediator) => _mediator = mediator;
 
-        // [HttpGet("profile")]
-        // public async Task<IActionResult> GetUserProfile()
-        // {
-        //     var userId = User.GetUserId();
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var userId = User.GetUserId();
 
-        //     var query = new GetUserProfileQuery(userId);
-        //     var result = await _mediator.Send(query);
-        //     return Ok(new ApiResponse<UserDto>
-        //     {
-        //         Success = true,
-        //         Message = "User profile retrieved successfully",
-        //         Data = result
-        //     });
-        // }
+            var query = new GetUserProfileQuery(userId);
+            var result = await _mediator.Send(query);
+            return Ok(new ApiResponse<UserDto>
+            {
+                Success = true,
+                Message = "User profile retrieved successfully",
+                Data = result
+            });
+        }
 
         [HttpGet("lookup/lecturers")]
         public async Task<IActionResult> GetLecturerLookupByFacultyId([FromQuery] GetLecturerLookupRequest request, CancellationToken cancellationToken)

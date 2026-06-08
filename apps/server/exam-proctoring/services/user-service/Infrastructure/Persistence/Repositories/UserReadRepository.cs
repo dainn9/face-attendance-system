@@ -14,25 +14,20 @@ namespace user_service.Infrastructure.Persistence.Repositories
 
         public UserReadRepository(UserDbContext Context) => _context = Context;
 
-        // public Task<UserDto?> GetProfileByIdAsync(Guid userId, CancellationToken ct)
-        // => _context.Users
-        //     .AsNoTracking()
-        //     .Where(u => u.Id == userId)
-        //     .Select(u => new UserDto(
-        //         u.Id,
-        //         u.FullName,
-        //         u.Gender,
-        //         u.DateOfBirth,
-        //         u.Email,
-        //         u.Role,
-
-        //         u.StudentProfile != null ? u.StudentProfile.StudentCode : null,
-
-        //         u.StudentProfile != null ? u.StudentProfile.ClassCode : null,
-
-        //         u.LecturerProfile != null ? u.LecturerProfile.FacultyCode : null
-        //     ))
-        //     .FirstOrDefaultAsync(cancellationToken);
+        public Task<UserDto?> GetProfileByIdAsync(Guid userId, CancellationToken cancellationToken)
+        => _context.Users
+            .AsNoTracking()
+            .Where(u => u.Id == userId)
+            .Select(u => new UserDto(
+                u.Id,
+                u.UserCode,
+                u.FullName,
+                u.Gender,
+                u.DateOfBirth,
+                u.Email,
+                u.Role
+            ))
+            .FirstOrDefaultAsync(cancellationToken);
 
         public Task<Dictionary<Guid, int>> GetStudentCountByMajorsAsync(CancellationToken ct = default)
         => _context.Users
