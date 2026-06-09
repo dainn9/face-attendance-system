@@ -2,25 +2,29 @@ import { useEffect} from "react"
 import { useAuthStore } from "../../features/auth/store/auth.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../../features/auth/services/auth.api";
+import { getMeFromPayload } from "../../features/auth/utils/roleRedirect";
 
 const AuthProvider = ({children} : {children: React.ReactNode}) => {
     const queryClient = useQueryClient();
-    const setAuth = useAuthStore(s => s.setAuth);
+    const setUser = useAuthStore(s => s.setUser);
+    const finishAuthLoading = useAuthStore(s => s.finishAuthLoading);
     
     useEffect(() => {
         let mounted = true;
 
         const initAuth = async () => {
             try {
-                await queryClient.fetchQuery({
+                const payload = await queryClient.fetchQuery({
                     queryKey: ["me"],
                     queryFn: authApi.getMe,
                     retry: false,
                 });
 
-                if (mounted) setAuth(true);
+                if (mounted) setUser(getMeFromPayload(payload));
             } catch {
-                if (mounted) setAuth(false);
+                if (mounted) setUser(null);
+            } finally {
+                if (mounted) finishAuthLoading();
             }
         };
 
@@ -30,7 +34,7 @@ const AuthProvider = ({children} : {children: React.ReactNode}) => {
             mounted = false;
         };
 
-    }, [queryClient, setAuth]);
+    }, [queryClient, setUser, finishAuthLoading]);
 
     return <>{children}</>;
 }

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useLogin } from "../hooks/auth.mutation";
 import { Link } from "react-router-dom";
-import { ValidationError } from "../../../shared/api/errors";
+import { ApiError, ValidationError } from "../../../shared/api/errors";
 
 const LoginPage = () => {
   const { mutate, isPending, error } = useLogin();
@@ -20,8 +20,8 @@ const LoginPage = () => {
           onSuccess: () => {
               setLoginError(null);
           },
-          onError: (error: any) => {
-              setLoginError(error.message);
+          onError: (error: unknown) => {
+              setLoginError(error instanceof ApiError ? error.message : "Login failed");
           }
       });
   }

@@ -2,7 +2,7 @@ const AUTH_PREFIX = import.meta.env.VITE_PREFIX_API_AUTH;
 const USERS_PREFIX = import.meta.env.VITE_PREFIX_API_USERS;
 const ADMIN_PREFIX = import.meta.env.VITE_PREFIX_API_ADMIN;
 const ATTENDANCE_PREFIX = import.meta.env.VITE_PREFIX_API_ATTENDANCE;
-
+const API_PREFIX = import.meta.env.VITE_PREFIX_API;
 
 export const API_ENDPOINTS = {
     AUTH: {
@@ -59,7 +59,7 @@ export const API_ENDPOINTS = {
     COURSES: {
         CREATE: `${ADMIN_PREFIX}/course-sections`,
         LIST: `${ADMIN_PREFIX}/course-sections`,
-        DETAIL: (id: string) => `${ADMIN_PREFIX}/course-sections/${id}`,
+        DETAIL: (id: string) => `${API_PREFIX}/course-sections/${id}`,
         ENROLLED_STUDENTS: (courseSectionId: string) => `${ADMIN_PREFIX}/course-sections/${courseSectionId}/students`,
         ENROLLMENTS: (courseSectionId: string) => `${ADMIN_PREFIX}/course-sections/${courseSectionId}/enrollments`,
         REMOVE_ENROLLMENT: (courseSectionId: string, studentId: string) => `${ATTENDANCE_PREFIX}/course-sections/${courseSectionId}/enrollments/${studentId}`
