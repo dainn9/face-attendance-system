@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Core.Enums;
 
-namespace attendance_service.API.Controllers
+namespace attendance_service.API.Controllers.Internals
 {
     [ApiController]
     [Authorize(AuthenticationSchemes = InternalAuthenticationHandler.SchemeName)]
