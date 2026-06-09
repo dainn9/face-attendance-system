@@ -110,5 +110,19 @@ namespace api_gateway.Clients
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<Guid, StudentAttendanceSummaryDto>>>(cancellationToken: cancellationToken);
             return result?.Data ?? new Dictionary<Guid, StudentAttendanceSummaryDto>();
         }
+
+        public async Task<Dictionary<Guid, AttendanceRecordDto>> GetAttendanceRecordsAsync(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var response = await _httpClient.GetAsync($"api/v1/internal/attendance-sessions/{attendanceSessionId}/records", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<Guid, AttendanceRecordDto>>>(cancellationToken: cancellationToken);
+            return result?.Data ?? new Dictionary<Guid, AttendanceRecordDto>();
+        }
     }
 }
