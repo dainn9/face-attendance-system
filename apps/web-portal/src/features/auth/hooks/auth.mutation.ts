@@ -3,22 +3,27 @@ import { authApi } from "../services/auth.api";
 import { useNavigate } from "react-router-dom";
 import type { LoginRequest } from "../types/auth.types";
 import { useAuthStore } from "../store/auth.store";
+import { getHomePathByRole, getMeFromPayload } from "../utils/roleRedirect";
 
 export const useLogin = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const setAuth = useAuthStore((s) => s.setAuth);
+    const setUser = useAuthStore((s) => s.setUser);
 
     return useMutation({
         mutationFn: (data: LoginRequest) =>
             authApi.login(data),
 
-        onSuccess: () => {
-            setAuth(true);
-            queryClient.invalidateQueries({
-                queryKey: ["me"]
+        onSuccess: async () => {
+            const payload = await queryClient.fetchQuery({
+                queryKey: ["me"],
+                queryFn: authApi.getMe,
+                retry: false,
             });
-            navigate("/");
+
+            const user = getMeFromPayload(payload);
+            setUser(user);
+            navigate(getHomePathByRole(user.role));
         }
     })
 }
@@ -26,13 +31,13 @@ export const useLogin = () => {
 export const useLogout = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const setAuth = useAuthStore((s) => s.setAuth);
+    const setUser = useAuthStore((s) => s.setUser);
 
     return useMutation({
         mutationFn: () => authApi.logout(),
 
         onSuccess: () => {
-            setAuth(false);
+            setUser(null);
             queryClient.removeQueries({
                 queryKey: ["me"]
             });
