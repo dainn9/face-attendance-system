@@ -341,5 +341,24 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
         public Task<bool> IsStudentEnrolledAsync(Guid courseSectionId, Guid userId, CancellationToken cancellationToken = default)
         => _context.CourseSections
             .AnyAsync(cs => cs.Id == courseSectionId && cs.Enrollments.Any(e => e.StudentId == userId), cancellationToken);
+
+        public async Task<Guid?> GetLecturerIdAsync(Guid courseSectionId, CancellationToken cancellationToken)
+        => await _context.CourseSections
+            .AsNoTracking()
+            .Where(cs => cs.Id == courseSectionId)
+            .Select(cs => (Guid?)cs.LecturerId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        public async Task<HashSet<Guid>> GetEnrollmentStudentIdsAsync(Guid courseSectionId, CancellationToken cancellationToken)
+        {
+            var studentIds = await _context.CourseSections
+                .AsNoTracking()
+                .Where(cs => cs.Id == courseSectionId)
+                .SelectMany(cs => cs.Enrollments)
+                .Select(e => e.StudentId)
+                .ToListAsync(cancellationToken);
+
+            return studentIds.ToHashSet();
+        }
     }
 }

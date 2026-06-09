@@ -79,16 +79,16 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
             SetUpdated(now);
         }
 
-        public void MarkAbsentStudents(IReadOnlyList<Guid> studentIds, DateTime now)
+        public void MarkAbsentStudents(IReadOnlyCollection<Guid> studentIds, DateTime now)
         {
             if (Status != AttendanceSessionStatus.Closed)
                 throw new BusinessRuleViolationException("Cannot mark students as absent in an open attendance session.", ErrorCodes.InvalidAttendanceSessionData);
 
-            var uniqueStudentIds = studentIds.Distinct();
+            var existingStudentIds = _records.Select(r => r.StudentId).ToHashSet();
 
-            foreach (var studentId in uniqueStudentIds)
+            foreach (var studentId in studentIds)
             {
-                if (_records.Any(r => r.StudentId == studentId))
+                if (existingStudentIds.Contains(studentId))
                     continue;
 
                 var record = AttendanceRecord.Absent(Id, studentId);

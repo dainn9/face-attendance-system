@@ -28,7 +28,10 @@ namespace attendance_service.Infrastructure.Persistence.Configurations
 
                 a.WithOwner().HasForeignKey("AttendanceSessionId");
 
-                a.HasKey(x => new { x.AttendanceSessionId, x.StudentId });
+                a.HasKey(x => new { x.AttendanceSessionId, x.Id });
+
+                a.Property(x => x.Id)
+                    .ValueGeneratedNever();
 
                 a.Property(x => x.AttendanceSessionId).IsRequired();
                 a.Property(x => x.StudentId).IsRequired();
@@ -37,6 +40,9 @@ namespace attendance_service.Infrastructure.Persistence.Configurations
                 a.Property(x => x.Confidence);
 
                 a.HasIndex(x => x.StudentId);
+
+                a.HasIndex(x => new { x.AttendanceSessionId, x.StudentId })
+                    .IsUnique();
             });
         }
     }

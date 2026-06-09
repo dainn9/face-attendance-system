@@ -140,8 +140,7 @@ namespace attendance_service.Migrations
                             b1.Property<Guid>("AttendanceSessionId")
                                 .HasColumnType("char(36)");
 
-                            b1.Property<Guid>("StudentId")
-                                .ValueGeneratedOnAdd()
+                            b1.Property<Guid>("Id")
                                 .HasColumnType("char(36)");
 
                             b1.Property<DateTime?>("CheckedInAt")
@@ -154,9 +153,15 @@ namespace attendance_service.Migrations
                                 .IsRequired()
                                 .HasColumnType("longtext");
 
-                            b1.HasKey("AttendanceSessionId", "StudentId");
+                            b1.Property<Guid>("StudentId")
+                                .HasColumnType("char(36)");
+
+                            b1.HasKey("AttendanceSessionId", "Id");
 
                             b1.HasIndex("StudentId");
+
+                            b1.HasIndex("AttendanceSessionId", "StudentId")
+                                .IsUnique();
 
                             b1.ToTable("attendance_records", (string)null);
 

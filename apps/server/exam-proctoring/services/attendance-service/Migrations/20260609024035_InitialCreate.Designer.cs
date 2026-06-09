@@ -11,7 +11,7 @@ using attendance_service.Infrastructure.Persistence;
 namespace attendance_service.Migrations
 {
     [DbContext(typeof(AttendanceDbContext))]
-    [Migration("20260605081946_InitialCreate")]
+    [Migration("20260609024035_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -21,6 +21,39 @@ namespace attendance_service.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("attendance_service.Domain.Aggregates.AttendanceSession.AttendanceSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CourseSectionId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<TimeOnly?>("EndTime")
+                        .HasColumnType("time(6)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("attendance_sessions", (string)null);
+                });
 
             modelBuilder.Entity("attendance_service.Domain.Aggregates.CourseSection.CourseSection", b =>
                 {
@@ -101,6 +134,45 @@ namespace attendance_service.Migrations
                     b.HasIndex("FacultyId");
 
                     b.ToTable("subjects", (string)null);
+                });
+
+            modelBuilder.Entity("attendance_service.Domain.Aggregates.AttendanceSession.AttendanceSession", b =>
+                {
+                    b.OwnsMany("attendance_service.Domain.Aggregates.AttendanceSession.AttendanceRecord", "Records", b1 =>
+                        {
+                            b1.Property<Guid>("AttendanceSessionId")
+                                .HasColumnType("char(36)");
+
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("char(36)");
+
+                            b1.Property<DateTime?>("CheckedInAt")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<double?>("Confidence")
+                                .HasColumnType("double");
+
+                            b1.Property<string>("Status")
+                                .IsRequired()
+                                .HasColumnType("longtext");
+
+                            b1.Property<Guid>("StudentId")
+                                .HasColumnType("char(36)");
+
+                            b1.HasKey("AttendanceSessionId", "Id");
+
+                            b1.HasIndex("StudentId");
+
+                            b1.HasIndex("AttendanceSessionId", "StudentId")
+                                .IsUnique();
+
+                            b1.ToTable("attendance_records", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AttendanceSessionId");
+                        });
+
+                    b.Navigation("Records");
                 });
 
             modelBuilder.Entity("attendance_service.Domain.Aggregates.CourseSection.CourseSection", b =>
