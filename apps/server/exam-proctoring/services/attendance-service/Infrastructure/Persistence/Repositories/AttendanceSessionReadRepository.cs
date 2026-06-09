@@ -68,6 +68,7 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
         )
         {
             var query = _context.AttendanceSessions
+                .AsNoTracking()
                 .Where(s => s.CourseSectionId == courseSectionId)
                 .OrderByDescending(s => s.Date)
                 .ThenByDescending(s => s.StartTime);
@@ -99,5 +100,40 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 PageSize = pageSize
             };
         }
+
+        public async Task<AttendanceSessionDetailDto?> GetAttendanceSessionByIdAsync(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken = default
+        )
+        => await _context.AttendanceSessions
+            .AsNoTracking()
+            .Where(s => s.Id == attendanceSessionId)
+            .Select(s => new AttendanceSessionDetailDto(
+                s.Id,
+                s.Date,
+                s.StartTime,
+                s.EndTime,
+                s.Status,
+                s.Records.Count(r => r.Status == AttendanceRecordStatus.Present),
+                s.Records.Count(r => r.Status == AttendanceRecordStatus.Absent),
+                s.Records.Count == 0
+                    ? 0.0
+                    : s.Records.Count(r => r.Status == AttendanceRecordStatus.Present) * 100.0 / s.Records.Count
+
+            ))
+            .FirstOrDefaultAsync(cancellationToken);
+
+        public async Task<Dictionary<Guid, AttendanceRecordDto>> GetAttendanceRecordsBySessionIdAsync(Guid attendanceSessionId, CancellationToken cancellationToken = default)
+        => await _context.AttendanceSessions
+            .AsNoTracking()
+            .Where(r => r.Id == attendanceSessionId)
+            .SelectMany(s => s.Records)
+            .Select(r => new AttendanceRecordDto(
+                r.StudentId,
+                r.Status,
+                r.Confidence,
+                r.CheckedInAt
+            ))
+            .ToDictionaryAsync(r => r.StudentId, cancellationToken: cancellationToken);
     }
 }

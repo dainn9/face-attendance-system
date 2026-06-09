@@ -1,6 +1,8 @@
 using attendance_service.API.Contracts.AttendanceSessions;
+using attendance_service.Application.Contracts.AttendanceSession;
 using attendance_service.Application.Features.Attendances.Commands.CloseAttendanceSession;
 using attendance_service.Application.Features.Attendances.Commands.CreateAttendanceSession;
+using attendance_service.Application.Features.Attendances.Queries.GetAttendanceSessionById;
 using BuildingBlocks.Extensions;
 using BuildingBlocks.Results;
 using MediatR;
@@ -55,6 +57,23 @@ namespace attendance_service.API.Controllers
             await _mediator.Send(command, cancellationToken);
 
             return NoContent();
+        }
+
+        // GET: api/v1/attendance-sessions/{attendanceSessionId}
+        [HttpGet("{attendanceSessionId:guid}")]
+        public async Task<IActionResult> GetAttendanceSessionById(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetAttendanceSessionByIdQuery(attendanceSessionId);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<AttendanceSessionDetailDto>
+            {
+                Success = true,
+                Message = "Attendance session retrieved successfully",
+                Data = result
+            });
         }
     }
 }

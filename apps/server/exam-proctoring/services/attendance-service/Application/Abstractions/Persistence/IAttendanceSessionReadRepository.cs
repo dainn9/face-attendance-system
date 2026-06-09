@@ -17,5 +17,15 @@ namespace attendance_service.Application.Abstractions.Persistence
             int pageSize,
             CancellationToken cancellationToken = default
         );
+
+        Task<AttendanceSessionDetailDto?> GetAttendanceSessionByIdAsync(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken = default
+        );
+
+        Task<Dictionary<Guid, AttendanceRecordDto>> GetAttendanceRecordsBySessionIdAsync(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken = default
+        );
     }
 }
