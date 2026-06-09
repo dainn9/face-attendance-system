@@ -34,7 +34,9 @@ namespace attendance_service.Application.Features.Attendances.Commands.CloseAtte
 
             var studentIds = await _courseSectionReadRepository.GetEnrollmentStudentIdsAsync(attendanceSession.CourseSectionId, cancellationToken);
 
-            var now = _clock.UtcNow;
+            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
+                _clock.UtcNow,
+                "SE Asia Standard Time");
             attendanceSession.Close(now);
             attendanceSession.MarkAbsentStudents(studentIds, now);
 

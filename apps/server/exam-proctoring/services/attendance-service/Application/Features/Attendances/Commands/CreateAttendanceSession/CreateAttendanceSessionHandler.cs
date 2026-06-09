@@ -41,7 +41,9 @@ namespace attendance_service.Application.Features.Attendances.Commands.CreateAtt
                     ErrorCodes.CourseSectionHasNoEnrollments
                 );
 
-            var now = _clock.UtcNow;
+            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
+                _clock.UtcNow,
+                "SE Asia Standard Time");
             var currentTime = TimeOnly.FromDateTime(now);
             var today = now.DayOfWeek;
 
