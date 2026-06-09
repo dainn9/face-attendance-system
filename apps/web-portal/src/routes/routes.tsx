@@ -28,7 +28,6 @@ export const routes = [
                         element: <RoleRoute allowedRoles={["lecturer"]} />,
                         children: [
                             { path: "lecturer", element: <LecturerCourseDashboardPage /> },
-                            { path: "lecturer/attendance-history", element: <LecturerAttendanceHistoryPage /> },
                             { path: "lecturer/courses/:courseId/attendance-history", element: <LecturerAttendanceHistoryPage /> },
                             { path: "lecturer/courses/:courseId", element: <LecturerCourseDetailPage /> },
                             { path: "lecturer/courses/:courseId/session", element: <LecturerAttendanceSessionPage /> },
