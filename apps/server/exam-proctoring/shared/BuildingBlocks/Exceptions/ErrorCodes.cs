@@ -64,6 +64,8 @@ namespace BuildingBlocks.Exceptions
         public const string CourseSectionDeactivated = "COURSE_SECTION_DEACTIVATED";
         public const string CourseSectionCodeAlreadyExists = "COURSE_SECTION_CODE_ALREADY_EXISTS";
         public const string CourseSectionMustHaveSchedule = "COURSE_SECTION_MUST_HAVE_SCHEDULE";
+        public const string CourseSectionHasNoEnrollments = "COURSE_SECTION_HAS_NO_ENROLLMENTS";
+        public const string CourseSectionScheduleNotMatched = "COURSE_SECTION_SCHEDULE_NOT_MATCHED";
 
         // ======= ENROLLMENT =======
         public const string InvalidEnrollmentData = "INVALID_ENROLLMENT_DATA";
@@ -75,6 +77,7 @@ namespace BuildingBlocks.Exceptions
 
         // ======= ATTENDANCE SESSION =======
         public const string InvalidAttendanceSessionData = "INVALID_ATTENDANCE_SESSION_DATA";
+        public const string AttendanceSessionAlreadyOpen = "ATTENDANCE_SESSION_ALREADY_OPEN";
 
         // ======= ATTENDANCE RECORD =======
         public const string InvalidAttendanceRecordData = "INVALID_ATTENDANCE_RECORD_DATA";

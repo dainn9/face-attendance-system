@@ -17,5 +17,12 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
         => _context.CourseSections
             .Include(cs => cs.Enrollments)
             .FirstOrDefaultAsync(cs => cs.Id == courseSectionId, cancellationToken);
+
+        public async Task<CourseSection?> GetByIdAsync(Guid courseSectionId, CancellationToken cancellationToken)
+        => await _context.CourseSections
+            .AsSplitQuery()
+            .Include(cs => cs.Enrollments)
+            .Include(cs => cs.Schedules)
+            .FirstOrDefaultAsync(cs => cs.Id == courseSectionId, cancellationToken);
     }
 }

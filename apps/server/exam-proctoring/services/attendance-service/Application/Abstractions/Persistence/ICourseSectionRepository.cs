@@ -6,5 +6,6 @@ namespace attendance_service.Application.Abstractions.Persistence
     {
         void Add(CourseSection courseSection);
         Task<CourseSection?> GetWithEnrollmentsByIdAsync(Guid courseSectionId, CancellationToken cancellationToken);
+        Task<CourseSection?> GetByIdAsync(Guid courseSectionId, CancellationToken cancellationToken);
     }
 }

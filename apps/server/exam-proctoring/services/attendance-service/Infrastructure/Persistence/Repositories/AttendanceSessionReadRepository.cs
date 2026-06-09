@@ -26,20 +26,37 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 Where(s => s.CourseSectionId == courseSectionId && s.Status == AttendanceSessionStatus.Closed)
                 .CountAsync(cancellationToken);
 
-            return await _context.AttendanceSessions
+            var presentCounts = await _context.AttendanceSessions
                 .Where(s => s.CourseSectionId == courseSectionId && s.Status == AttendanceSessionStatus.Closed)
                 .SelectMany(s => s.Records)
                 .Where(r => ids.Contains(r.StudentId) && r.Status == AttendanceRecordStatus.Present)
                 .GroupBy(r => r.StudentId)
-                .Select(g => new StudentAttendanceSummaryDto(
-                    g.Key,
-                    g.Count(),
-                    totalSessions,
-                    totalSessions > 0
-                        ? Math.Round(g.Count() * 100.0 / totalSessions, 2)
-                        : 0
-                ))
-                .ToDictionaryAsync(s => s.StudentId, cancellationToken);
+                .Select(g => new
+                {
+                    StudentId = g.Key,
+                    PresentSessions = g.Count()
+                })
+                .ToDictionaryAsync(x => x.StudentId, x => x.PresentSessions, cancellationToken);
+
+            return ids.ToDictionary(
+                studentId => studentId,
+                studentId =>
+                {
+                    var present = presentCounts.GetValueOrDefault(studentId);
+
+                    return new StudentAttendanceSummaryDto(
+                        studentId,
+                        present,
+                        totalSessions,
+                        totalSessions > 0
+                            ? Math.Round(present * 100.0 / totalSessions, 2)
+                            : 0
+                    );
+                });
         }
+
+        public async Task<bool> HasOpenSessionAsync(Guid courseSectionId, CancellationToken cancellationToken = default)
+        => await _context.AttendanceSessions
+            .AnyAsync(s => s.CourseSectionId == courseSectionId && s.Status == AttendanceSessionStatus.Open, cancellationToken);
     }
 }

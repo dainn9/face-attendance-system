@@ -5,6 +5,7 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
 {
     public class AttendanceRecord
     {
+        public Guid Id { get; private set; }
         public Guid StudentId { get; private set; }
         public Guid AttendanceSessionId { get; private set; }
         public AttendanceRecordStatus Status { get; private set; }
@@ -24,6 +25,7 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
 
             return new AttendanceRecord
             {
+                Id = Guid.NewGuid(),
                 AttendanceSessionId = attendanceSessionId,
                 StudentId = studentId,
                 Status = AttendanceRecordStatus.Present,
@@ -43,6 +45,7 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
 
             return new AttendanceRecord
             {
+                Id = Guid.NewGuid(),
                 AttendanceSessionId = attendanceSessionId,
                 StudentId = studentId,
                 Status = AttendanceRecordStatus.Late,
@@ -59,6 +62,7 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
 
             return new AttendanceRecord
             {
+                Id = Guid.NewGuid(),
                 AttendanceSessionId = attendanceSessionId,
                 StudentId = studentId,
                 Status = AttendanceRecordStatus.Absent,

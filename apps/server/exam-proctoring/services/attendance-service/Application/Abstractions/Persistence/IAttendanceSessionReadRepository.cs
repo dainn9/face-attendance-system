@@ -8,5 +8,7 @@ namespace attendance_service.Application.Abstractions.Persistence
             Guid courseSectionId,
             IEnumerable<Guid> studentIds,
             CancellationToken cancellationToken = default);
+
+        Task<bool> HasOpenSessionAsync(Guid courseSectionId, CancellationToken cancellationToken = default);
     }
 }
