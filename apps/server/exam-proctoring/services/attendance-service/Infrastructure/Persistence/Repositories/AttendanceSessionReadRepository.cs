@@ -1,6 +1,7 @@
 using attendance_service.Application.Abstractions.Persistence;
 using attendance_service.Application.Contracts.AttendanceSession;
 using attendance_service.Domain.Enums;
+using BuildingBlocks.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace attendance_service.Infrastructure.Persistence.Repositories
@@ -58,5 +59,45 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
         public async Task<bool> HasOpenSessionAsync(Guid courseSectionId, CancellationToken cancellationToken = default)
         => await _context.AttendanceSessions
             .AnyAsync(s => s.CourseSectionId == courseSectionId && s.Status == AttendanceSessionStatus.Open, cancellationToken);
+
+        public async Task<PagedResult<AttendanceSessionHistoryDto>> GetAttendanceSessionHistoryAsync(
+            Guid courseSectionId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var query = _context.AttendanceSessions
+                .Where(s => s.CourseSectionId == courseSectionId)
+                .OrderByDescending(s => s.Date)
+                .ThenByDescending(s => s.StartTime);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(s => new AttendanceSessionHistoryDto(
+                    s.Id,
+                    s.Date,
+                    s.StartTime,
+                    s.EndTime,
+                    s.Status,
+                    s.Records.Count(r => r.Status == AttendanceRecordStatus.Present),
+                    s.Records.Count(r => r.Status == AttendanceRecordStatus.Absent),
+                    s.Records.Count == 0
+                        ? 0.0
+                        : s.Records.Count(r => r.Status == AttendanceRecordStatus.Present) * 100.0 / s.Records.Count
+                ))
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<AttendanceSessionHistoryDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
     }
 }
