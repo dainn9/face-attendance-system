@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { AxiosRequestConfig } from "axios";
 import { ApiError, NotFoundError, UnauthorizedError, ValidationError } from "./errors";
 import { API_ENDPOINTS } from "./endpoints";
 import { ERROR_CODE } from "../constants/error-code";
@@ -15,9 +16,13 @@ export const api = axios.create({
 let isRefreshing = false
 let failedQueue: { resolve: (v: unknown) => void; reject: (e: unknown) => void }[] = []
 
-const processQueue = (error: any) => {
+const processQueue = (error: unknown) => {
     failedQueue.forEach((p) => {
-        error ? p.reject(error) : p.resolve(true)
+        if (error) {
+            p.reject(error)
+        } else {
+            p.resolve(true)
+        }
     })
     failedQueue = []
 }
@@ -34,22 +39,26 @@ api.interceptors.response.use(
             throw new ApiError(0, "Unknown error")
         }
 
-        const originalRequest: any = error.config
+        const originalRequest = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined
         const status = error.response?.status
         const data = error.response?.data
 
         // Tránh loop refresh
-        if (originalRequest._retry) {
+        if (originalRequest?._retry) {
             return Promise.reject(error);
         }
 
-        if (originalRequest.url?.includes(API_ENDPOINTS.AUTH.REFRESH)) {
+        if (originalRequest?.url?.includes(API_ENDPOINTS.AUTH.REFRESH)) {
             processQueue(new UnauthorizedError());
             isRefreshing = false;
             return Promise.reject(new UnauthorizedError());
         }
         // HANDLE 401 + REFRESH TOKEN
         if (status === 401 && data?.errorCode === ERROR_CODE.Token_Expired) {
+            if (!originalRequest) {
+                return Promise.reject(new UnauthorizedError());
+            }
+
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });

@@ -1,5 +1,6 @@
 import { api } from "../../../shared/api/client";
 import { API_ENDPOINTS } from "../../../shared/api/endpoints";
+import type { ApiResponse, Me } from "../../../shared/api/types";
 
 export const authApi = {
     login: (data: { email: string; password: string }) =>
@@ -7,5 +8,5 @@ export const authApi = {
 
     logout: () => api.post(API_ENDPOINTS.AUTH.LOGOUT),
 
-    getMe: () => api.get(API_ENDPOINTS.AUTH.ME),
+    getMe: () => api.get<unknown, ApiResponse<Me>>(API_ENDPOINTS.AUTH.ME),
 }

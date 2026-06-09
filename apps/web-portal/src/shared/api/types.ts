@@ -14,3 +14,9 @@ export interface PagedResult<T> {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
 }
+
+export interface Me {
+    id: string;
+    email: string;
+    role: string;
+}
