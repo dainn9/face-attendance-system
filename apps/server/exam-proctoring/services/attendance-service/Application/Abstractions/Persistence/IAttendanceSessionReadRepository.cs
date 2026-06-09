@@ -1,4 +1,5 @@
 using attendance_service.Application.Contracts.AttendanceSession;
+using BuildingBlocks.Results;
 
 namespace attendance_service.Application.Abstractions.Persistence
 {
@@ -10,5 +11,11 @@ namespace attendance_service.Application.Abstractions.Persistence
             CancellationToken cancellationToken = default);
 
         Task<bool> HasOpenSessionAsync(Guid courseSectionId, CancellationToken cancellationToken = default);
+        Task<PagedResult<AttendanceSessionHistoryDto>> GetAttendanceSessionHistoryAsync(
+            Guid courseSectionId,
+            int page,
+            int pageSize,
+            CancellationToken cancellationToken = default
+        );
     }
 }

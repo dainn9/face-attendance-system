@@ -1,5 +1,8 @@
+using attendance_service.API.Contracts.AttendanceSessions;
 using attendance_service.API.Contracts.CourseSections;
 using attendance_service.Application.Contracts;
+using attendance_service.Application.Contracts.AttendanceSession;
+using attendance_service.Application.Features.Attendances.Queries.GetAttendanceSessionHistory;
 using attendance_service.Application.Features.CourseSections.Queries.GetCoureseSectionPagedByLecturerId;
 using attendance_service.Application.Features.CourseSections.Queries.GetLecturerCourseSectionLookup;
 using BuildingBlocks.Extensions;
@@ -45,6 +48,7 @@ namespace attendance_service.API.Controllers
             });
         }
 
+        // GET: api/v1/lecturer/course-sections/lookup
         [HttpGet("lookup")]
         public async Task<IActionResult> GetLookup(CancellationToken cancellationToken)
         {
@@ -57,6 +61,29 @@ namespace attendance_service.API.Controllers
             {
                 Success = true,
                 Message = "Course section lookup retrieved successfully",
+                Data = result
+            });
+        }
+
+        // GET: api/v1/lecturer/course-sections/{courseSectionId}/attendance-sessions
+        [HttpGet("{courseSectionId:guid}/attendance-sessions")]
+        public async Task<IActionResult> GetAttendanceSessionHistory(
+            Guid courseSectionId,
+            [FromQuery] GetAttendanceSessionHistoryRequest request,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(
+                new GetAttendanceSessionHistoryQuery(
+                    courseSectionId,
+                    request.Page,
+                    request.PageSize
+                ),
+                cancellationToken);
+
+            return Ok(new ApiResponse<PagedResult<AttendanceSessionHistoryDto>>
+            {
+                Success = true,
+                Message = "Attendance session history retrieved successfully",
                 Data = result
             });
         }
