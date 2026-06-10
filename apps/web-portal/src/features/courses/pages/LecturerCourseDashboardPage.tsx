@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useProfileDetail } from "../../profile/hooks/profile.query";
 import { getInitials } from "../../../shared/utils/getInitials";
-import { lecturer } from "../data/mockCourses";
 import {
     useLecturerCourseSectionLookup,
     useLecturerCourseSections,
@@ -59,6 +58,9 @@ const LecturerCourseDashboardPage = () => {
     });
     const coursePage = courseSectionsQuery.data;
     const courseSections = coursePage?.items ?? [];
+    const selectedSemesterLabel =
+        selectedLookup?.label ??
+        (lookupQuery.isLoading ? "Dang tai hoc ky..." : "Chua co hoc ky");
     const activeCount = courseSections.filter(
         (course) => course.isActive,
     ).length;
@@ -73,10 +75,10 @@ const LecturerCourseDashboardPage = () => {
                 <div>
                     <h1 className="text-xl font-semibold text-gray-900">
                         Lớp học của tôi -{" "}
-                        {selectedLookup?.label ?? lecturer.semester}
+                        {selectedSemesterLabel}
                     </h1>
                     <p className="mt-1 text-sm text-gray-500">
-                        {lecturer.semester}
+                        {selectedSemesterLabel}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -140,7 +142,7 @@ const LecturerCourseDashboardPage = () => {
                     [
                         "Tổng lớp học",
                         coursePage?.totalCount ?? 0,
-                        selectedLookup?.label ?? lecturer.semester,
+                        selectedSemesterLabel,
                     ],
                 ].map(([label, value, sub]) => (
                     <div
@@ -158,7 +160,7 @@ const LecturerCourseDashboardPage = () => {
 
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                 {coursePage?.totalCount ?? 0} lop hoc -{" "}
-                {selectedLookup?.label ?? lecturer.semester}
+                {selectedSemesterLabel}
             </p>
 
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
