@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toastEmitter } from "../../../shared/utils/toastEmitter";
+import { useStartAttendanceSession } from "../../attendance/hooks/attendance.mutation";
 import { useAttendanceSessionHistory } from "../../attendance/hooks/attendance.query";
 import {
     useCourseDetail,
@@ -23,9 +25,19 @@ const getInitials = (name: string) =>
         .join("")
         .toUpperCase();
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+    if (error instanceof Error && error.message) {
+        return error.message;
+    }
+
+    return fallback;
+};
+
 const LecturerCourseDetailPage = () => {
     const { courseId } = useParams();
     const [page, setPage] = useState(1);
+    const [isStartConfirmOpen, setIsStartConfirmOpen] = useState(false);
+    const startAttendanceSessionMutation = useStartAttendanceSession();
     const courseDetailQuery = useCourseDetail(courseId);
     const courseStudentsQuery = useLecturerCourseStudents(courseId, {
         page,
@@ -59,6 +71,22 @@ const LecturerCourseDetailPage = () => {
     const statusLabel = course.isActive ? "Hoạt động" : "Đã kết thúc";
     const semesterLabel = `${formatSemester(course.semester)} ${course.academicYear}`;
     const attendanceHistoryPath = `/lecturer/courses/${course.id}/attendance-history`;
+    const handleStartAttendanceSession = () => {
+        startAttendanceSessionMutation.mutate(course.id, {
+            onSuccess: () => {
+                setIsStartConfirmOpen(false);
+                toastEmitter.success("Đã tạo phiên điểm danh.");
+            },
+            onError: (error) => {
+                toastEmitter.error(
+                    getErrorMessage(
+                        error,
+                        "Không thể tạo phiên điểm danh. Vui lòng thử lại.",
+                    ),
+                );
+            },
+        });
+    };
 
     return (
         <div className="space-y-5">
@@ -93,12 +121,14 @@ const LecturerCourseDetailPage = () => {
                     >
                         Lịch sử điểm danh
                     </Link>
-                    <Link
-                        to={`/lecturer/courses/${course.id}/session`}
+                    <button
+                        type="button"
+                        onClick={() => setIsStartConfirmOpen(true)}
                         className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
+                        disabled={startAttendanceSessionMutation.isPending}
                     >
                         Tạo buổi điểm danh
-                    </Link>
+                    </button>
                 </div>
             </div>
 
@@ -326,6 +356,45 @@ const LecturerCourseDetailPage = () => {
                     ))}
                 </div>
             </section>
+
+            {isStartConfirmOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                    <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-lg">
+                        <h2 className="text-base font-semibold text-gray-900">
+                            Tạo phiên điểm danh?
+                        </h2>
+                        <p className="mt-2 text-sm text-gray-500">
+                            Hệ thống sẽ tạo phiên điểm danh mới cho lớp{" "}
+                            {course.courseSectionCode} và chuyển sang màn hình
+                            theo dõi điểm danh.
+                        </p>
+                        <div className="mt-5 flex justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setIsStartConfirmOpen(false)}
+                                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700"
+                                disabled={
+                                    startAttendanceSessionMutation.isPending
+                                }
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleStartAttendanceSession}
+                                className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
+                                disabled={
+                                    startAttendanceSessionMutation.isPending
+                                }
+                            >
+                                {startAttendanceSessionMutation.isPending
+                                    ? "Đang tạo..."
+                                    : "Tạo phiên"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

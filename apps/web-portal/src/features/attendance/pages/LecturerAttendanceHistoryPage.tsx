@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaEye } from "react-icons/fa";
 import { Link, useParams } from "react-router-dom";
 import { useCourseDetail } from "../../courses/hooks/course.query";
 import {
@@ -153,6 +154,9 @@ const LecturerAttendanceHistoryPage = () => {
                                 <th className="px-5 py-3 font-medium">
                                     Trạng thái
                                 </th>
+                                <th className="px-5 py-3 font-medium">
+                                    Thao tác
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -160,7 +164,7 @@ const LecturerAttendanceHistoryPage = () => {
                                 <tr>
                                     <td
                                         className="px-5 py-8 text-center text-gray-500"
-                                        colSpan={7}
+                                        colSpan={8}
                                     >
                                         Dang tai lich su diem danh...
                                     </td>
@@ -171,7 +175,7 @@ const LecturerAttendanceHistoryPage = () => {
                                     <tr>
                                         <td
                                             className="px-5 py-8 text-center text-gray-500"
-                                            colSpan={7}
+                                            colSpan={8}
                                         >
                                             Chua co phien diem danh nao cho lop
                                             nay.
@@ -219,6 +223,15 @@ const LecturerAttendanceHistoryPage = () => {
                                                 item.status,
                                             )}
                                         </span>
+                                    </td>
+                                    <td className="px-5 py-3">
+                                        <Link
+                                            to={`/lecturer/courses/${courseId}/attendance-sessions/${item.id}`}
+                                            className="inline-flex size-8 items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                            title="Xem lại"
+                                        >
+                                            <FaEye />
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}
