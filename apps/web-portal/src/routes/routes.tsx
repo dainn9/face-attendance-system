@@ -29,6 +29,7 @@ export const routes = [
                         children: [
                             { path: "lecturer", element: <LecturerCourseDashboardPage /> },
                             { path: "lecturer/courses/:courseId/attendance-history", element: <LecturerAttendanceHistoryPage /> },
+                            { path: "lecturer/courses/:courseId/attendance-sessions/:sessionId", element: <LecturerAttendanceSessionPage /> },
                             { path: "lecturer/courses/:courseId", element: <LecturerCourseDetailPage /> },
                             { path: "lecturer/courses/:courseId/session", element: <LecturerAttendanceSessionPage /> },
                         ],

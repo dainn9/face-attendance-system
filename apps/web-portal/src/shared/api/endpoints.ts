@@ -22,6 +22,13 @@ export const API_ENDPOINTS = {
 
     ATTENDANCE: {
         SESSION_HISTORY: (courseSectionId: string) => `${ATTENDANCE_PREFIX}/lecturer/course-sections/${courseSectionId}/attendance-sessions`,
+        SESSION_DETAIL: (attendanceSessionId: string) => `${ATTENDANCE_PREFIX}/attendance-sessions/${attendanceSessionId}`,
+        SESSION_STUDENTS: (
+            courseSectionId: string
+            ,attendanceSessionId: string
+        ) => `${API_PREFIX}/lecturer/course-sections/${courseSectionId}/attendance-sessions/${attendanceSessionId}/students`,
+        CLOSE_SESSION: (attendanceSessionId: string) => `${ATTENDANCE_PREFIX}/attendance-sessions/${attendanceSessionId}/close`,
+        CREATE_SESSION: `${ATTENDANCE_PREFIX}/attendance-sessions`,
     },
 
     USER: {
