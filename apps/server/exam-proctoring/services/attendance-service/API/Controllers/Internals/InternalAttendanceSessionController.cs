@@ -1,6 +1,7 @@
+using attendance_service.API.Contracts.AttendanceSessions;
 using attendance_service.Application.Contracts.AttendanceSession;
+using attendance_service.Application.Features.Attendances.Commands.CheckInAttendance;
 using attendance_service.Application.Features.Attendances.Queries.GetAttendanceRecords;
-using attendance_service.Application.Features.Attendances.Queries.GetAttendanceSessionById;
 using BuildingBlocks.Results;
 using BuildingBlocks.Security.Internal;
 using MediatR;
@@ -32,6 +33,28 @@ namespace attendance_service.API.Controllers.Internals
                 Success = true,
                 Message = "Attendance records retrieved successfully",
                 Data = result
+            });
+        }
+
+        // POST: api/v1/internal/attendance-sessions/{attendanceSessionId}/check-in
+        [HttpPost("{attendanceSessionId:guid}/check-in")]
+        public async Task<IActionResult> CheckInAttendance(
+            Guid attendanceSessionId,
+            [FromBody] CheckInAttendanceRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new CheckInAttendanceCommand(
+                AttendanceSessionId: attendanceSessionId,
+                StudentId: request.StudentId,
+                Confidence: request.Confidence
+            );
+
+            await _mediator.Send(command, cancellationToken);
+
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Student checked in successfully",
             });
         }
     }
