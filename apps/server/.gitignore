@@ -86,3 +86,5 @@ docker-compose.yml
 !Dockerfile.user
 
 data/uploads
+
+*.md

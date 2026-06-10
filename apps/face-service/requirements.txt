@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+insightface
+opencv-python-headless
+numpy
+python-multipart
+pydantic-settings
+onnxruntime
+torch 
+torchvision
+pymilvus

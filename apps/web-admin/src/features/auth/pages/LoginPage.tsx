@@ -1,0 +1,131 @@
+import { useState } from "react";
+import { useLogin } from "../hooks/auth.mutation";
+import { Link } from "react-router-dom";
+import { ValidationError } from "../../../shared/api/errors";
+import Spinner from "../../../shared/components/Spinner/Spinner";
+
+const LoginPage = () => {
+    const { mutate, isPending, error } = useLogin();
+
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        mutate(formData);
+    };
+
+    return (
+        <div>
+            <section className="bg-gray-50 dark:bg-gray-900 w-screen min-h-screen">
+                <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                    <div className="w-full md:max-w-112.5 bg-white rounded-lg shadow dark:border md:mt-0 xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+                        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+                            <h1 className="text-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                                Login to your account
+                            </h1>
+                            <form
+                                className="space-y-4 md:space-y-6"
+                                onSubmit={handleSubmit}
+                            >
+                                {error &&
+                                    !(error instanceof ValidationError) && (
+                                        <div className="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
+                                            {error.message}
+                                        </div>
+                                    )}
+                                <div>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        autoComplete="email"
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                email: e.target.value,
+                                            })
+                                        }
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Password
+                                    </label>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={formData.password}
+                                        autoComplete="password"
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                password: e.target.value,
+                                            })
+                                        }
+                                        placeholder="••••••••"
+                                        required
+                                        className={`
+                                            block
+                                            w-full
+                                            rounded-lg
+                                            border
+                                            p-2.5
+                                            text-gray-900
+                                            outline-none
+                                        ${
+                                            error instanceof ValidationError &&
+                                            error.get("password")
+                                                ? `
+                                                    border-red-400
+                                                    bg-red-50
+                                                    focus:border-red-500
+                                                `
+                                                : `
+                                                    border-gray-300
+                                                    bg-gray-50
+                                                    focus:border-blue-500
+                                                `
+                                        }
+                                    `}
+                                    />
+                                    {error instanceof ValidationError &&
+                                        error.get("password") && (
+                                            <p className="mt-1 text-xs text-red-500">
+                                                {error.get("password")}
+                                            </p>
+                                        )}
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full md:text-xl bg-blue-400 text-white hover:bg-blue-300 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg px-5 py-2.5 cursor-pointer"
+                                    disabled={isPending}
+                                >
+                                    {isPending ? <Spinner /> : "Log in"}
+                                </button>
+                                <div className="text-center">
+                                    <Link
+                                        to="/forgot"
+                                        className="text-blue-400 hover:underline cursor-pointer"
+                                    >
+                                        Forgotten password?
+                                    </Link>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+};
+
+export default LoginPage;

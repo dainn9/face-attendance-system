@@ -1,4 +1,8 @@
 <Solution>
+  <Project Path="services/api-gateway/api-gateway.csproj" Id="fe5dd69b-5eb9-4d28-9dc3-324cce2440ac" />
+  <Project Path="services/attendance-service/attendance-service.csproj" Id="63431085-9d24-4474-8b47-b9092d9c6af8" />
   <Project Path="services/auth-service/auth-service.csproj" Id="0c0a5154-22da-4b17-b46c-545dcd7f5ce6" />
   <Project Path="services/user-service/user-service.csproj" Id="6399d14b-a970-4f67-a2cd-e84c52497d64" />
+  <Project Path="shared/BuildingBlocks/BuildingBlocks.csproj" Id="50608688-3bb6-4ddd-870a-348949771fb5" />
+  <Project Path="shared/SharedKernel/SharedKernel.csproj" Id="c5184cc6-0f31-42df-97d4-79b0a910f351" />
 </Solution>
