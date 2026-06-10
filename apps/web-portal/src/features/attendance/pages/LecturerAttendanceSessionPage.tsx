@@ -178,8 +178,8 @@ const LecturerAttendanceSessionPage = () => {
                     {pageTitle}
                 </h1>
                 <p className="mt-1 text-sm text-gray-500">
-                    {course?.subjectName ?? "Cau truc du lieu va giai thuat"} -{" "}
-                    {course?.courseSectionCode ?? "CTDL-01"} -{" "}
+                    {course?.subjectName ?? "Dang tai lop hoc"} -{" "}
+                    {course?.courseSectionCode ?? "-"} -{" "}
                     {formatDate(sessionDate)} -{" "}
                     {formatTimeToMinute(sessionStartTime)} -{" "}
                     {displayEndTime
@@ -209,13 +209,13 @@ const LecturerAttendanceSessionPage = () => {
                         "text-gray-900",
                     ],
                     [
-                        "Ti le",
+                        "Tỷ lệ",
                         `${percentage}%`,
                         "đã điểm danh",
                         "text-gray-900",
                     ],
                     [
-                        "Trang thai",
+                        "Trạng thái",
                         getAttendanceSessionStatusLabel(
                             attendanceSession?.status ?? 1,
                         ),
@@ -335,7 +335,7 @@ const LecturerAttendanceSessionPage = () => {
                                 ? "Danh sách điểm danh"
                                 : "Danh sách điểm danh real-time"}
                         </h2>
-                        <div className="flex gap-2">
+                        {/* <div className="flex gap-2">
                             <select className="rounded-md border border-gray-300 px-2 py-1.5 text-xs">
                                 <option>Tất cả</option>
                                 <option>Đã điểm danh</option>
@@ -345,13 +345,13 @@ const LecturerAttendanceSessionPage = () => {
                                 className="w-40 rounded-md border border-gray-300 px-2 py-1.5 text-xs"
                                 placeholder="Tìm sinh viên..."
                             />
-                        </div>
+                        </div> */}
                     </div>
                     <table className="w-full text-left text-sm">
                         <thead className="bg-gray-50 text-xs text-gray-500">
                             <tr>
                                 <th className="px-5 py-3 font-medium">
-                                    Sinh vien
+                                    Sinh viên
                                 </th>
                                 <th className="px-5 py-3 font-medium">MSSV</th>
                                 <th className="px-5 py-3 font-medium">
