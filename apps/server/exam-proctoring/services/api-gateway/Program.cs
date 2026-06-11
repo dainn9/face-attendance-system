@@ -54,6 +54,13 @@ builder.Services.AddHttpClient<AttendanceClient>(
             client,
             "AttendanceService"));
 
+builder.Services.AddHttpClient<FaceClient>(
+    (sp, client) =>
+        ConfigureInternalClient(
+            sp,
+            client,
+            "FaceService"));
+
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
     {
@@ -83,12 +90,17 @@ using var rsa = RSA.Create();
 rsa.ImportFromPem(publicPem);
 
 // CORS Configuration
+
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173", "http://localhost:3001")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
