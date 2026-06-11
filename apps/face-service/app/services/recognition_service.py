@@ -203,4 +203,13 @@ class RecognitionService:
             "match": best_score >= self.threshold,
             "score": round(best_score, 4)
         }
+
+    def exists(self, user_id: str) -> bool:
+        """Kiểm tra xem user_id đã tồn tại trong database chưa."""
+        results = self.collection.query(
+            expr=f'user_id == "{user_id}"',
+            output_fields=["user_id"],
+            limit=1,
+        )
+        return len(results) > 0
      
