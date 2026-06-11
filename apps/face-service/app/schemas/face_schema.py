@@ -1,13 +1,5 @@
 from pydantic import BaseModel
-from typing import List
-
-class FaceImageItem(BaseModel):
-    pose: str
-    image: str
-
-class FaceRegisterRequest(BaseModel):
-    user_id: str
-    images: List[FaceImageItem]
+from typing import List, Literal
 
 class FaceIdentifyRequest(BaseModel):
     image: str

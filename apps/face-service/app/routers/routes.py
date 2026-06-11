@@ -1,5 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
-from app.schemas.face_schema import FaceIdentifyRequest, FaceRegisterRequest
+import numpy as np
+import cv2
+from fastapi import APIRouter, Depends, File, Form, UploadFile
+from app.core.face_app import face_app
+from app.core.exceptions import AppException
+from app.core.responses import success_response
+from app.schemas.face_schema import FaceIdentifyRequest
+from app.utils.face_register_validator import validate_face_register_images
 from app.utils.image import base64_to_image
 from app.services.recognition_service import RecognitionService
 from app.services.detector_service import detect_faces
@@ -22,46 +28,72 @@ svc = RecognitionService(
 
 @router.post("/register")
 async def register_face(
-    req: FaceRegisterRequest,
+    user_id: str = Form(...),
+    left: UploadFile = File(...),
+    center: UploadFile = File(...),
+    right: UploadFile = File(...),
     _: None = Depends(verify_api_key)
 ):
     
-    registered = []
-
+    if svc.exists(user_id):
+        raise AppException(
+            409,
+            "FACE_ALREADY_REGISTERED",
+            "Face already registered"
+        )
+    
     try:
-        for item in req.images:
-            # Chuyển base64 sang ảnh OpenCV
-            img = base64_to_image(item.image)
+        images_by_pose = {}
 
-            # Phát hiện khuôn mặt
-            # Nếu không phát hiện được khuôn mặt nào hoặc phát hiện nhiều hơn 1 khuôn mặt, trả về lỗi
-            faces = detect_faces(img, mode="single")
-            if not faces:
-                raise HTTPException(
+        files = {
+                    "left": left,
+                    "center": center,
+                    "right": right,
+                }
+
+        # 1. Decode đủ 3 ảnh trước
+        for pose, file in files.items():
+            contents = await file.read()
+
+            img = cv2.imdecode(
+                np.frombuffer(contents, np.uint8),
+                cv2.IMREAD_COLOR
+            )
+
+            if img is None:
+                raise AppException(
                     status_code=422,
-                    detail=f"No face detected in pose '{item.pose}'"
+                    code="INVALID_IMAGE",
+                    message=f"Invalid image for pose {pose}"
                 )
 
-            face_crop = faces[0]["crop"]     
-            ## Đăng ký khuôn mặt vào hệ thống
-            svc.register(user_id=req.user_id, pose=item.pose, img=face_crop)
+            images_by_pose[pose] = img
 
-            registered.append(item.pose)
+         # 2. Sau đó mới validate toàn bộ 3 ảnh
+        validated = validate_face_register_images(
+            face_app,
+            images_by_pose
+        )
 
-    except HTTPException:
+    # 3. Register
+        registered = []
+
+        for pose in ["left", "center", "right"]:
+            svc.register(
+                user_id=user_id,
+                pose=pose,
+                img=validated[pose]["crop"]
+            )
+
+            registered.append(pose)
+
+    except AppException:
         raise
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
     
-    return {
-        "success": True,
-        "message": "Face registered successfully",
-        "result": {
-            "user_id": req.user_id,
-            "registered_poses": registered,
-        }
-    }
+    return None
 
 @router.post("/identify")
 async def identify_face(
@@ -72,25 +104,25 @@ async def identify_face(
         img = base64_to_image(req.image)
         faces = detect_faces(img, mode="single")
         if not faces:
-            raise HTTPException(
+            raise AppException(
                 status_code=422,
-                detail="No face detected in the image"
+                code="NO_FACE_DETECTED",
+                message="No face detected in the image"
             )
         
         face_crop = faces[0]["crop"]
         result = svc.identify(img=face_crop, allowed_user_ids=req.allowed_user_ids)
 
-    except HTTPException:
+    except AppException:
         raise
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
 
-    return {
-        "success": True,
-        "result": result
-    }
-
+    return success_response(
+        message="Face identified successfully", 
+        data=result
+    )
 
 @router.delete("/remove/{user_id}")
 async def remove_face(
@@ -100,10 +132,7 @@ async def remove_face(
     try:
         svc.remove(user_id=user_id)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
 
-    return {
-        "success": True,
-        "message": "Face removed successfully"
-    }
-
+    return success_response(message="Face removed successfully")
+        
