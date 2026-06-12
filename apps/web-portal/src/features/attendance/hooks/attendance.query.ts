@@ -25,6 +25,13 @@ export const attendanceQueryKeys = {
         attendanceSessionId,
     ],
 
+    checkInInfo: (attendanceSessionId?: string) => [
+        ...attendanceQueryKeys.all,
+        "sessions",
+        "check-in-info",
+        attendanceSessionId,
+    ],
+
     getStudents: (
         courseSectionId?: string,
         attendanceSessionId?: string,
@@ -59,6 +66,19 @@ export const useAttendanceSessionDetail = (attendanceSessionId?: string) =>
         queryKey: attendanceQueryKeys.detail(attendanceSessionId),
         queryFn: () =>
             attendanceApi.getAttendanceSessionDetail(
+                attendanceSessionId as string
+            ),
+        enabled: !!attendanceSessionId,
+        placeholderData: (previousData) => previousData,
+        refetchInterval: (query) =>
+            query.state.data?.status === 1 ? openSessionRefetchIntervalMs : false,
+    });
+
+export const useAttendanceCheckInInfo = (attendanceSessionId?: string) =>
+    useQuery({
+        queryKey: attendanceQueryKeys.checkInInfo(attendanceSessionId),
+        queryFn: () =>
+            attendanceApi.getAttendanceCheckInInfo(
                 attendanceSessionId as string
             ),
         enabled: !!attendanceSessionId,

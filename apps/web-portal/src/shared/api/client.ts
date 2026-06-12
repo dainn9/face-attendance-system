@@ -90,21 +90,19 @@ api.interceptors.response.use(
 
         // MAP STATUS CODE
 
+        if (data?.errorCode === ERROR_CODE.Validation_Error) {
+            throw new ValidationError(data?.errors || {}, data?.message)
+        }
+
         switch (status) {
-            case 422:
-                throw new ValidationError(data?.errors || {})
             case 401:
                 throw new UnauthorizedError(data?.message)
             case 404:
                 throw new NotFoundError(data?.message || "Not Found")
             case 500:
-                throw new ApiError(500, data?.message || "Internal Server Error")
+                throw new ApiError(500, data?.message || "Internal Server Error", data?.errorCode)
         }
 
-        if (data?.errorCode === ERROR_CODE.Validation_Error) {
-            throw new ValidationError(data?.errors || {})
-        }
-
-        throw new ApiError(status || 0, data?.message || "API Error")
+        throw new ApiError(status || 0, data?.message || "API Error", data?.errorCode)
     }
 );

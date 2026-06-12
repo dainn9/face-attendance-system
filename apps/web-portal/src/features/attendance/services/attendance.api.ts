@@ -8,6 +8,7 @@ import type {
     AttendanceSessionStudentDto,
     AttendanceSessionStudentsRequest,
     CreateAttendanceSessionRequest,
+    AttendanceCheckInInfoDto,
 } from "../types/attendance.types";
 
 export const attendanceApi = {
@@ -56,5 +57,12 @@ export const attendanceApi = {
 
     closeAttendanceSession: async (attendanceSessionId: string) => {
         await api.post(API_ENDPOINTS.ATTENDANCE.CLOSE_SESSION(attendanceSessionId));
+    },
+
+    getAttendanceCheckInInfo: async (attendanceSessionId: string) => {
+        const res = await api.get<unknown,ApiResponse<AttendanceCheckInInfoDto>>(
+            API_ENDPOINTS.ATTENDANCE.CHECK_IN_INFO(attendanceSessionId)
+        );
+        return res.data;
     }
 };

@@ -58,3 +58,13 @@ export interface AttendanceSessionStudentDto {
 export interface CreateAttendanceSessionRequest {
     courseSectionId: string;
 }
+
+export interface AttendanceCheckInInfoDto {
+    id: string;
+    subjectName: string;
+    courseSectionCode?: string;
+    CourseSectionCode?: string;
+    date: string;
+    startTime: string;
+    status: number; //1 open session, 2 closed session
+}
