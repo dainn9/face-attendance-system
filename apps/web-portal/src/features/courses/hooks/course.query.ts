@@ -22,6 +22,12 @@ export const courseQueryKeys = {
         params?: LecturerCourseStudentsRequest
     ) => [...courseQueryKeys.all, "lecturer", "detail", courseSectionId, "students", params],
 
+    studentCourseSections: () =>
+        [...courseQueryKeys.all, "student", "sections"],
+
+    studentAttendanceRecords: (courseSectionId?: string) =>
+        [...courseQueryKeys.all, "student", "attendance-records", courseSectionId],
+
 };
 
 export const useLecturerCourseSections = (
@@ -58,3 +64,17 @@ export const useLecturerCourseStudents = (
         placeholderData: (previousData) => previousData
     });
 
+export const useStudentCourseSections = () =>
+    useQuery({
+        queryKey: courseQueryKeys.studentCourseSections(),
+        queryFn: () => courseApi.getStudentCourseSections(),
+        placeholderData: (previousData) => previousData
+    });
+
+export const useStudentAttendanceRecords = (courseSectionId?: string) =>
+    useQuery({
+        queryKey: courseQueryKeys.studentAttendanceRecords(courseSectionId),
+        queryFn: () => courseApi.getStudentAttendanceRecords(courseSectionId as string),
+        enabled: !!courseSectionId,
+        placeholderData: (previousData) => previousData
+    });
