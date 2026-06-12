@@ -386,7 +386,13 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                             s.EndTime,
                             s.Room
                         ))
-                        .ToList()
+                        .ToList(),
+
+                    _context.AttendanceSessions
+                        .AsNoTracking()
+                        .Where(a => a.CourseSectionId == cs.Id && a.Status == AttendanceSessionStatus.Open)
+                        .Select(a => (Guid?)a.Id)
+                        .FirstOrDefault()
                 )
             )
             .ToListAsync(cancellationToken);
