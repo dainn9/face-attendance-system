@@ -1,6 +1,8 @@
 import { useProfileDetail } from "../hooks/profile.query";
 import { Gender, Role, type UserDto } from "../types/profile.types";
 import { getInitials } from "../../../shared/utils/getInitials";
+import { Link } from "react-router-dom";
+import { FaKey } from "react-icons/fa";
 
 const formatGender = (gender: UserDto["gender"]) => {
     if (gender === Gender.Male) return "Nam";
@@ -64,18 +66,27 @@ const ProfilePage = () => {
             </div>
 
             <section className="rounded-lg bg-white p-5 shadow-sm">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <span className="flex size-16 items-center justify-center rounded-full bg-indigo-100 text-lg font-semibold text-indigo-700">
-                        {getInitials(profile.fullName)}
-                    </span>
-                    <div>
-                        <h2 className="text-lg font-semibold text-gray-900">
-                            {profile.fullName}
-                        </h2>
-                        <p className="mt-1 text-sm text-gray-500">
-                            {formatRole(profile.role)} - {profile.userCode}
-                        </p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <span className="flex size-16 items-center justify-center rounded-full bg-indigo-100 text-lg font-semibold text-indigo-700">
+                            {getInitials(profile.fullName)}
+                        </span>
+                        <div>
+                            <h2 className="text-lg font-semibold text-gray-900">
+                                {profile.fullName}
+                            </h2>
+                            <p className="mt-1 text-sm text-gray-500">
+                                {formatRole(profile.role)} - {profile.userCode}
+                            </p>
+                        </div>
                     </div>
+                    <Link
+                        to="/profile/change-password"
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
+                    >
+                        <FaKey />
+                        Đổi mật khẩu
+                    </Link>
                 </div>
             </section>
 

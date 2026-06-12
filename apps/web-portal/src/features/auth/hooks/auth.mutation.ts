@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { authApi } from "../services/auth.api";
 import { useNavigate } from "react-router-dom";
-import type { LoginRequest } from "../types/auth.types";
+import type { ChangePasswordRequest, LoginRequest } from "../types/auth.types";
 import { useAuthStore } from "../store/auth.store";
 import { getHomePathByRole, getMeFromPayload } from "../utils/roleRedirect";
 
@@ -45,3 +45,10 @@ export const useLogout = () => {
         }
     })
 }
+
+export const useChangePassword = () => {
+    return useMutation({
+        mutationFn: (data: ChangePasswordRequest) =>
+            authApi.changePassword(data),
+    });
+};
