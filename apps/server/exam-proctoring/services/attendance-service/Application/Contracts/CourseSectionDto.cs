@@ -86,6 +86,8 @@ namespace attendance_service.Application.Contracts
         Guid LecturerId,
         Semester Semester,
         string AcademicYear,
-        List<ScheduleDto> Schedules
+        List<ScheduleDto> Schedules,
+
+       Guid? OpenAttendanceSessionId
     );
 }

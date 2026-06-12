@@ -172,5 +172,32 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 r.CheckedInAt
             ))
             .ToDictionaryAsync(r => r.StudentId, cancellationToken: cancellationToken);
+
+        public async Task<AttendanceCheckInInfoDto?> GetAttendanceCheckInInfoAsync(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken = default)
+            => await _context.AttendanceSessions
+                .AsNoTracking()
+                .Where(s => s.Id == attendanceSessionId)
+                .Join(
+                    _context.CourseSections.AsNoTracking(),
+                    s => s.CourseSectionId,
+                    cs => cs.Id,
+                    (s, cs) => new { s, cs }
+                )
+                .Join(
+                    _context.Subjects.AsNoTracking(),
+                    x => x.cs.SubjectId,
+                    subj => subj.Id,
+                    (x, subj) => new AttendanceCheckInInfoDto(
+                        x.s.Id,
+                        subj.Name,
+                        x.cs.CourseSectionCode,
+                        x.s.Date,
+                        x.s.StartTime,
+                        x.s.Status
+                    )
+                )
+                .FirstOrDefaultAsync(cancellationToken);
     }
 }

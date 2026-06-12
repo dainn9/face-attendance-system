@@ -390,7 +390,8 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
 
                     _context.AttendanceSessions
                         .AsNoTracking()
-                        .Where(a => a.CourseSectionId == cs.Id && a.Status == AttendanceSessionStatus.Open)
+                        .Where(a => a.CourseSectionId == cs.Id && a.Status == AttendanceSessionStatus.Open
+                             && !a.Records.Any(r => r.StudentId == studentId))
                         .Select(a => (Guid?)a.Id)
                         .FirstOrDefault()
                 )
