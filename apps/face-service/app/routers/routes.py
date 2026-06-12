@@ -1,17 +1,19 @@
 import numpy as np
 import cv2
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from torchvision.io import read_image
 from app.core.face_app import face_app
 from app.core.exceptions import AppException
 from app.core.responses import success_response
 from app.schemas.face_schema import FaceIdentifyRequest
-from app.utils.face_register_validator import validate_face_register_images
+from app.utils.face_validator import validate_face_liveness_images, validate_face_register_images, validate_face_verify_image
 from app.utils.image import base64_to_image
 from app.services.recognition_service import RecognitionService
 from app.services.detector_service import detect_faces
 from app.core.auth import verify_api_key
 
 from app.core.config import settings
+from app.utils.read_upload_image import read_upload_image
 
 router = APIRouter()
 
@@ -53,21 +55,7 @@ async def register_face(
 
         # 1. Decode đủ 3 ảnh trước
         for pose, file in files.items():
-            contents = await file.read()
-
-            img = cv2.imdecode(
-                np.frombuffer(contents, np.uint8),
-                cv2.IMREAD_COLOR
-            )
-
-            if img is None:
-                raise AppException(
-                    status_code=422,
-                    code="INVALID_IMAGE",
-                    message=f"Invalid image for pose {pose}"
-                )
-
-            images_by_pose[pose] = img
+            images_by_pose[pose] = await read_upload_image(file)
 
          # 2. Sau đó mới validate toàn bộ 3 ảnh
         validated = validate_face_register_images(
@@ -107,6 +95,50 @@ async def get_face_status(
         data=isRegistered
     )
 
+@router.post("/verify")
+async def verify_face(
+    user_id: str = Form(...),
+    image: UploadFile = File(...),
+    _: None = Depends(verify_api_key)
+):
+    img = await read_upload_image(image)
+
+    face_crop = validate_face_verify_image(face_app, img)
+
+    result = svc.verify(
+        user_id=user_id,
+        img=face_crop["crop"]
+    )
+
+    return success_response(
+        message="Face verified completely",
+        data=result
+    )
+
+@router.post("/verify-liveness")
+async def verify_face_liveness(
+    user_id: str = Form(...),
+    challenge: str = Form(...),
+    center: UploadFile = File(...),
+    action: UploadFile = File(...),
+    _: None = Depends(verify_api_key)
+):
+    img_center = await read_upload_image(center)
+    img_action = await read_upload_image(action)
+
+    face_center_crop = validate_face_liveness_images(face_app, img_center, img_action, challenge)
+
+    result = svc.verify(
+        user_id=user_id,
+        img=face_center_crop
+    )
+
+    return success_response(
+        message="Face verified completely",
+        data=result
+    )
+    
+
 @router.post("/identify")
 async def identify_face(
     req: FaceIdentifyRequest,
@@ -132,7 +164,7 @@ async def identify_face(
         raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
 
     return success_response(
-        message="Face identified successfully", 
+        message="Face identified completely", 
         data=result
     )
 
