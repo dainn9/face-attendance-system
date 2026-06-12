@@ -27,5 +27,10 @@ namespace attendance_service.Application.Abstractions.Persistence
             Guid attendanceSessionId,
             CancellationToken cancellationToken = default
         );
+
+        Task<AttendanceCheckInInfoDto?> GetAttendanceCheckInInfoAsync(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken = default
+        );
     }
 }
