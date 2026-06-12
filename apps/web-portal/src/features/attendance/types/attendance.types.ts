@@ -68,3 +68,7 @@ export interface AttendanceCheckInInfoDto {
     startTime: string;
     status: number; //1 open session, 2 closed session
 }
+
+export interface ChallengeDto {
+    challenge: string;
+}

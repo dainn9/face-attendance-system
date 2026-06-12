@@ -31,8 +31,8 @@ const StudentCourseDashboardPage = () => {
     const firstCourse = courses[0];
     const semesterLabel = firstCourse
         ? `${formatSemester(firstCourse.semester)} ${firstCourse.academicYear}`
-        : "Chua co hoc ky";
-    const studentName = profile?.fullName ?? "Sinh vien";
+        : "Chưa có học kỳ";
+    const studentName = profile?.fullName ?? "Sinh viên";
     const studentCode = profile?.userCode ?? "-";
     const activeCourse = courses.find(canCheckInCourse);
 
@@ -41,7 +41,7 @@ const StudentCourseDashboardPage = () => {
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                     <h1 className="truncate text-lg font-semibold text-gray-900 sm:text-xl">
-                        Xin chao, {studentName}
+                        Xin chào, {studentName}
                     </h1>
                     <p className="mt-1 text-sm text-gray-500">
                         MSSV: {studentCode}
@@ -62,31 +62,31 @@ const StudentCourseDashboardPage = () => {
                     <div className="min-w-0">
                         <p className="text-sm font-semibold leading-5 text-emerald-900">
                             <span className="mr-2 inline-block size-2 rounded-full bg-emerald-600" />
-                            Dang co buoi diem danh - {activeCourse.subjectName}
+                            Đang có buổi điểm danh - {activeCourse.subjectName}
                         </p>
                     </div>
                     <Link
                         to={getCourseDetailPath(activeCourse)}
                         className="inline-flex min-h-11 items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white sm:w-auto"
                     >
-                        Xem lop diem danh
+                        Xem lớp điểm danh
                     </Link>
                 </section>
             )}
 
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                {courses.length} lop hoc - {semesterLabel}
+                {courses.length} lớp học - {semesterLabel}
             </p>
 
             {courseSectionsQuery.isLoading && (
                 <div className="rounded-lg bg-white p-5 text-sm text-gray-500 shadow-sm">
-                    Dang tai danh sach lop...
+                    Đang tải danh sách lớp...
                 </div>
             )}
 
             {!courseSectionsQuery.isLoading && courses.length === 0 && (
                 <div className="rounded-lg bg-white p-5 text-sm text-gray-500 shadow-sm">
-                    Chua co lop hoc nao.
+                    Chưa có lớp học nào.
                 </div>
             )}
 
@@ -114,7 +114,7 @@ const StudentCourseDashboardPage = () => {
                                 <span
                                     className={`shrink-0 rounded-md px-2 py-1 text-xs font-medium ${canCheckIn ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"}`}
                                 >
-                                    {canCheckIn ? "Dang mo" : "Dang hoc"}
+                                    {canCheckIn ? "Đang mở" : "Đang học"}
                                 </span>
                             </div>
                             <p className="mt-4 truncate text-sm text-gray-500">
@@ -126,7 +126,7 @@ const StudentCourseDashboardPage = () => {
                                         <p key={schedule}>{schedule}</p>
                                     ))
                                 ) : (
-                                    <p>Chua co lich hoc</p>
+                                    <p>Chưa có lịch học</p>
                                 )}
                             </div>
                         </Link>

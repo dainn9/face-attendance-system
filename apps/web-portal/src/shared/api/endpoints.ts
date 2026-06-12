@@ -33,6 +33,9 @@ export const API_ENDPOINTS = {
         CLOSE_SESSION: (attendanceSessionId: string) => `${ATTENDANCE_PREFIX}/attendance-sessions/${attendanceSessionId}/close`,
         CREATE_SESSION: `${ATTENDANCE_PREFIX}/attendance-sessions`,
         CHECK_IN_INFO: (attendanceSessionId: string) => `${ATTENDANCE_PREFIX}/student/attendance-session/${attendanceSessionId}/check-in-info`,
+
+        CHALLENGE_CODE: `${API_PREFIX}/student/faces/challenge`,
+            CHECK_IN: (attendanceSessionId: string) => `${API_PREFIX}/student/attendance-session/${attendanceSessionId}/check-in`,
     },
 
     USER: {

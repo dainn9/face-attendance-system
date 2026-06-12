@@ -32,6 +32,12 @@ export const attendanceQueryKeys = {
         attendanceSessionId,
     ],
 
+    challenge: () => [
+        ...attendanceQueryKeys.all,
+        "student",
+        "challenge",
+    ],
+
     getStudents: (
         courseSectionId?: string,
         attendanceSessionId?: string,
@@ -85,6 +91,14 @@ export const useAttendanceCheckInInfo = (attendanceSessionId?: string) =>
         placeholderData: (previousData) => previousData,
         refetchInterval: (query) =>
             query.state.data?.status === 1 ? openSessionRefetchIntervalMs : false,
+    });
+
+export const useChallengeCode = (enabled = true) =>
+    useQuery({
+        queryKey: attendanceQueryKeys.challenge(),
+        queryFn: () => attendanceApi.getChallengeCode(),
+        enabled,
+        staleTime: 0,
     });
 
 export const useAttendanceSessionStudents = (
