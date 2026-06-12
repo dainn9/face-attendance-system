@@ -3,11 +3,19 @@ import { useAuthStore } from "../../features/auth/store/auth.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../../features/auth/services/auth.api";
 import { getMeFromPayload } from "../../features/auth/utils/roleRedirect";
+import { subscribeAuthSessionExpired } from "../../shared/utils/authSessionEvents";
 
 const AuthProvider = ({children} : {children: React.ReactNode}) => {
     const queryClient = useQueryClient();
     const setUser = useAuthStore(s => s.setUser);
     const finishAuthLoading = useAuthStore(s => s.finishAuthLoading);
+
+    useEffect(() => {
+        return subscribeAuthSessionExpired(() => {
+            setUser(null);
+            queryClient.clear();
+        });
+    }, [queryClient, setUser]);
     
     useEffect(() => {
         let mounted = true;

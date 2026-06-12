@@ -3,6 +3,7 @@ import type { AxiosRequestConfig } from "axios";
 import { ApiError, NotFoundError, UnauthorizedError, ValidationError } from "./errors";
 import { API_ENDPOINTS } from "./endpoints";
 import { ERROR_CODE } from "../constants/error-code";
+import { emitAuthSessionExpired } from "../utils/authSessionEvents";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +28,11 @@ const processQueue = (error: unknown) => {
     failedQueue = []
 }
 
+const rejectUnauthorizedSession = (message?: string) => {
+    emitAuthSessionExpired();
+    return Promise.reject(new UnauthorizedError(message));
+}
+
 // ─── RESPONSE ───────────────────────────────────────────
 
 api.interceptors.response.use(
@@ -45,18 +51,22 @@ api.interceptors.response.use(
 
         // Tránh loop refresh
         if (originalRequest?._retry) {
+            if (status === 401) {
+                return rejectUnauthorizedSession(data?.message);
+            }
+
             return Promise.reject(error);
         }
 
         if (originalRequest?.url?.includes(API_ENDPOINTS.AUTH.REFRESH)) {
             processQueue(new UnauthorizedError());
             isRefreshing = false;
-            return Promise.reject(new UnauthorizedError());
+            return rejectUnauthorizedSession();
         }
         // HANDLE 401 + REFRESH TOKEN
         if (status === 401 && data?.errorCode === ERROR_CODE.Token_Expired) {
             if (!originalRequest) {
-                return Promise.reject(new UnauthorizedError());
+                return rejectUnauthorizedSession();
             }
 
             if (isRefreshing) {
@@ -82,7 +92,7 @@ api.interceptors.response.use(
                 return api(originalRequest)
             } catch (err) {
                 processQueue(err);
-                return Promise.reject(new UnauthorizedError());
+                return rejectUnauthorizedSession();
             } finally {
                 isRefreshing = false
             }
@@ -96,7 +106,7 @@ api.interceptors.response.use(
 
         switch (status) {
             case 401:
-                throw new UnauthorizedError(data?.message)
+                return rejectUnauthorizedSession(data?.message)
             case 404:
                 throw new NotFoundError(data?.message || "Not Found")
             case 500:
