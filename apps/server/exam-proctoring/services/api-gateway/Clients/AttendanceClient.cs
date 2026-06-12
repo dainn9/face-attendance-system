@@ -136,5 +136,14 @@ namespace api_gateway.Clients
             return result?.Data ?? new List<StudentCourseSectionDto>();
         }
 
+        public async Task CheckInAttendanceAsync(Guid attendanceSessionId, CheckInAttendanceRequest request, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"api/v1/internal/attendance-sessions/{attendanceSessionId}/check-in", request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            return;
+        }
     }
 }
