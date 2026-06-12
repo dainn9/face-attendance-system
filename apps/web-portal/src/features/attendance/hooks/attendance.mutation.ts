@@ -3,6 +3,13 @@ import { attendanceApi } from "../services/attendance.api";
 import { attendanceQueryKeys } from "./attendance.query";
 import { useNavigate } from "react-router-dom";
 
+type CheckInAttendanceVariables = {
+    attendanceSessionId: string;
+    challenge: string;
+    centerImage: File;
+    challengeImage: File;
+};
+
 export const useCloseAttendanceSession = () => {
     const queryClient = useQueryClient();
 
@@ -42,3 +49,30 @@ export const useStartAttendanceSession = () => {
         }
     });
 }
+
+export const useCheckInAttendance = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({
+            attendanceSessionId,
+            challenge,
+            centerImage,
+            challengeImage,
+        }: CheckInAttendanceVariables) =>
+            attendanceApi.checkInAttendance(
+                attendanceSessionId,
+                challenge,
+                centerImage,
+                challengeImage,
+            ),
+        onSuccess: (_, { attendanceSessionId }) => {
+            queryClient.invalidateQueries({
+                queryKey: attendanceQueryKeys.checkInInfo(attendanceSessionId),
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["courses", "student", "attendance-records"],
+            });
+        },
+    });
+};

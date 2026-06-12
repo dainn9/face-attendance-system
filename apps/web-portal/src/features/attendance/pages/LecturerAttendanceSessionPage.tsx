@@ -184,7 +184,7 @@ const LecturerAttendanceSessionPage = () => {
                     {formatTimeToMinute(sessionStartTime)} -{" "}
                     {displayEndTime
                         ? formatTimeToMinute(displayEndTime)
-                        : "Dang mo"}
+                        : "Đang mở"}
                 </p>
             </div>
 
