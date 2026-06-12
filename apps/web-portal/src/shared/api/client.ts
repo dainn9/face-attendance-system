@@ -3,8 +3,15 @@ import type { AxiosRequestConfig } from "axios";
 import { ApiError, NotFoundError, UnauthorizedError, ValidationError } from "./errors";
 import { API_ENDPOINTS } from "./endpoints";
 import { ERROR_CODE } from "../constants/error-code";
+import { emitAuthSessionExpired } from "../utils/authSessionEvents";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+type ApiErrorBody = {
+    message?: string;
+    errorCode?: string;
+    errors?: unknown;
+};
 
 export const api = axios.create({
     baseURL: API_URL,
@@ -27,6 +34,32 @@ const processQueue = (error: unknown) => {
     failedQueue = []
 }
 
+const rejectUnauthorizedSession = (message?: string) => {
+    emitAuthSessionExpired();
+    return Promise.reject(new UnauthorizedError(message));
+}
+
+const isTokenExpiredError = (status?: number, data?: { errorCode?: string }) =>
+    status === 401 && data?.errorCode === ERROR_CODE.Token_Expired;
+
+const isInvalidRefreshTokenError = (data?: { errorCode?: string }) =>
+    data?.errorCode === ERROR_CODE.Invalid_Refresh_Token;
+
+const toApiError = (error: unknown, fallbackMessage: string) => {
+    if (!axios.isAxiosError(error)) {
+        return new ApiError(0, fallbackMessage);
+    }
+
+    const status = error.response?.status || 0;
+    const data = error.response?.data as ApiErrorBody | undefined;
+
+    return new ApiError(
+        status,
+        data?.message || fallbackMessage,
+        data?.errorCode,
+    );
+};
+
 // ─── RESPONSE ───────────────────────────────────────────
 
 api.interceptors.response.use(
@@ -45,18 +78,31 @@ api.interceptors.response.use(
 
         // Tránh loop refresh
         if (originalRequest?._retry) {
+            if (isTokenExpiredError(status, data)) {
+                return rejectUnauthorizedSession(data?.message);
+            }
+
             return Promise.reject(error);
         }
 
         if (originalRequest?.url?.includes(API_ENDPOINTS.AUTH.REFRESH)) {
             processQueue(new UnauthorizedError());
             isRefreshing = false;
-            return Promise.reject(new UnauthorizedError());
+
+            if (isInvalidRefreshTokenError(data)) {
+                return rejectUnauthorizedSession(data?.message);
+            }
+
+            throw new ApiError(
+                status || 0,
+                data?.message || "Refresh token failed",
+                data?.errorCode,
+            );
         }
         // HANDLE 401 + REFRESH TOKEN
-        if (status === 401 && data?.errorCode === ERROR_CODE.Token_Expired) {
+        if (isTokenExpiredError(status, data)) {
             if (!originalRequest) {
-                return Promise.reject(new UnauthorizedError());
+                return rejectUnauthorizedSession();
             }
 
             if (isRefreshing) {
@@ -82,7 +128,16 @@ api.interceptors.response.use(
                 return api(originalRequest)
             } catch (err) {
                 processQueue(err);
-                return Promise.reject(new UnauthorizedError());
+
+                if (axios.isAxiosError(err)) {
+                    const refreshData = err.response?.data as ApiErrorBody | undefined;
+
+                    if (isInvalidRefreshTokenError(refreshData)) {
+                        return rejectUnauthorizedSession(refreshData?.message);
+                    }
+                }
+
+                return Promise.reject(toApiError(err, "Refresh token failed"));
             } finally {
                 isRefreshing = false
             }

@@ -7,6 +7,7 @@ import LecturerCourseDetailPage from "../features/courses/pages/LecturerCourseDe
 import StudentCourseDashboardPage from "../features/courses/pages/StudentCourseDashboardPage";
 import StudentCourseDetailPage from "../features/courses/pages/StudentCourseDetailPage";
 import StudentFaceProfilePage from "../features/face-profile/pages/StudentFaceProfilePage";
+import ChangePasswordPage from "../features/profile/pages/ChangePasswordPage";
 import ProfilePage from "../features/profile/pages/ProfilePage";
 import ResultPage from "../features/profile/pages/ResultPage";
 import Layout from "../shared/components/Layout/Layout";
@@ -44,6 +45,7 @@ export const routes = [
                         ],
                     },
                     { path: "profile", element: <ProfilePage /> },
+                    { path: "profile/change-password", element: <ChangePasswordPage /> },
                     { path: "results", element: <ResultPage /> },
 
                 ],
