@@ -172,5 +172,52 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 r.CheckedInAt
             ))
             .ToDictionaryAsync(r => r.StudentId, cancellationToken: cancellationToken);
+
+        public async Task<AttendanceCheckInInfoDto?> GetAttendanceCheckInInfoAsync(
+            Guid attendanceSessionId,
+            CancellationToken cancellationToken = default)
+            => await _context.AttendanceSessions
+                .AsNoTracking()
+                .Where(s => s.Id == attendanceSessionId)
+                .Join(
+                    _context.CourseSections.AsNoTracking(),
+                    s => s.CourseSectionId,
+                    cs => cs.Id,
+                    (s, cs) => new { s, cs }
+                )
+                .Join(
+                    _context.Subjects.AsNoTracking(),
+                    x => x.cs.SubjectId,
+                    subj => subj.Id,
+                    (x, subj) => new AttendanceCheckInInfoDto(
+                        x.s.Id,
+                        subj.Name,
+                        x.cs.CourseSectionCode,
+                        x.s.Date,
+                        x.s.StartTime,
+                        x.s.Status
+                    )
+                )
+                .FirstOrDefaultAsync(cancellationToken);
+
+        public async Task<IReadOnlyList<StudentAttendanceRecordDto>> GetStudentAttendanceRecordsByCourseSectionIdAsync(
+            Guid studentId,
+            Guid courseSectionId,
+            CancellationToken cancellationToken = default)
+        => await _context.AttendanceSessions
+                .AsNoTracking()
+                .Where(s => s.CourseSectionId == courseSectionId)
+                .SelectMany(s => s.Records, (s, r) => new { s, r })
+                .Where(x => x.r.StudentId == studentId)
+                .OrderByDescending(x => x.s.Date)
+                .ThenByDescending(x => x.s.StartTime)
+                .Select(x => new StudentAttendanceRecordDto(
+                    x.s.Id,
+                    x.s.Date,
+                    x.s.StartTime,
+                    x.r.Status,
+                    x.r.Confidence,
+                    x.r.CheckedInAt
+                )).ToListAsync(cancellationToken);
     }
 }

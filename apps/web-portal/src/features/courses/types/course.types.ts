@@ -113,3 +113,25 @@ export interface LecturerCourseStudentsRequest {
     pageSize?: number;
 }
 
+export interface StudentCourseSectionDto {
+    id: string;
+    subjectName: string;
+    subjectCode: string;
+    courseSectionCode: string;
+    lecturerId: string;
+    lecturerName: string;
+    semester: Semester;
+    academicYear: string;
+    schedules: ScheduleDto[];
+    canCheckIn?: boolean;
+    openAttendanceSessionId?: string;
+}
+
+export interface StudentAttendanceRecordDto {
+    attendanceSessionId: string;
+    date: string;
+    startTime: string;
+    status: number; // 1: Present, 2: Absent, 3: Late
+    confidenceScore?: number;
+    checkedInAt?: string;
+}

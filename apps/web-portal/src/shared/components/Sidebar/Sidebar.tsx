@@ -1,7 +1,6 @@
 import {
     FaCamera,
     FaChartBar,
-    FaClipboardCheck,
     FaSchool,
     FaUser,
 } from "react-icons/fa";
@@ -10,7 +9,12 @@ import { useAuthStore } from "../../../features/auth/store/auth.store";
 import { PATHS } from "../../constants/path";
 import LogoutButton from "../LogoutButton/LogoutButton";
 
-const Sidebar = () => {
+type SidebarProps = {
+    className?: string;
+    onNavigate?: () => void;
+};
+
+const Sidebar = ({ className = "", onNavigate }: SidebarProps) => {
     const baseClass =
         "flex items-center gap-3 px-4 py-3 rounded-xl mt-1 font-medium";
     const role = useAuthStore((s) => s.user?.role?.toLowerCase());
@@ -18,7 +22,7 @@ const Sidebar = () => {
     const isLecturer = role === "lecturer";
 
     return (
-        <aside className="w-64 bg-white shadow-xl flex flex-col">
+        <aside className={`w-64 bg-white shadow-xl flex flex-col ${className}`}>
             <div className="p-6 border-b">
                 <h1 className="text-2xl font-bold text-blue-600">FaceAttend</h1>
                 <p className="text-sm text-gray-500">
@@ -32,6 +36,7 @@ const Sidebar = () => {
                         <NavLink
                             to={PATHS.LECTURER}
                             end
+                            onClick={onNavigate}
                             className={({ isActive }) =>
                                 `${baseClass} ${isActive ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100"}`
                             }
@@ -46,6 +51,7 @@ const Sidebar = () => {
                         <NavLink
                             to={PATHS.STUDENT}
                             end
+                            onClick={onNavigate}
                             className={({ isActive }) =>
                                 `${baseClass} ${isActive ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100"}`
                             }
@@ -53,15 +59,8 @@ const Sidebar = () => {
                             <FaSchool /> Lớp học của tôi
                         </NavLink>
                         <NavLink
-                            to={PATHS.STUDENT_CHECKIN}
-                            className={({ isActive }) =>
-                                `${baseClass} ${isActive ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100"}`
-                            }
-                        >
-                            <FaClipboardCheck /> Điểm danh
-                        </NavLink>
-                        <NavLink
                             to={PATHS.UPDATE_FACE}
+                            onClick={onNavigate}
                             className={({ isActive }) =>
                                 `${baseClass} ${isActive ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100"}`
                             }
@@ -73,6 +72,7 @@ const Sidebar = () => {
 
                 <NavLink
                     to={PATHS.PROFILE}
+                    onClick={onNavigate}
                     className={({ isActive }) =>
                         `${baseClass} ${isActive ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100"}`
                     }
@@ -83,6 +83,7 @@ const Sidebar = () => {
                 {!isLecturer && !isStudent && (
                     <NavLink
                         to={PATHS.RESULTS}
+                        onClick={onNavigate}
                         className={({ isActive }) =>
                             `${baseClass} ${isActive ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100"}`
                         }
@@ -100,3 +101,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

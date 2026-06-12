@@ -1,9 +1,11 @@
 export class ApiError extends Error {
     status: number
+    errorCode?: string
 
-    constructor(status: number, message: string) {
+    constructor(status: number, message: string, errorCode?: string) {
         super(message);
         this.status = status;
+        this.errorCode = errorCode;
     }
 }
 
@@ -39,8 +41,8 @@ type ValidationItem = {
 export class ValidationError extends ApiError {
     errors: Record<string, string[]>
 
-    constructor(details: ValidationItem[]) {
-        super(422, "Validation Error");
+    constructor(details: unknown, message: string = "Validation Error") {
+        super(422, message);
         this.errors = mapValidation(details);
     }
 
@@ -49,15 +51,59 @@ export class ValidationError extends ApiError {
     }
 }
 
-function mapValidation(details: ValidationItem[]) {
+function mapValidation(details: unknown) {
     const errors: Record<string, string[]> = {}
 
-    details.forEach((item) => {
-        const key = item.field.charAt(0).toLowerCase() + item.field.slice(1)
-        if (!errors[key]) {
-            errors[key] = []
-        }
-        errors[key].push(item.error)
-    })
+    if (Array.isArray(details)) {
+        details.forEach((item) => {
+            if (!isValidationItem(item)) return;
+
+            const key = normalizeField(item.field);
+            if (!errors[key]) {
+                errors[key] = []
+            }
+            errors[key].push(item.error)
+        })
+        return errors
+    }
+
+    if (details && typeof details === "object") {
+        Object.entries(details).forEach(([field, value]) => {
+            const key = normalizeField(field);
+            const messages = Array.isArray(value) ? value : [value];
+
+            messages.forEach((message) => {
+                if (typeof message !== "string") return;
+
+                if (!errors[key]) {
+                    errors[key] = []
+                }
+                errors[key].push(message)
+            })
+        })
+        return errors
+    }
+
+    if (typeof details === "string") {
+        errors.general = [details]
+    }
+
     return errors
+}
+
+function isValidationItem(value: unknown): value is ValidationItem {
+    return (
+        !!value &&
+        typeof value === "object" &&
+        "field" in value &&
+        "error" in value &&
+        typeof value.field === "string" &&
+        typeof value.error === "string"
+    )
+}
+
+function normalizeField(field: string) {
+    if (!field) return "general";
+
+    return field.charAt(0).toLowerCase() + field.slice(1)
 }

@@ -1,17 +1,7 @@
-from insightface.app import FaceAnalysis
-from app.core.config import settings
-
-app = FaceAnalysis(
-    name='buffalo_l',
-    providers=['CUDAExecutionProvider'],
-    allowed_modules=['detection']
-)
-
-app.prepare(ctx_id=settings.CTX_ID)
-
+from app.core.face_app import face_app
 
 def detect_faces(img, mode="single"):
-    faces = app.get(img)
+    faces = face_app.get(img)
 
     if len(faces) == 0:
         return []

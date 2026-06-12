@@ -124,5 +124,26 @@ namespace api_gateway.Clients
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<Dictionary<Guid, AttendanceRecordDto>>>(cancellationToken: cancellationToken);
             return result?.Data ?? new Dictionary<Guid, AttendanceRecordDto>();
         }
+
+        public async Task<IReadOnlyList<StudentCourseSectionDto>> GetStudentActiveCourseSectionsAsync(Guid studentId, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.GetAsync($"api/v1/internal/course-sections/students/{studentId}/active-course-sections", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<StudentCourseSectionDto>>>(cancellationToken: cancellationToken);
+            return result?.Data ?? new List<StudentCourseSectionDto>();
+        }
+
+        public async Task CheckInAttendanceAsync(Guid attendanceSessionId, CheckInAttendanceRequest request, CancellationToken cancellationToken = default)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"api/v1/internal/attendance-sessions/{attendanceSessionId}/check-in", request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+                await HandleErrorAsync(response, cancellationToken);
+
+            return;
+        }
     }
 }

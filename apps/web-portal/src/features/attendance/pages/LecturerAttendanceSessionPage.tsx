@@ -52,10 +52,10 @@ const getStudentAttendanceStatus = (status?: number) => {
     };
 };
 
-const formatConfidence = (confidence?: number) => {
-    if (confidence === undefined || confidence === null) return "-";
+const formatConfidence = (similarity?: number) => {
+    if (similarity == null) return "--";
 
-    return `${confidence.toFixed(1)}%`;
+    return `${(similarity * 100).toFixed(1)}%`;
 };
 
 const formatCheckedInAt = (checkedInAt?: string) => {
@@ -184,7 +184,7 @@ const LecturerAttendanceSessionPage = () => {
                     {formatTimeToMinute(sessionStartTime)} -{" "}
                     {displayEndTime
                         ? formatTimeToMinute(displayEndTime)
-                        : "Dang mo"}
+                        : "Đang mở"}
                 </p>
             </div>
 
@@ -358,7 +358,7 @@ const LecturerAttendanceSessionPage = () => {
                                     Trạng thái
                                 </th>
                                 <th className="px-5 py-3 font-medium">
-                                    Độ chính xác
+                                    Độ tương đồng
                                 </th>
                                 <th className="px-5 py-3 font-medium">
                                     Thời gian check-in

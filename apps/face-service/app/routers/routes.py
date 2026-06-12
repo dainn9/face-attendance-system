@@ -1,11 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException
-from app.schemas.face_schema import FaceIdentifyRequest, FaceRegisterRequest
+from random import choice
+from fastapi import APIRouter, Depends, File, Form, UploadFile
+from app.core.face_app import face_app
+from app.core.exceptions import AppException
+from app.core.responses import success_response
+from app.schemas.face_schema import FaceIdentifyRequest
+from app.utils.face_validator import validate_face_liveness_images, validate_face_register_images, validate_face_verify_image
 from app.utils.image import base64_to_image
 from app.services.recognition_service import RecognitionService
 from app.services.detector_service import detect_faces
 from app.core.auth import verify_api_key
 
 from app.core.config import settings
+from app.utils.read_upload_image import read_upload_image
 
 router = APIRouter()
 
@@ -22,46 +28,114 @@ svc = RecognitionService(
 
 @router.post("/register")
 async def register_face(
-    req: FaceRegisterRequest,
+    user_id: str = Form(...),
+    left: UploadFile = File(...),
+    center: UploadFile = File(...),
+    right: UploadFile = File(...),
     _: None = Depends(verify_api_key)
 ):
     
-    registered = []
-
+    if svc.exists(user_id):
+        raise AppException(
+            409,
+            "FACE_ALREADY_REGISTERED",
+            "Face already registered"
+        )
+    
     try:
-        for item in req.images:
-            # Chuyển base64 sang ảnh OpenCV
-            img = base64_to_image(item.image)
+        images_by_pose = {}
 
-            # Phát hiện khuôn mặt
-            # Nếu không phát hiện được khuôn mặt nào hoặc phát hiện nhiều hơn 1 khuôn mặt, trả về lỗi
-            faces = detect_faces(img, mode="single")
-            if not faces:
-                raise HTTPException(
-                    status_code=422,
-                    detail=f"No face detected in pose '{item.pose}'"
-                )
+        files = {
+                    "left": left,
+                    "center": center,
+                    "right": right,
+                }
 
-            face_crop = faces[0]["crop"]     
-            ## Đăng ký khuôn mặt vào hệ thống
-            svc.register(user_id=req.user_id, pose=item.pose, img=face_crop)
+        # 1. Decode đủ 3 ảnh trước
+        for pose, file in files.items():
+            images_by_pose[pose] = await read_upload_image(file)
 
-            registered.append(item.pose)
+         # 2. Sau đó mới validate toàn bộ 3 ảnh
+        validated = validate_face_register_images(
+            face_app,
+            images_by_pose
+        )
 
-    except HTTPException:
+    # 3. Register
+        registered = []
+
+        for pose in ["left", "center", "right"]:
+            svc.register(
+                user_id=user_id,
+                pose=pose,
+                img=validated[pose]["crop"]
+            )
+
+            registered.append(pose)
+
+    except AppException:
         raise
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
     
-    return {
-        "success": True,
-        "message": "Face registered successfully",
-        "result": {
-            "user_id": req.user_id,
-            "registered_poses": registered,
-        }
-    }
+    return None
+
+@router.get("/status/{user_id}")
+async def get_face_status(
+    user_id: str,
+    _: None = Depends(verify_api_key)
+):  
+    isRegistered = svc.exists(user_id)
+
+    return success_response(
+        message="Face status retrieved successfully", 
+        data=isRegistered
+    )
+
+@router.post("/verify")
+async def verify_face(
+    user_id: str = Form(...),
+    image: UploadFile = File(...),
+    _: None = Depends(verify_api_key)
+):
+    img = await read_upload_image(image)
+
+    face_crop = validate_face_verify_image(face_app, img)
+
+    result = svc.verify(
+        user_id=user_id,
+        img=face_crop["crop"]
+    )
+
+    return success_response(
+        message="Face verified completely",
+        data=result
+    )
+
+@router.post("/verify-liveness")
+async def verify_face_liveness(
+    user_id: str = Form(...),
+    challenge: str = Form(...),
+    center: UploadFile = File(...),
+    action: UploadFile = File(...),
+    _: None = Depends(verify_api_key)
+):
+    img_center = await read_upload_image(center)
+    img_action = await read_upload_image(action)
+
+    face_center_crop = validate_face_liveness_images(face_app, img_center, img_action, challenge)
+
+    result = svc.verify(
+        user_id=user_id,
+        img=face_center_crop
+    )
+
+    return success_response(
+        message="Face verified completely",
+        data=result
+    )
+    
 
 @router.post("/identify")
 async def identify_face(
@@ -72,25 +146,25 @@ async def identify_face(
         img = base64_to_image(req.image)
         faces = detect_faces(img, mode="single")
         if not faces:
-            raise HTTPException(
+            raise AppException(
                 status_code=422,
-                detail="No face detected in the image"
+                code="NO_FACE_DETECTED",
+                message="No face detected in the image"
             )
         
         face_crop = faces[0]["crop"]
         result = svc.identify(img=face_crop, allowed_user_ids=req.allowed_user_ids)
 
-    except HTTPException:
+    except AppException:
         raise
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
 
-    return {
-        "success": True,
-        "result": result
-    }
-
+    return success_response(
+        message="Face identified completely", 
+        data=result
+    )
 
 @router.delete("/remove/{user_id}")
 async def remove_face(
@@ -100,10 +174,17 @@ async def remove_face(
     try:
         svc.remove(user_id=user_id)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
 
-    return {
-        "success": True,
-        "message": "Face removed successfully"
-    }
+    return success_response(message="Face removed successfully")
 
+@router.get("/challenge")
+async def get_challenge(
+    _: None = Depends(verify_api_key)
+):
+    return success_response(
+        message="Challenge generated successfully",
+        data={
+            "challenge": choice(["left", "right"])
+        }
+    )
