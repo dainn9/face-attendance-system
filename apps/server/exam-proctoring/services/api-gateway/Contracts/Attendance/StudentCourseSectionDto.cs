@@ -9,6 +9,7 @@ namespace api_gateway.Contracts.Attendance
         int Semester,
         string AcademicYear,
         List<ScheduleDto> Schedules,
+        Guid? OpenAttendanceSessionId,
         string LecturerName // merge từ User service
     );
 }
