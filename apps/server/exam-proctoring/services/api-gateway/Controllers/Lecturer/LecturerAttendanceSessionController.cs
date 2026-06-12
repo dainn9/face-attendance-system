@@ -6,26 +6,27 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Core.Enums;
 
-namespace api_gateway.Controllers
+namespace api_gateway.Controllers.Lecturer
 {
     [ApiController]
     [Authorize(Roles = nameof(UserRole.Lecturer))]
-    [Route("api/v1/lecturer/course-sections")]
-    public class LecturerCoureSectionController : ControllerBase
+    [Route("api/v1/lecturer/course-sections/{courseSectionId:guid}/attendance-sessions")]
+    public class LecturerAttendanceSessionController : ControllerBase
     {
         private readonly AttendanceClient _attendanceClient;
         private readonly UserClient _userClient;
 
-        public LecturerCoureSectionController(AttendanceClient attendanceClient, UserClient userClient)
+        public LecturerAttendanceSessionController(AttendanceClient attendanceClient, UserClient userClient)
         {
             _attendanceClient = attendanceClient;
             _userClient = userClient;
         }
 
-        // GET: api/v1/lecturer/course-sections/{courseSectionId}/students
-        [HttpGet("{courseSectionId:guid}/students")]
-        public async Task<IActionResult> GetCourseSectionStudents(
+        // GET: api/v1/lecturer/course-sections/{courseSectionId}/attendance-sessions/{attendanceSessionId}/students?page=1&pageSize=10
+        [HttpGet("{attendanceSessionId:guid}/students")]
+        public async Task<IActionResult> GetAttendanceSessionStudents(
             Guid courseSectionId,
+            Guid attendanceSessionId,
             [FromQuery] CourseSectionStudentsPagedRequest request,
             CancellationToken cancellationToken
         )
@@ -50,13 +51,7 @@ namespace api_gateway.Controllers
                 ? await _userClient.GetStudentBasicsByIdsAsync(studentIdsPaged.Items, cancellationToken)
                 : new Dictionary<Guid, StudentBasicDto>();
 
-            var attendanceSummaries = studentIdsPaged.Items.Any()
-                ? await _attendanceClient.GetStudentAttendanceSummariesAsync(
-                    courseSectionId,
-                    studentIdsPaged.Items,
-                    cancellationToken
-                )
-                : new Dictionary<Guid, StudentAttendanceSummaryDto>();
+            var attendanceRecords = await _attendanceClient.GetAttendanceRecordsAsync(attendanceSessionId, cancellationToken);
 
             var items = studentIdsPaged.Items
                 .Where(id => studentBasics.ContainsKey(id))
@@ -64,21 +59,21 @@ namespace api_gateway.Controllers
                 {
                     var student = studentBasics[id];
 
-                    attendanceSummaries.TryGetValue(id, out var summary);
+                    attendanceRecords.TryGetValue(id, out var attendanceRecord);
 
-                    return new LecturerCourseSectionStudentDto(
-                        student.UserId,
-                        student.UserCode,
-                        student.FullName,
-                        student.Email,
-                        summary?.PresentSessions ?? 0,
-                        summary?.TotalSessions ?? 0,
-                        summary?.AttendanceRate ?? 0
+                    return new AttendanceSessionStudentDto(
+                        UserId: id,
+                        StudentCode: student.UserCode,
+                        FullName: student.FullName,
+                        Email: student.Email,
+                        AttendanceStatus: attendanceRecord != null ? attendanceRecord.Status : null,
+                        Confidence: attendanceRecord?.Confidence ?? null,
+                        CheckedInAt: attendanceRecord?.CheckedInAt ?? null
                     );
                 })
                 .ToList();
 
-            var pagedResult = new PagedResult<LecturerCourseSectionStudentDto>
+            var pagedResult = new PagedResult<AttendanceSessionStudentDto>
             {
                 Items = items,
                 TotalCount = studentIdsPaged.TotalCount,
@@ -86,10 +81,10 @@ namespace api_gateway.Controllers
                 PageSize = studentIdsPaged.PageSize
             };
 
-            return Ok(new ApiResponse<PagedResult<LecturerCourseSectionStudentDto>>
+            return Ok(new ApiResponse<PagedResult<AttendanceSessionStudentDto>>
             {
                 Success = true,
-                Message = "Course section students retrieved successfully",
+                Message = "Attendance session students retrieved successfully",
                 Data = pagedResult
             });
         }

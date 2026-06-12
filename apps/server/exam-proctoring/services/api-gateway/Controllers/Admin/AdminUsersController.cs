@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Core.Enums;
 
-namespace api_gateway.Controllers
+namespace api_gateway.Controllers.Admin
 {
     [ApiController]
     [Authorize(Roles = nameof(UserRole.Admin))]
