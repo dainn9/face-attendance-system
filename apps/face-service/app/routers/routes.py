@@ -1,7 +1,5 @@
-import numpy as np
-import cv2
+from random import choice
 from fastapi import APIRouter, Depends, File, Form, UploadFile
-from torchvision.io import read_image
 from app.core.face_app import face_app
 from app.core.exceptions import AppException
 from app.core.responses import success_response
@@ -179,4 +177,14 @@ async def remove_face(
         raise AppException(status_code=400, code="INTERNAL_ERROR", message=str(e))
 
     return success_response(message="Face removed successfully")
-        
+
+@router.get("/challenge")
+async def get_challenge(
+    _: None = Depends(verify_api_key)
+):
+    return success_response(
+        message="Challenge generated successfully",
+        data={
+            "challenge": choice(["left", "right"])
+        }
+    )
