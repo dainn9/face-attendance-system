@@ -77,4 +77,15 @@ namespace attendance_service.Application.Contracts
         string AcademicYear,
         string Label
     );
+
+    public record StudentCourseSectionDto(
+        Guid Id,
+        string SubjectName,
+        string SubjectCode,
+        string CourseSectionCode,
+        Guid LecturerId,
+        Semester Semester,
+        string AcademicYear,
+        List<ScheduleDto> Schedules
+    );
 }

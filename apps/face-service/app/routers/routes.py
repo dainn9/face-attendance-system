@@ -95,6 +95,18 @@ async def register_face(
     
     return None
 
+@router.get("/status/{user_id}")
+async def get_face_status(
+    user_id: str,
+    _: None = Depends(verify_api_key)
+):  
+    isRegistered = svc.exists(user_id)
+
+    return success_response(
+        message="Face status retrieved successfully", 
+        data=isRegistered
+    )
+
 @router.post("/identify")
 async def identify_face(
     req: FaceIdentifyRequest,
