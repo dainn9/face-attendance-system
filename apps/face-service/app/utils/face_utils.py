@@ -15,7 +15,7 @@ def estimate_pose_ratio(kps):
 
     return dist_left / max(dist_right, 1e-6)
     
-def check_image_quality(img, face, pose : str | None = None):
+def check_image_quality(img, face, pose : str | None = None, blur_threshold=50):
     label = f" for pose {pose}" if pose else ""
 
     h, w = img.shape[:2]
@@ -63,7 +63,7 @@ def check_image_quality(img, face, pose : str | None = None):
         )
 
     blur_score = cv2.Laplacian(gray, cv2.CV_64F).var()
-    if blur_score < 50:   
+    if blur_score < blur_threshold:   
         raise AppException(
             422,
             "IMAGE_TOO_BLURRY",
@@ -81,7 +81,7 @@ def check_pose(face, expected_pose: str):
         raise AppException(
             422,
             "INVALID_POSE",
-            "Unable to estimate face pose"
+            f"Unable to estimate face pose for {expected_pose} image"
         )
 
     if expected_pose == "center":
@@ -89,7 +89,7 @@ def check_pose(face, expected_pose: str):
             raise AppException(
                 422,
                 "INVALID_POSE",
-                "Center image must be front-facing"
+                f"Center image for {expected_pose} must be front-facing"
             )
 
     elif expected_pose == "left":
@@ -97,7 +97,7 @@ def check_pose(face, expected_pose: str):
             raise AppException(
                 422,
                 "INVALID_POSE",
-                "Left image must be slightly turned left"
+                f"Left image for {expected_pose} must be slightly turned left"
             )
 
     elif expected_pose == "right":
@@ -105,7 +105,7 @@ def check_pose(face, expected_pose: str):
             raise AppException(
                 422,
                 "INVALID_POSE",
-                "Right image must be slightly turned right"
+                f"Right image for {expected_pose} must be slightly turned right"
             )
 
     else:

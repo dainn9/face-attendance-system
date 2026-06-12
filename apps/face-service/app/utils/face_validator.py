@@ -82,7 +82,7 @@ def validate_face_register_images(face_app, images_by_pose: dict):
 
     return result
 
-def validate_face_verify_image(face_app, image):
+def validate_face_verify_image(face_app, image, blur_threshold=50):
     faces = face_app.get(image)
 
     if len(faces) == 0:
@@ -109,7 +109,7 @@ def validate_face_verify_image(face_app, image):
 
     crop = image[y1:y2, x1:x2]
 
-    check_image_quality(image, face)
+    check_image_quality(image, face, blur_threshold=blur_threshold)
 
     return {
         "face": face,
@@ -118,8 +118,8 @@ def validate_face_verify_image(face_app, image):
     }
 
 def validate_face_liveness_images(face_app, center_img, action_img, challenge):
-    center_face = validate_face_verify_image(face_app, center_img)
-    action_face = validate_face_verify_image(face_app, action_img)
+    center_face = validate_face_verify_image(face_app, center_img, blur_threshold=30)
+    action_face = validate_face_verify_image(face_app, action_img, blur_threshold=30)
 
     check_pose(center_face["face"], "center")
     check_pose(action_face["face"], challenge)
