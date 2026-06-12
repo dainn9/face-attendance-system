@@ -360,5 +360,35 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
 
             return studentIds.ToHashSet();
         }
+
+        public async Task<IReadOnlyList<StudentCourseSectionDto>> GetStudentActiveCourseSectionsAsync(Guid studentId, CancellationToken cancellationToken = default)
+        => await _context.CourseSections
+            .AsNoTracking()
+            .Where(cs => cs.IsActive && cs.Enrollments.Any(e => e.StudentId == studentId))
+            .Join(
+                _context.Subjects.AsNoTracking(),
+                cs => cs.SubjectId,
+                s => s.Id,
+                (cs, s) => new StudentCourseSectionDto(
+                    cs.Id,
+                    s.Name,
+                    s.Code,
+                    cs.CourseSectionCode,
+                    cs.LecturerId,
+                    cs.Semester,
+                    cs.AcademicYear,
+                    cs.Schedules
+                        .OrderBy(s => s.DayOfWeek)
+                        .ThenBy(s => s.StartTime)
+                        .Select(s => new ScheduleDto(
+                            s.DayOfWeek,
+                            s.StartTime,
+                            s.EndTime,
+                            s.Room
+                        ))
+                        .ToList()
+                )
+            )
+            .ToListAsync(cancellationToken);
     }
 }

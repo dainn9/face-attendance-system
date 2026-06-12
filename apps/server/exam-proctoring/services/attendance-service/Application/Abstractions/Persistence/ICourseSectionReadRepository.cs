@@ -54,5 +54,10 @@ namespace attendance_service.Application.Abstractions.Persistence
         Task<bool> IsStudentEnrolledAsync(Guid courseSectionId, Guid userId, CancellationToken cancellationToken = default);
         Task<Guid?> GetLecturerIdAsync(Guid courseSectionId, CancellationToken cancellationToken);
         Task<HashSet<Guid>> GetEnrollmentStudentIdsAsync(Guid courseSectionId, CancellationToken cancellationToken);
+
+        Task<IReadOnlyList<StudentCourseSectionDto>> GetStudentActiveCourseSectionsAsync(
+            Guid studentId,
+            CancellationToken cancellationToken = default
+        );
     }
 }

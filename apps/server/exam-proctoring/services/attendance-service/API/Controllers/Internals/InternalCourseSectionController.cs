@@ -6,6 +6,7 @@ using attendance_service.Application.Features.Attendances.Queries.GetStudentAtte
 using attendance_service.Application.Features.CourseSections.Commands.CreateCourseSection;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionDetail;
 using attendance_service.Application.Features.CourseSections.Queries.GetCourseSectionPaged;
+using attendance_service.Application.Features.CourseSections.Queries.GetStudentActiveCourseSections;
 using attendance_service.Application.Features.Enrollments.Commands.AddEnrollments;
 using attendance_service.Application.Features.Enrollments.Queries.GetEnrolledStudentIdsPaged;
 using BuildingBlocks.Results;
@@ -142,6 +143,21 @@ namespace attendance_service.API.Controllers.Internals
             {
                 Success = true,
                 Message = "Student attendance summaries retrieved successfully",
+                Data = result
+            });
+        }
+
+        // GET: api/v1/internal/course-sections/students/{studentId}/active-course-sections
+        [HttpGet("students/{studentId:guid}/active-course-sections")]
+        public async Task<IActionResult> GetStudentActiveCourseSections(Guid studentId, CancellationToken cancellationToken)
+        {
+            var query = new GetStudentActiveCourseSectionsQuery(studentId);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            return Ok(new ApiResponse<IReadOnlyList<StudentCourseSectionDto>>
+            {
+                Success = true,
+                Message = "Student active course sections retrieved successfully",
                 Data = result
             });
         }
