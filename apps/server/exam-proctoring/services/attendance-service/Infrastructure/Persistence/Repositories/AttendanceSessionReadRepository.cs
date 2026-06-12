@@ -199,5 +199,25 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                     )
                 )
                 .FirstOrDefaultAsync(cancellationToken);
+
+        public async Task<IReadOnlyList<StudentAttendanceRecordDto>> GetStudentAttendanceRecordsByCourseSectionIdAsync(
+            Guid studentId,
+            Guid courseSectionId,
+            CancellationToken cancellationToken = default)
+        => await _context.AttendanceSessions
+                .AsNoTracking()
+                .Where(s => s.CourseSectionId == courseSectionId)
+                .SelectMany(s => s.Records, (s, r) => new { s, r })
+                .Where(x => x.r.StudentId == studentId)
+                .OrderByDescending(x => x.s.Date)
+                .ThenByDescending(x => x.s.StartTime)
+                .Select(x => new StudentAttendanceRecordDto(
+                    x.s.Id,
+                    x.s.Date,
+                    x.s.StartTime,
+                    x.r.Status,
+                    x.r.Confidence,
+                    x.r.CheckedInAt
+                )).ToListAsync(cancellationToken);
     }
 }

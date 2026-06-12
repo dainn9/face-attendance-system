@@ -32,5 +32,11 @@ namespace attendance_service.Application.Abstractions.Persistence
             Guid attendanceSessionId,
             CancellationToken cancellationToken = default
         );
+
+        Task<IReadOnlyList<StudentAttendanceRecordDto>> GetStudentAttendanceRecordsByCourseSectionIdAsync(
+            Guid studentId,
+            Guid courseSectionId,
+            CancellationToken cancellationToken = default
+        );
     }
 }
