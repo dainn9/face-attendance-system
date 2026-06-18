@@ -31,7 +31,7 @@ namespace attendance_service.Application.Features.Attendances.Commands.CheckInAt
 
             var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
                 _clock.UtcNow,
-                "SE Asia Standard Time");
+                TimeZoneConstants.VietnamTimeZoneId);
 
             attendanceSession.CheckInStudent(request.StudentId, now, request.Confidence);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

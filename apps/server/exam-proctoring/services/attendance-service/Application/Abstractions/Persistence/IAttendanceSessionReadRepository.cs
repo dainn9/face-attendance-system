@@ -38,5 +38,9 @@ namespace attendance_service.Application.Abstractions.Persistence
             Guid courseSectionId,
             CancellationToken cancellationToken = default
         );
+
+        Task<IReadOnlyList<Guid>> GetExpiredOpenAttendanceSessionIdsAsync(
+            CancellationToken cancellationToken = default
+        );
     }
 }

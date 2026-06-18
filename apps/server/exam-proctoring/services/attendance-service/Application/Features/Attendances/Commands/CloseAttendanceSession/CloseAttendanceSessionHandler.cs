@@ -1,8 +1,10 @@
 using attendance_service.Application.Abstractions.Persistence;
+using attendance_service.Domain.Enums;
 using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Time;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace attendance_service.Application.Features.Attendances.Commands.CloseAttendanceSession
 {
@@ -36,11 +38,23 @@ namespace attendance_service.Application.Features.Attendances.Commands.CloseAtte
 
             var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
                 _clock.UtcNow,
-                "SE Asia Standard Time");
-            attendanceSession.Close(now);
-            attendanceSession.MarkAbsentStudents(studentIds, now);
+                TimeZoneConstants.VietnamTimeZoneId);
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            try
+            {
+
+                attendanceSession.Close(now);
+                attendanceSession.MarkAbsentStudents(studentIds, now);
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new BusinessRuleViolationException(
+                    "Attendance session was already closed by another process.",
+                    ErrorCodes.AttendanceSessionAlreadyClosed);
+            }
+
         }
     }
 }
