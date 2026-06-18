@@ -3,16 +3,21 @@ using attendance_service.Application.Contracts.AttendanceSession;
 using attendance_service.Domain.Enums;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Results;
+using BuildingBlocks.Time;
 using Microsoft.EntityFrameworkCore;
 
 namespace attendance_service.Infrastructure.Persistence.Repositories
 {
     public class AttendanceSessionReadRepository : IAttendanceSessionReadRepository
     {
+        private readonly IClock _clock;
         private readonly AttendanceDbContext _context;
 
-        public AttendanceSessionReadRepository(AttendanceDbContext context)
-        => _context = context;
+        public AttendanceSessionReadRepository(AttendanceDbContext context, IClock clock)
+        {
+            _context = context;
+            _clock = clock;
+        }
 
         public async Task<Dictionary<Guid, StudentAttendanceSummaryDto>> GetStudentAttendanceSummariesAsync(
             Guid courseSectionId,
@@ -219,5 +224,21 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                     x.r.Confidence,
                     x.r.CheckedInAt
                 )).ToListAsync(cancellationToken);
+
+        public async Task<IReadOnlyList<Guid>> GetExpiredOpenAttendanceSessionIdsAsync(CancellationToken cancellationToken = default)
+        {
+            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(_clock.UtcNow, TimeZoneConstants.VietnamTimeZoneId);
+            var currentDate = DateOnly.FromDateTime(now);
+            var currentTime = TimeOnly.FromDateTime(now);
+
+            return await _context.AttendanceSessions
+                .AsNoTracking()
+                .Where(s => s.Status == AttendanceSessionStatus.Open && (
+                    s.Date < currentDate ||
+                    (s.Date == currentDate && s.StartTime < currentTime)
+                ))
+                .Select(s => s.Id)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

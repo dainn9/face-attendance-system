@@ -44,6 +44,8 @@ namespace attendance_service.Infrastructure.Persistence.Configurations
                 a.HasIndex(x => new { x.AttendanceSessionId, x.StudentId })
                     .IsUnique();
             });
+
+            builder.Property(s => s.RowVersion).IsRowVersion();
         }
     }
 }

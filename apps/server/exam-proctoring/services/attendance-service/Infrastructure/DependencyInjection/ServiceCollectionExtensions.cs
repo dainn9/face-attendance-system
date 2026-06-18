@@ -1,4 +1,5 @@
 using attendance_service.Application.Abstractions.Persistence;
+using attendance_service.Infrastructure.BackgroundJobs;
 using attendance_service.Infrastructure.Persistence;
 using attendance_service.Infrastructure.Persistence.Repositories;
 using BuildingBlocks.Abstractions.Persistence;
@@ -46,6 +47,11 @@ namespace attendance_service.Infrastructure.DependencyInjection
             // Utilities
             // ==========================
             services.AddSingleton<IClock, SystemClock>();
+
+            // ==========================
+            // Background Jobs
+            // ==========================
+            services.AddHostedService<AttendanceSessionWorker>();
 
             return services;
         }

@@ -361,6 +361,19 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
             return studentIds.ToHashSet();
         }
 
+        public async Task<Dictionary<Guid, HashSet<Guid>>> GetEnrollmentStudentIdsAsync(IEnumerable<Guid> courseSectionIds, CancellationToken cancellationToken)
+        {
+            var pairs = await _context.CourseSections
+                .AsNoTracking()
+                .Where(cs => courseSectionIds.Contains(cs.Id))
+                .SelectMany(cs => cs.Enrollments, (cs, e) => new { cs.Id, e.StudentId })
+                .ToListAsync(cancellationToken);
+
+            return pairs
+                .GroupBy(p => p.Id)
+                .ToDictionary(g => g.Key, g => g.Select(p => p.StudentId).ToHashSet());
+        }
+
         public async Task<IReadOnlyList<StudentCourseSectionDto>> GetStudentActiveCourseSectionsAsync(Guid studentId, CancellationToken cancellationToken = default)
         => await _context.CourseSections
             .AsNoTracking()

@@ -43,7 +43,8 @@ namespace attendance_service.Application.Features.Attendances.Commands.CreateAtt
 
             var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
                 _clock.UtcNow,
-                "SE Asia Standard Time");
+                TimeZoneConstants.VietnamTimeZoneId);
+
             var currentTime = TimeOnly.FromDateTime(now);
             var today = now.DayOfWeek;
 
@@ -52,19 +53,20 @@ namespace attendance_service.Application.Features.Attendances.Commands.CreateAtt
                     "There is already an open attendance session for this course section.",
                     ErrorCodes.AttendanceSessionAlreadyOpen);
 
-            var hasValidScheduleNow = courseSection.Schedules.Any(s =>
-                s.DayOfWeek == today &&
-                s.StartTime <= currentTime &&
-                s.EndTime >= currentTime);
+            var hasValidScheduleNow = courseSection.Schedules.FirstOrDefault(s =>
+               s.DayOfWeek == today &&
+               s.StartTime <= currentTime &&
+               s.EndTime >= currentTime);
 
-            if (!hasValidScheduleNow)
+            if (hasValidScheduleNow == null)
                 throw new BusinessRuleViolationException(
                     "Cannot create attendance session outside the course section schedule.",
                     ErrorCodes.CourseSectionScheduleNotMatched);
 
             var attendanceSession = AttendanceSession.Create(
                 request.CourseSectionId,
-                now
+                now,
+                hasValidScheduleNow.EndTime
             );
 
             _attendanceSessionRepository.Add(attendanceSession);

@@ -16,5 +16,13 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
         => await _context.AttendanceSessions
             .Include(s => s.Records)
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+
+        public async Task<IReadOnlyList<AttendanceSession>> GetByIdsWithRecordsAsync(
+            IEnumerable<Guid> ids,
+            CancellationToken cancellationToken = default)
+        => await _context.AttendanceSessions
+            .Include(s => s.Records)
+            .Where(s => ids.Contains(s.Id))
+            .ToListAsync(cancellationToken);
     }
 }

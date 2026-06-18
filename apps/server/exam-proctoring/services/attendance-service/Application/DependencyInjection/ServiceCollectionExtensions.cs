@@ -1,3 +1,5 @@
+using attendance_service.Application.Abstractions.Services;
+using attendance_service.Application.Services;
 using BuildingBlocks.Behaviors;
 using FluentValidation;
 using MediatR;
@@ -20,6 +22,11 @@ namespace attendance_service.Application.DependencyInjection
             });
 
             services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
+
+            // ==========================
+            // Other services
+            // ==========================
+            services.AddScoped<IAttendanceService, AttendanceService>();
 
             return services;
         }
