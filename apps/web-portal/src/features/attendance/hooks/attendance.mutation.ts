@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 type CheckInAttendanceVariables = {
     attendanceSessionId: string;
     challenge: string;
-    centerImage: File;
-    challengeImage: File;
+    video: File;
 };
 
 export const useCloseAttendanceSession = () => {
@@ -57,14 +56,12 @@ export const useCheckInAttendance = () => {
         mutationFn: ({
             attendanceSessionId,
             challenge,
-            centerImage,
-            challengeImage,
+            video,
         }: CheckInAttendanceVariables) =>
             attendanceApi.checkInAttendance(
                 attendanceSessionId,
                 challenge,
-                centerImage,
-                challengeImage,
+                video,
             ),
         onSuccess: (_, { attendanceSessionId }) => {
             queryClient.invalidateQueries({
