@@ -53,6 +53,7 @@ namespace BuildingBlocks.Exceptions
         public const string StudentAlreadyEnrolled = "STUDENT_ALREADY_ENROLLED";
         public const string StudentNotEnrolled = "STUDENT_NOT_ENROLLED";
         public const string AttendanceSessionNotOpen = "ATTENDANCE_SESSION_NOT_OPEN";
+        public const string AttendanceSessionAlreadyClosed = "ATTENDANCE_SESSION_ALREADY_CLOSED";
 
         // ======= SUBJECT =======
         public const string SubjectCodeAlreadyExists = "SUBJECT_CODE_ALREADY_EXISTS";

@@ -15,9 +15,11 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
         private readonly List<AttendanceRecord> _records = new();
         public IReadOnlyCollection<AttendanceRecord> Records => _records.AsReadOnly();
 
+        public byte[] RowVersion { get; private set; }
+
         private AttendanceSession() { }
 
-        public static AttendanceSession Create(Guid courseSectionId, DateTime now)
+        public static AttendanceSession Create(Guid courseSectionId, DateTime now, TimeOnly endTime)
         {
             if (courseSectionId == Guid.Empty)
                 throw new BusinessRuleViolationException("Course section ID cannot be empty.", ErrorCodes.InvalidAttendanceSessionData);
@@ -36,12 +38,16 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
             // if (date == DateOnly.FromDateTime(now) && startTime < TimeOnly.FromDateTime(now))
             //     throw new BusinessRuleViolationException("Start time cannot be in the past.", ErrorCodes.InvalidAttendanceSessionData);
 
+            if (endTime <= TimeOnly.FromDateTime(now))
+                throw new BusinessRuleViolationException("End time must be in the future.", ErrorCodes.InvalidAttendanceSessionData);
+
             var attendanceSession = new AttendanceSession
             {
                 Id = Guid.NewGuid(),
                 CourseSectionId = courseSectionId,
                 Date = DateOnly.FromDateTime(now),
                 StartTime = TimeOnly.FromDateTime(now),
+                EndTime = endTime,
                 Status = AttendanceSessionStatus.Open
             };
 
@@ -69,7 +75,7 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
         public void CheckInStudent(Guid studentId, DateTime now, double confidence)
         {
             if (Status == AttendanceSessionStatus.Closed)
-                throw new BusinessRuleViolationException("Cannot check in to a closed attendance session.", ErrorCodes.InvalidAttendanceSessionData);
+                throw new BusinessRuleViolationException("Cannot check in to a closed attendance session.", ErrorCodes.AttendanceSessionAlreadyClosed);
 
             if (_records.Any(r => r.StudentId == studentId))
                 throw new BusinessRuleViolationException("Student has already checked in.", ErrorCodes.InvalidAttendanceSessionData);
