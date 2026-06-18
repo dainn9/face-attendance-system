@@ -60,8 +60,7 @@ namespace api_gateway.Clients
             form.Add(new StringContent(userId.ToString()), "user_id");
             form.Add(new StringContent(request.Challenge), "challenge");
 
-            AddFile(form, request.Center!, "center");
-            AddFile(form, request.ChallengeImage!, "action");
+            AddFile(form, request.Video!, "video");
 
             var response = await _httpClient.PostAsync("api/v1/internal/faces/verify-liveness", form, cancellationToken);
 
@@ -78,7 +77,11 @@ namespace api_gateway.Clients
             string fieldName)
         {
             var streamContent = new StreamContent(file.OpenReadStream());
-            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+            var mediaType = file.ContentType.Split(';')[0];
+            if (!mediaType.StartsWith("image/") && !mediaType.StartsWith("video/"))
+                throw new ArgumentException("Invalid media type");
+
+            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mediaType);
             form.Add(streamContent, fieldName, file.FileName);
         }
     }

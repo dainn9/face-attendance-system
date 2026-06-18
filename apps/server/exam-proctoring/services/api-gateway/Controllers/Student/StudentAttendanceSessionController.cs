@@ -34,13 +34,12 @@ namespace api_gateway.Controllers.Student
         {
             var studentId = User.GetUserId();
 
-            if (FileValidator.IsInvalidImage(request.Center) ||
-                FileValidator.IsInvalidImage(request.ChallengeImage))
+            if (FileValidator.IsInvalidVideo(request.Video))
             {
                 return BadRequest(new ApiResponse<object>
                 {
                     Success = false,
-                    Message = "Center and challenge images are required.",
+                    Message = "Video is required.",
                     ErrorCode = "INVALID_FACE_IMAGES"
                 });
             }
