@@ -8,5 +8,12 @@ namespace api_gateway.Helpers
                    file.Length == 0 ||
                    !file.ContentType.StartsWith("image/");
         }
+
+        public static bool IsInvalidVideo(IFormFile? file)
+        {
+            return file is null
+                   || file.Length == 0
+                   || !file.ContentType.StartsWith("video/");
+        }
     }
 }

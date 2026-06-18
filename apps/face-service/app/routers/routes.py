@@ -4,7 +4,8 @@ from app.core.face_app import face_app
 from app.core.exceptions import AppException
 from app.core.responses import success_response
 from app.schemas.face_schema import FaceIdentifyRequest
-from app.utils.face_validator import validate_face_liveness_images, validate_face_register_images, validate_face_verify_image
+from app.utils.face_utils import extract_frames
+from app.utils.face_validator import validate_face_continuity, validate_face_liveness_images, validate_face_register_images, validate_face_verify_image, validate_pose_sequence
 from app.utils.image import base64_to_image
 from app.services.recognition_service import RecognitionService
 from app.services.detector_service import detect_faces
@@ -93,42 +94,47 @@ async def get_face_status(
         data=isRegistered
     )
 
-@router.post("/verify")
-async def verify_face(
-    user_id: str = Form(...),
-    image: UploadFile = File(...),
-    _: None = Depends(verify_api_key)
-):
-    img = await read_upload_image(image)
-
-    face_crop = validate_face_verify_image(face_app, img)
-
-    result = svc.verify(
-        user_id=user_id,
-        img=face_crop["crop"]
-    )
-
-    return success_response(
-        message="Face verified completely",
-        data=result
-    )
 
 @router.post("/verify-liveness")
 async def verify_face_liveness(
     user_id: str = Form(...),
     challenge: str = Form(...),
-    center: UploadFile = File(...),
-    action: UploadFile = File(...),
+    video: UploadFile = File(...),
     _: None = Depends(verify_api_key)
 ):
-    img_center = await read_upload_image(center)
-    img_action = await read_upload_image(action)
 
-    face_center_crop = validate_face_liveness_images(face_app, img_center, img_action, challenge)
+    (
+        center_img,
+        action_img,
+        center_ratio,
+        action_ratio,
+        center_frame_idx,
+        action_frame_idx,
+        valid_frame_indices
+    ) = await extract_frames(
+        video,
+        challenge,
+        face_app,
+    )
+
+    validate_face_continuity(valid_frame_indices)
+
+    validate_pose_sequence(
+        center_ratio=center_ratio,
+        action_ratio=action_ratio,
+        center_frame_idx=center_frame_idx,
+        action_frame_idx=action_frame_idx,
+        challenge=challenge,
+    )
+
+    live_face_crop = validate_face_liveness_images(
+        face_app,
+        center_img, action_img,
+    )
 
     result = svc.verify(
         user_id=user_id,
-        img=face_center_crop
+        img=live_face_crop
     )
 
     return success_response(

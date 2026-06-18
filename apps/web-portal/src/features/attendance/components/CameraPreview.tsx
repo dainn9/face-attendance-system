@@ -21,6 +21,8 @@ type CameraPreviewProps = {
     countdown: number | null;
     errorMessage: string;
     hasCameraStream: boolean;
+    isFlashActive: boolean;
+    isRetryingCheckin: boolean;
     isStartingCamera: boolean;
     livenessDone: boolean;
     onBeginCapture: () => void;
@@ -51,6 +53,8 @@ const CameraPreview = ({
     countdown,
     errorMessage,
     hasCameraStream,
+    isFlashActive,
+    isRetryingCheckin,
     isStartingCamera,
     livenessDone,
     onBeginCapture,
@@ -127,6 +131,12 @@ const CameraPreview = ({
                                 </span>
                             </div>
                         )}
+
+                        <div
+                            className={`pointer-events-none absolute inset-0 bg-white transition-opacity duration-200 ${
+                                isFlashActive ? "opacity-90" : "opacity-0"
+                            }`}
+                        />
 
                         <div className="absolute bottom-4 left-4 right-4 rounded-lg bg-black/55 px-4 py-3 text-center text-sm font-medium text-white backdrop-blur">
                             {cameraInstruction}
@@ -240,9 +250,13 @@ const CameraPreview = ({
                             {stage === "error" && (
                                 <button
                                     type="button"
-                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
+                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:border-blue-100 disabled:text-blue-300 disabled:hover:bg-transparent"
+                                    disabled={isRetryingCheckin}
                                     onClick={onRetryCheckin}
                                 >
+                                    {isRetryingCheckin && (
+                                        <FaSpinner className="animate-spin" />
+                                    )}
                                     Thử lại
                                 </button>
                             )}

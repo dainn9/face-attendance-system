@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { Link, useSearchParams } from "react-router-dom";
 import AttendanceClosedView from "../components/AttendanceClosedView";
@@ -37,53 +37,33 @@ const getChallengeInstruction = (challenge?: string) => {
         normalizedChallenge.includes("left") ||
         normalizedChallenge.includes("trai")
     ) {
-        return "Quay mat sang trai";
+        return "Quay mặt sang trái";
     }
     if (
         normalizedChallenge.includes("right") ||
         normalizedChallenge.includes("phai")
     ) {
-        return "Quay mat sang phai";
+        return "Quay mặt sang phải";
     }
 
     return challenge;
 };
 
-const captureVideoFrame = (video: HTMLVideoElement | null, fileName: string) =>
-    new Promise<File | null>((resolve) => {
-        if (!video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
-            resolve(null);
-            return;
-        }
+const getSupportedVideoMimeType = () => {
+    if (typeof MediaRecorder === "undefined") return "";
 
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+    return (
+        [
+            "video/webm;codecs=vp9",
+            "video/webm;codecs=vp8",
+            "video/webm",
+            "video/mp4",
+        ].find((mimeType) => MediaRecorder.isTypeSupported(mimeType)) ?? ""
+    );
+};
 
-        const context = canvas.getContext("2d");
-        if (!context) {
-            resolve(null);
-            return;
-        }
-
-        context.save();
-        context.translate(canvas.width, 0);
-        context.scale(-1, 1);
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        context.restore();
-        canvas.toBlob(
-            (blob) => {
-                if (!blob) {
-                    resolve(null);
-                    return;
-                }
-
-                resolve(new File([blob], fileName, { type: "image/jpeg" }));
-            },
-            "image/jpeg",
-            0.92,
-        );
-    });
+const getVideoFileName = (mimeType: string) =>
+    mimeType.includes("mp4") ? "attendance-checkin.mp4" : "attendance-checkin.webm";
 
 const formatTimeToMinute = (time?: string | null) => {
     if (!time) return "--:--";
@@ -111,16 +91,20 @@ const StudentCheckinFacePage = () => {
     const [searchParams] = useSearchParams();
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
-    const centerImageRef = useRef<File | null>(null);
-    const challengeImageRef = useRef<File | null>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const recordedChunksRef = useRef<Blob[]>([]);
+    const recordedVideoRef = useRef<File | null>(null);
     const challengeRef = useRef<string | undefined>(undefined);
     const hasSubmittedCheckInRef = useRef(false);
+    const isRetryingCheckinRef = useRef(false);
     const [stage, setStage] = useState<CheckinStage>("ready");
     const [countdown, setCountdown] = useState<number | null>(null);
     const [errorMessage, setErrorMessage] = useState(errorMessages[0]);
     const [cameraError, setCameraError] = useState("");
+    const [isRetryingCheckin, setIsRetryingCheckin] = useState(false);
     const [isStartingCamera, setIsStartingCamera] = useState(false);
     const [hasCameraStream, setHasCameraStream] = useState(false);
+    const [isFlashActive, setIsFlashActive] = useState(false);
     const courseId = searchParams.get("courseId");
     const sessionId = searchParams.get("sessionId");
     const hasCheckinContext = !!courseId && !!sessionId;
@@ -195,6 +179,9 @@ const StudentCheckinFacePage = () => {
 
     useEffect(() => {
         return () => {
+            if (mediaRecorderRef.current?.state === "recording") {
+                mediaRecorderRef.current.stop();
+            }
             streamRef.current?.getTracks().forEach((track) => track.stop());
             streamRef.current = null;
         };
@@ -203,6 +190,9 @@ const StudentCheckinFacePage = () => {
     useEffect(() => {
         if (!isSessionClosed) return;
 
+        if (mediaRecorderRef.current?.state === "recording") {
+            mediaRecorderRef.current.stop();
+        }
         streamRef.current?.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
 
@@ -213,6 +203,76 @@ const StudentCheckinFacePage = () => {
 
         return () => window.clearTimeout(resetTimer);
     }, [isSessionClosed]);
+
+    const playFlash = useCallback(() =>
+        new Promise<void>((resolve) => {
+            setIsFlashActive(true);
+            window.setTimeout(() => {
+                setIsFlashActive(false);
+                resolve();
+            }, 220);
+        }), []);
+
+    const stopRecording = useCallback(() =>
+        new Promise<File | null>((resolve) => {
+            const recorder = mediaRecorderRef.current;
+
+            if (!recorder) {
+                resolve(null);
+                return;
+            }
+
+            const buildVideoFile = () => {
+                const mimeType = recorder.mimeType || "video/webm";
+                const blob = new Blob(recordedChunksRef.current, { type: mimeType });
+
+                if (blob.size === 0) return null;
+
+                return new File([blob], getVideoFileName(mimeType), {
+                    type: mimeType,
+                });
+            };
+
+            if (recorder.state === "inactive") {
+                resolve(buildVideoFile());
+                return;
+            }
+
+            recorder.onstop = () => {
+                resolve(buildVideoFile());
+            };
+            recorder.onerror = () => {
+                resolve(null);
+            };
+            recorder.stop();
+        }), []);
+
+    const finishRecording = useCallback(async () => {
+        await playFlash();
+
+        const video = await stopRecording();
+        if (!video) {
+            setErrorMessage("Không thể quay video điểm danh");
+            setStage("error");
+            return;
+        }
+
+        recordedVideoRef.current = video;
+        setStage("verifying");
+    }, [playFlash, stopRecording]);
+
+    const startRecording = useCallback(() => {
+        const recorder = mediaRecorderRef.current;
+
+        if (!recorder || recorder.state !== "inactive") {
+            setErrorMessage("Không thể quay video điểm danh");
+            setStage("error");
+            return false;
+        }
+
+        recorder.start();
+        return true;
+    }, []);
 
     useEffect(() => {
         if (stage !== "center-countdown" && stage !== "challenge-countdown")
@@ -225,37 +285,13 @@ const StudentCheckinFacePage = () => {
                     window.setTimeout(() => {
                         void (async () => {
                             if (stage === "center-countdown") {
-                                const centerImage = await captureVideoFrame(
-                                    videoRef.current,
-                                    "center.jpg",
-                                );
-
-                                if (!centerImage) {
-                                    setErrorMessage(
-                                        "Không thể chụp ảnh chính diện",
-                                    );
-                                    setStage("error");
-                                    return;
-                                }
-
-                                centerImageRef.current = centerImage;
+                                if (!startRecording()) return;
+                                await playFlash();
                                 setStage("center-captured");
                                 return;
                             }
 
-                            const challengeImage = await captureVideoFrame(
-                                videoRef.current,
-                                "challenge.jpg",
-                            );
-
-                            if (!challengeImage) {
-                                setErrorMessage("Không thể chụp ảnh thử thách");
-                                setStage("error");
-                                return;
-                            }
-
-                            challengeImageRef.current = challengeImage;
-                            setStage("verifying");
+                            await finishRecording();
                         })();
                     }, 250);
                     return null;
@@ -266,7 +302,7 @@ const StudentCheckinFacePage = () => {
         }, 800);
 
         return () => window.clearInterval(timer);
-    }, [stage]);
+    }, [finishRecording, playFlash, stage, startRecording]);
 
     useEffect(() => {
         if (stage !== "center-captured") return;
@@ -296,8 +332,8 @@ const StudentCheckinFacePage = () => {
                 if (errorTimer !== undefined) window.clearTimeout(errorTimer);
             };
         }
-        if (!centerImageRef.current || !challengeImageRef.current) {
-            setAsyncError("Thiếu ảnh điểm danh");
+        if (!recordedVideoRef.current) {
+            setAsyncError("Thiếu video điểm danh");
             return () => {
                 if (errorTimer !== undefined) window.clearTimeout(errorTimer);
             };
@@ -308,8 +344,7 @@ const StudentCheckinFacePage = () => {
             {
                 attendanceSessionId: sessionId,
                 challenge,
-                centerImage: centerImageRef.current,
-                challengeImage: challengeImageRef.current,
+                video: recordedVideoRef.current,
             },
             {
                 onSuccess: () => {
@@ -376,32 +411,65 @@ const StudentCheckinFacePage = () => {
             return;
         }
 
-        centerImageRef.current = null;
-        challengeImageRef.current = null;
+        const stream = streamRef.current;
+        if (!stream) {
+            setErrorMessage("Camera chưa sẵn sàng");
+            setStage("error");
+            return;
+        }
+
+        const mimeType = getSupportedVideoMimeType();
+        if (typeof MediaRecorder === "undefined" || !mimeType) {
+            setErrorMessage("Trình duyệt không hỗ trợ quay video điểm danh");
+            setStage("error");
+            return;
+        }
+
+        recordedChunksRef.current = [];
+        recordedVideoRef.current = null;
         hasSubmittedCheckInRef.current = false;
+        const recorder = new MediaRecorder(stream, { mimeType });
+        recorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                recordedChunksRef.current.push(event.data);
+            }
+        };
+        recorder.onerror = () => {
+            setErrorMessage("Không thể quay video điểm danh");
+            setStage("error");
+        };
+        mediaRecorderRef.current = recorder;
         setCountdown(3);
         setStage("center-countdown");
     };
 
     const retryCheckin = () => {
         if (!hasCameraStream) return;
+        if (isRetryingCheckinRef.current) return;
 
         void (async () => {
+            isRetryingCheckinRef.current = true;
+            setIsRetryingCheckin(true);
             setErrorMessage(
                 errorMessages[Math.floor(Math.random() * errorMessages.length)],
             );
 
-            const refreshedChallenge = await challengeQuery.refetch();
-            const nextChallenge = refreshedChallenge.data?.challenge;
-            challengeRef.current = nextChallenge;
+            try {
+                const refreshedChallenge = await challengeQuery.refetch();
+                const nextChallenge = refreshedChallenge.data?.challenge;
+                challengeRef.current = nextChallenge;
 
-            if (!nextChallenge) {
-                setErrorMessage("Đang tải thử thách điểm danh");
-                setStage("error");
-                return;
+                if (!nextChallenge) {
+                    setErrorMessage("Đang tải thử thách điểm danh");
+                    setStage("error");
+                    return;
+                }
+
+                beginCapture();
+            } finally {
+                isRetryingCheckinRef.current = false;
+                setIsRetryingCheckin(false);
             }
-
-            beginCapture();
         })();
     };
 
@@ -487,6 +555,8 @@ const StudentCheckinFacePage = () => {
             countdown={countdown}
             errorMessage={errorMessage}
             hasCameraStream={hasCameraStream}
+            isFlashActive={isFlashActive}
+            isRetryingCheckin={isRetryingCheckin}
             isStartingCamera={isStartingCamera}
             livenessDone={livenessDone}
             onBeginCapture={beginCapture}

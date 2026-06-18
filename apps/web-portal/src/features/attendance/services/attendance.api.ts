@@ -76,13 +76,11 @@ export const attendanceApi = {
     checkInAttendance: async (
         attendanceSessionId: string,
         challenge: string,
-        center_image: File,
-        challenge_image: File
+        video: File
     ) => {
         const formData = new FormData();
         formData.append("challenge", challenge);
-        formData.append("center", center_image);
-        formData.append("challengeImage", challenge_image);
+        formData.append("video", video);
 
         const res = await api.post<unknown, ApiResponse<void> | undefined | "">(
             API_ENDPOINTS.ATTENDANCE.CHECK_IN(attendanceSessionId),
