@@ -235,7 +235,7 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
                 .AsNoTracking()
                 .Where(s => s.Status == AttendanceSessionStatus.Open && (
                     s.Date < currentDate ||
-                    (s.Date == currentDate && s.StartTime < currentTime)
+                    (s.Date == currentDate && s.EndTime < currentTime)
                 ))
                 .Select(s => s.Id)
                 .ToListAsync(cancellationToken);

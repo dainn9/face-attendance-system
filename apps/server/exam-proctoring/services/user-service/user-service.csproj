@@ -24,4 +24,10 @@
     <ProjectReference Include="..\..\shared\SharedKernel\SharedKernel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\keys\public.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>keys\public.pem</Link>
+    </None>
+  </ItemGroup>
 </Project>

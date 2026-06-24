@@ -44,10 +44,15 @@ if (jwtSettings == null)
 if (string.IsNullOrWhiteSpace(jwtSettings.PublicKeyPath))
     throw new ConfigurationException("JWT public key path is missing.");
 
-if (!File.Exists(jwtSettings.PublicKeyPath))
-    throw new ConfigurationException($"JWT public key file not found: {jwtSettings.PublicKeyPath}");
+var publicKeyPath = Path.Combine(
+    AppContext.BaseDirectory,
+    jwtSettings.PublicKeyPath
+);
 
-var publicPem = await File.ReadAllTextAsync(jwtSettings.PublicKeyPath);
+if (!File.Exists(publicKeyPath))
+    throw new ConfigurationException($"JWT public key file not found: {publicKeyPath}");
+
+var publicPem = await File.ReadAllTextAsync(publicKeyPath);
 using var rsa = RSA.Create();
 rsa.ImportFromPem(publicPem);
 

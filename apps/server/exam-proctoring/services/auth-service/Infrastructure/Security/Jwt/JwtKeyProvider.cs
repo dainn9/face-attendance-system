@@ -14,16 +14,11 @@ namespace auth_service.Infrastructure.Security.Jwt
         {
             _options = options.Value;
 
-            var privatePath = _options.PrivateKeyPath;
+            var privatePath = Path.Combine(AppContext.BaseDirectory, _options.PrivateKeyPath);
             var privatePem = File.ReadAllText(privatePath);
 
             _rsa = RSA.Create();
             _rsa.ImportFromPem(privatePem);
-        }
-
-        public RsaSecurityKey GetPublicKey()
-        {
-            return new RsaSecurityKey(_rsa.ExportParameters(false));
         }
 
         public SigningCredentials GetSigningCredentials()
