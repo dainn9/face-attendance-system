@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+**/.venv/
+.venv/
+
+# Build artifacts
+**/bin/
+**/obj/
+**/node_modules/
+**/.vite/
+dist/
+build/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Git
+.git/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Data (QUAN TRỌNG)
+data/
+datasets/
+uploads/
+**/*.mp4
+**/*.jpg
+**/*.jpeg
+**/*.png
+
+# Test
+tests/
+*_test.py
+
+# Docker (optional)
+docker-compose*.yml

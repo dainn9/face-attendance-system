@@ -1,5 +1,4 @@
 using attendance_service.Application.Abstractions.Persistence;
-using attendance_service.Domain.Enums;
 using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Time;
@@ -35,14 +34,10 @@ namespace attendance_service.Application.Features.Attendances.Commands.CloseAtte
                 throw new ForbiddenException("You are not authorized to close this attendance session.");
 
             var studentIds = await _courseSectionReadRepository.GetEnrollmentStudentIdsAsync(attendanceSession.CourseSectionId, cancellationToken);
-
-            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
-                _clock.UtcNow,
-                TimeZoneConstants.VietnamTimeZoneId);
+            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, TimeZoneConstants.Vietnam);
 
             try
             {
-
                 attendanceSession.Close(now);
                 attendanceSession.MarkAbsentStudents(studentIds, now);
 

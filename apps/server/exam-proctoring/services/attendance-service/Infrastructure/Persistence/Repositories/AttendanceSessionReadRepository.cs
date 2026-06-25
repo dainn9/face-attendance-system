@@ -227,7 +227,8 @@ namespace attendance_service.Infrastructure.Persistence.Repositories
 
         public async Task<IReadOnlyList<Guid>> GetExpiredOpenAttendanceSessionIdsAsync(CancellationToken cancellationToken = default)
         {
-            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(_clock.UtcNow, TimeZoneConstants.VietnamTimeZoneId);
+            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, TimeZoneConstants.Vietnam);
+
             var currentDate = DateOnly.FromDateTime(now);
             var currentTime = TimeOnly.FromDateTime(now);
 

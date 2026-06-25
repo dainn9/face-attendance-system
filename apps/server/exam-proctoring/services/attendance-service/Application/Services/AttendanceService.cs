@@ -48,7 +48,7 @@ namespace attendance_service.Application.Services
             var enrollmentMap = await _courseSectionReadRepository
                 .GetEnrollmentStudentIdsAsync(courseSectionIds, cancellationToken);
 
-            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(_clock.UtcNow, TimeZoneConstants.VietnamTimeZoneId);
+            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, TimeZoneConstants.Vietnam);
 
             foreach (var session in sessions)
             {
