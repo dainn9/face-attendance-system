@@ -29,9 +29,7 @@ namespace attendance_service.Application.Features.Attendances.Commands.CheckInAt
             if (!await _courseSectionReadRepository.IsStudentEnrolledAsync(attendanceSession.CourseSectionId, request.StudentId, cancellationToken))
                 throw new ForbiddenException("Student is not enrolled in this course section.");
 
-            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
-                _clock.UtcNow,
-                TimeZoneConstants.VietnamTimeZoneId);
+            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, TimeZoneConstants.Vietnam);
 
             attendanceSession.CheckInStudent(request.StudentId, now, request.Confidence);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

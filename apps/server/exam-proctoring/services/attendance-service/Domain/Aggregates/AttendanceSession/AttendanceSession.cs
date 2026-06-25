@@ -61,12 +61,13 @@ namespace attendance_service.Domain.Aggregates.AttendanceSession
             if (Status == AttendanceSessionStatus.Closed)
                 throw new BusinessRuleViolationException("Attendance session is already closed.", ErrorCodes.InvalidAttendanceSessionData);
 
-            var endTime = TimeOnly.FromDateTime(now);
+            var startDateTime = Date.ToDateTime(StartTime);
+            var endDateTime = now;
 
-            if (endTime <= StartTime)
+            if (endDateTime <= startDateTime)
                 throw new BusinessRuleViolationException("End time must be after start time.", ErrorCodes.InvalidAttendanceSessionData);
 
-            EndTime = endTime;
+            EndTime = TimeOnly.FromDateTime(endDateTime);
             Status = AttendanceSessionStatus.Closed;
 
             SetUpdated(now);

@@ -41,9 +41,7 @@ namespace attendance_service.Application.Features.Attendances.Commands.CreateAtt
                     ErrorCodes.CourseSectionHasNoEnrollments
                 );
 
-            var now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(
-                _clock.UtcNow,
-                TimeZoneConstants.VietnamTimeZoneId);
+            var now = TimeZoneInfo.ConvertTime(_clock.UtcNow, TimeZoneConstants.Vietnam);
 
             var currentTime = TimeOnly.FromDateTime(now);
             var today = now.DayOfWeek;
